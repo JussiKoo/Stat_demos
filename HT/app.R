@@ -1,30 +1,32 @@
+library(ggplot2)
+
 ui <- fluidPage(
   
-  titlePanel("Suurimman uskottavuuden estimointi"),
+  titlePanel("Estimation of maximum likelihood"),
   
   sidebarLayout(
     
     sidebarPanel(
       
-      radioButtons(inputId = "model", h3("Choose the model"), 
-                   choices = list("Poisson" = 1, "Normal" = 2, "Exponential"=3), selected = 1),
-      
-      actionButton(inputId = "eval", label="Plot"),
-      
-      numericInput(
-        "num", h3("Maximum size"), value = 100
+      #Radio buttons to choose the model
+      radioButtons(inputId = "model", h3("Choose the distribution"), 
+        choices = list("Poisson" = 1, "Normal" = 2, "Exponent"=3, "Geometric"=4), selected = 1
       ),
       
-      numericInput(
-        "theta", h3("Theta"), value = 1, min = 1
-      )
+      #Slider input to choose the max sample size
+      sliderInput(
+        inputId = "n", h3("Choose sample size"), value = 100, min=1, max=10000
+      ),
+      
+      #Slider to choose the value of the model parameter. 
+      #sliderInput(
+      #  inputId = "theta", h3("Choose the value for estimated parameter"), value = 1, min = 1, max=10
+      #),
+      
+      uiOutput("thetaSlider")
     ),
       
-      
-      
-      
-    
-    mainPanel(
+      mainPanel(
       plotOutput("plot")
     )
   )
@@ -33,30 +35,66 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
-  output$plot <- renderPlot({
-    #simulate random numbers from chosen distribution
-    
-    theta <- input$theta
-    
-    if (input$model == 1 ) 
+  output$thetaSlider <- renderUI({
+    minval <- 0
+    maxval <- 0
+    if (input$model == 1 || input$model == 3) 
     {
-      x <- rpois(input$num, lambda=theta)
-      mle <- cumsum(x)/1:input$num
+      minval <- 0.1
+      maxval <- 10
     }
     else if (input$model == 2 ) 
     {
-      x <- rnorm(input$num, mean=theta, sd=1)
-      mle <- cumsum(x)/1:input$num
+      minval <- -10
+      maxval <- 10
+    }
+    else if (input$model == 4 ) 
+    {
+      minval <- 0.01
+      maxval <- 0.99
+    }
+    
+    sliderInput("theta", "Theta", min=minval, max=maxval, value=minval)
+  })
+  
+  output$plot <- renderPlot({
+    
+    theta <- input$theta
+    
+    #Generate random numbers from chosen distribution with chosen parameter and
+    #evaluate mle's from all different sample sizesfrom 1 to chosen max sample
+    #size.
+    if (input$model == 1 ) 
+    {
+      x <- rpois(input$n, lambda=theta)
+      mle <- cumsum(x)/1:input$n
+      
+    }
+    else if (input$model == 2 ) 
+    {
+      x <- rnorm(input$n, mean=theta, sd=1)
+      mle <- cumsum(x)/1:input$n
     }
     else if (input$model == 3 ) 
     {
-      x <- rexp(input$num, rate=theta)
-      mle <- 1:input$num/cumsum(x)
+      x <- rexp(input$n, rate=theta)
+      mle <- 1:input$n/cumsum(x)
+    }
+    else if (input$model == 4 ) 
+    {
+      x <- rgeom(input$n, prob=theta)
+      mle <- 1/(1+cumsum(x)/(1:input$n))
     }
     
+    estimates <- data.frame(sampleSize = 1:input$n, MLE = mle)
     
-    plot(1:input$num, mle)
-    abline(a=theta, b=0)
+    #plot(1:input$n, mle)
+    #Plot the mle's against sample sizes and also the real value of
+    #model parameter.
+    ggplot(data=estimates, aes(x=sampleSize,y=MLE))+
+    geom_point(color="blue")+
+    geom_line(aes(y=theta), col="red")
+    #abline(a=theta, b=0, col=2)
   
   })
   
