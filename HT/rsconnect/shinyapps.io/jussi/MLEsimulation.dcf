@@ -1,0 +1,12 @@
+name: MLEsimulation
+title: MLEsimulation
+username: jussi
+account: jussi
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10704357
+bundleId: 8001596
+url: https://jussi.shinyapps.io/MLEsimulation/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
