@@ -38,8 +38,9 @@ library(mnormt)
 mu <- c(2,2,1,1)
 
 cov <- cbind(c(2,1.6,0.4,0.4),c(1.6,2,0.4,0.4),c(0.4,0.4,1,0.8),c(0.4,0.4,0.8,1))
+S <- 6*cov/8
 
-x <- rmt(n = 10000, mean = mu, S = cov, df = 8)
+x <- rmt(n = 10000, mean = mu, S = S, df = 8)
 y <- rep(NA, 10000)
 
 for (i in 1:10000) 
@@ -47,7 +48,7 @@ for (i in 1:10000)
   y[i] <- ((x[i,][1] + x[i,][2])^2) / (1 + abs(x[i,][3]) + abs(x[i,][4]))
 }
 
-nsim <- 1000
+nsim <- 10000
 means <- rep(NA, nsim)
 
 #a
@@ -66,7 +67,7 @@ sd(means)
 #x edelleen otos t-jakautuneista satunnaisvektoreista.
 #Oletetaan, että x on normaalijakautunut.
 
-#Määritetään ensin estimoitu odotuarvovektori suurimman uskottavuuden 
+#Määritetään ensin estimoitu odotusarvovektori suurimman uskottavuuden 
 #menetelmällä
 muhat <- c(mean(x[,1]), mean(x[,2]), mean(x[,3]), mean(x[,4]))
 
@@ -159,7 +160,24 @@ Hdist <- function(n, theta, nsim)
 
 #Testausta
 
-Hdist(100, 0.1, 10000)
+Hdist(100, 0.4, 10000)
+
+simH <- function(n, theta, m) {
+  H <- rep(NA,m)
+  for(j in 1:m) {
+    x <- 1 + rgeom(n,theta)
+    xtable <- table(x)
+    xtable <- xtable[xtable == 1] # arvattu kerran
+    if(length(xtable) > 0) {
+      # pienin kerran arvattu
+      H[j] <- min(as.numeric(names(xtable)))
+    }
+  }
+  return(H)
+}
+simu <- simH(100,0.1,10000)
+table(simu)
+
 
 ################################################################################
 
