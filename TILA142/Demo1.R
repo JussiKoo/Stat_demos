@@ -19,15 +19,17 @@ optim(par=initial_parameters, fn=neglogL, data=pitoisuudet, method="Nelder-Mead"
 #==========================================================================================
 #T5
 
-data <- read.csv("C:\\kurssit\\TILA142\\mittalaite.csv")
+data <- read.csv("C:\\kurssit\\stat_demos\\TILA142\\mittalaite.csv")
 
 #Pitoisuudet x, mittaustulokset y
 
+#Negatiivinen log-uskottavuus
 neglogL <- function(par, data){
   a <- par[1]
   b <- par[2]
   sigma <- par[3]
   
+  #Erotellaan rajan yli menneet havainnot
   data1 <- data[data$ylirajan==0,]
   data2 <- data[data$ylirajan==1,]
   
@@ -38,23 +40,27 @@ neglogL <- function(par, data){
   }
   
   v2 <- c()
-
+  
   for (i in 1:length(data2)){
-    v2 <- append(v2, log(1-pnorm(80, a+b*data2$x[i], sigma, log=TRUE)))
+    v2 <- append(v2, log(1-pnorm(80, a+b*data2$x[i], sigma, log=FALSE)))
   }
   
   
-  neg_log_likelihood <- -sum(v1) - sum(v2)
-  #Tässä korjaa tuo a+b*data1$x, pitää olla yksi arvo?
-  return(neg_log_likelihood)
+  logL <- sum(v1) + sum(v2)
+  return(-logL)
 }
 
-plot(data$x, data$y)
-abline(a=-167, b=3.6)
+initial_parameters <- c(-16,3.6,12)
 
-initial_parameters <- c(25, 0.6, 5)
+result <- optim(par=initial_parameters, fn=neglogL, data=data, method="Nelder-Mead")
 
-optim(par=initial_parameters, fn=neglogL, data=data, method="Nelder-Mead")
+ahat <- result$par[1]
+bhat <- result$par[2]
+sigmahat <- result$par[3]
+
+ahat
+bhat
+sigmahat
 
 
 
