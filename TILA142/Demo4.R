@@ -46,7 +46,7 @@ p.values <- numeric(m)
 #a
 
 for (i in 1:m){
-  p.values[i] <- 2*(1-pnorm(z[i], mean = 0, sd = 1))
+  p.values[i] <- 1-pnorm(abs(z[i]), mean = 0, sd = 1)
   
   reject[i] <- p.values[i]*m < alpha
 }
@@ -69,7 +69,7 @@ i
 
 #T3
 
-priori <- 0.1
+priori <- 0.01
 
 ptautipos <- (0.85*priori)/(0.85*priori + 0.04*(1-priori))
 
