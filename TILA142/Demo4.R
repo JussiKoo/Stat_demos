@@ -46,7 +46,7 @@ p.values <- numeric(m)
 #a
 
 for (i in 1:m){
-  p.values[i] <- 1-pnorm(z[i], mean = 0, sd = 1)
+  p.values[i] <- 2*(1-pnorm(z[i], mean = 0, sd = 1))
   
   reject[i] <- p.values[i]*m < alpha
 }
@@ -67,6 +67,8 @@ i
 
 #================
 
+#T3
+
 priori <- 0.1
 
 ptautipos <- (0.85*priori)/(0.85*priori + 0.04*(1-priori))
@@ -74,6 +76,61 @@ ptautipos <- (0.85*priori)/(0.85*priori + 0.04*(1-priori))
 ptautineg <- (0.15*priori)/(0.15*priori + 0.96*(1-priori))
 
 100*ptautipos+900*ptautineg
+
+#=========================
+
+#T4
+
+set.seed(20190109)
+x <- rexp(45, rate = 1.6)
+
+thetahat <- length(x)/sum(x)
+thetanull <- 1.2
+
+L <- function(theta, data){
+  n <- length(data)
+  
+  return(theta^n*exp(-theta*sum(data)))
+}
+
+dl <- function(theta, data){
+  n <- length(data)
+  
+  return(n/theta - sum(data))
+}
+
+#a Uskottavuusosamäärän testi
+
+LR <- L(thetanull, x)/L(thetahat, x)
+
+D <- -2*log(LR)
+
+p1 <- 1-pchisq(D, df=1)
+
+#b Waldin testi
+
+ZW <- (thetahat-thetanull)/sd(x)
+
+p2 <- 2*(1-pnorm(ZW,0,1))
+
+#c Raon skooritesti
+
+ddl <- function(theta, data){
+  n <- length(data)
+  
+  return(-n/theta^2)
+}
+
+ZR <- dl(thetanull, x)/sqrt(-ddl(thetanull, x))
+
+p3 <- 2*(1 - pnorm(ZR,0,1))
+
+cat("Uskottavuusosamäärän testi: ", p1)
+cat("Waldin testi: ", p2)
+cat("Raon skooritesti: ", p3)
+
+
+
 
 
 
