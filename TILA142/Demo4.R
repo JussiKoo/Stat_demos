@@ -19,7 +19,11 @@ tn2 <- 1 - (1-0.05/m)^m
 plot(1:100, tn1)
 points(1:100, tn2, col="red")
 
+#===============================================================================
+
 #T2
+
+#===============================================================================
 
 #Testisuure Z_k
 #Nollahypoteesin vallitessa noudattaa N(0,1)
@@ -51,7 +55,7 @@ for (i in 1:m){
   reject[i] <- p.values[i]*m < alpha
 }
 
-sum(reject)/m
+sum(reject)
 
 #b
 
@@ -125,9 +129,27 @@ ZR <- dl(thetanull, x)/sqrt(-ddl(thetanull, x))
 
 p3 <- 2*(1 - pnorm(ZR,0,1))
 
-cat("Uskottavuusosamäärän testi: ", p1)
-cat("Waldin testi: ", p2)
-cat("Raon skooritesti: ", p3)
+cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skooritesti: ", p3)
+
+#T5
+
+#Testisuure D
+simn <- 1000000
+simD <- rep(NA,simn)
+simZW <- rep(NA,simn)
+simZR <- rep(NA,simn)
+for(i in 1:simn)
+{
+  x <- rexp(45, rate=1.6)
+  
+  simD[i] <- -2*log(L(thetanull, x)/L(thetahat, x))
+  simZW[i] <- 2*(1-pnorm((thetahat-thetanull)/sd(x),0,1))
+  simZR[i] <- 2*(1 - pnorm(dl(thetanull, x)/sqrt(-ddl(thetanull, x)),0,1))
+}  
+
+sum(D < simD)/simn
+sum(ZW < simZW)/simn #korjaa
+sum(ZR < simZR)/simn #korjaa
 
 
 
