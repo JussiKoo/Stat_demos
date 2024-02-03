@@ -113,7 +113,7 @@ p1 <- 1-pchisq(D, df=1)
 
 #b Waldin testi
 
-ZW <- (thetahat-thetanull)/sd(x)
+ZW <- (thetahat-thetanull)/(sd(x)/length(x))
 
 p2 <- 2*(1-pnorm(ZW,0,1))
 
@@ -143,17 +143,26 @@ for(i in 1:simn)
   x <- rexp(45, rate=1.6)
   
   simD[i] <- -2*log(L(thetanull, x)/L(thetahat, x))
-  simZW[i] <- 2*(1-pnorm((thetahat-thetanull)/sd(x),0,1))
+  simZW[i] <- 2*(1-pnorm((thetahat-thetanull)/(sd(x)/sqrt(length(x))),0,1))
   simZR[i] <- 2*(1 - pnorm(dl(thetanull, x)/sqrt(-ddl(thetanull, x)),0,1))
 }  
 
 sum(D < simD)/simn
-sum(ZW < simZW)/simn #korjaa
-sum(ZR < simZR)/simn #korjaa
+2*sum(ZW < simZW)/simn #korjaa
+2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn) #korjaa
 
+cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skooritesti: ", p3)
 
+#T6
 
+simn <- 100000
 
+simthetahat <- rep(NA,simn)
 
+for(i in 1:simn){
+  simthetahat[i] <- 45/rgamma(1, 45, 1.2)
+}
+
+sum(simthetahat > thetahat)/simn
 
 
