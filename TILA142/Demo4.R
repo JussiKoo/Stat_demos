@@ -113,7 +113,7 @@ p1 <- 1-pchisq(D, df=1)
 
 #b Waldin testi
 
-ZW <- (thetahat-thetanull)/(sd(x)/length(x))
+ZW <- (thetahat-thetanull)/(sd(x)/sqrt(length(x)))
 
 p2 <- 2*(1-pnorm(ZW,0,1))
 
@@ -133,8 +133,7 @@ cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skoor
 
 #T5
 
-#Testisuure D
-simn <- 1000000
+simn <- 10000
 simD <- rep(NA,simn)
 simZW <- rep(NA,simn)
 simZR <- rep(NA,simn)
@@ -148,8 +147,8 @@ for(i in 1:simn)
 }  
 
 sum(D < simD)/simn
-2*sum(ZW < simZW)/simn #korjaa
-2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn) #korjaa
+2*sum(ZW < simZW)/simn 
+2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn) 
 
 cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skooritesti: ", p3)
 
@@ -163,6 +162,7 @@ for(i in 1:simn){
   simthetahat[i] <- 45/rgamma(1, 45, 1.2)
 }
 
+#Lasketaan moniko simuloitu estimaatti on suurempi kuin alkuperäinen.
 sum(simthetahat > thetahat)/simn
 
 
