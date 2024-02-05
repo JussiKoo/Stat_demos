@@ -139,16 +139,17 @@ simZW <- rep(NA,simn)
 simZR <- rep(NA,simn)
 for(i in 1:simn)
 {
-  x <- rexp(45, rate=1.6)
+  xsim <- rexp(45, rate=1.2)
+  thetahatsim <- length(x)/sum(x)
   
-  simD[i] <- -2*log(L(thetanull, x)/L(thetahat, x))
-  simZW[i] <- 2*(1-pnorm((thetahat-thetanull)/(sd(x)/sqrt(length(x))),0,1))
-  simZR[i] <- 2*(1 - pnorm(dl(thetanull, x)/sqrt(-ddl(thetanull, x)),0,1))
+  simD[i] <- -2*log(L(thetanull, xsim)/L(thetahatsim, xsim))
+  simZW[i] <- (thetahatsim-thetanull)/(sd(xsim)/sqrt(length(xsim)))
+  simZR[i] <- dl(thetanull, xsim)/sqrt(-ddl(thetanull, xsim))
 }  
 
 sum(D < simD)/simn
 2*sum(ZW < simZW)/simn 
-2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn) 
+2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn)
 
 cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skooritesti: ", p3)
 
