@@ -35,7 +35,7 @@ points(1:100, tn2, col="red")
 set.seed(2019)
 
 m <- 100000
-alpha <- 0.05
+alpha <- 0.025
 
 z1 <- rnorm(99900,0,1)
 z2 <- rnorm(100,3,1)
@@ -113,7 +113,7 @@ p1 <- 1-pchisq(D, df=1)
 
 #b Waldin testi
 
-ZW <- (thetahat-thetanull)/(sd(x)/sqrt(length(x)))
+ZW <- (thetahat-thetanull)/(thetahat/sqrt(length(x)))
 
 p2 <- 2*(1-pnorm(ZW,0,1))
 
@@ -143,13 +143,13 @@ for(i in 1:simn)
   thetahatsim <- length(x)/sum(x)
   
   simD[i] <- -2*log(L(thetanull, xsim)/L(thetahatsim, xsim))
-  simZW[i] <- (thetahatsim-thetanull)/(sd(xsim)/sqrt(length(xsim)))
+  simZW[i] <- (thetahatsim-thetanull)/(thetahatsim/sqrt(length(x)))
   simZR[i] <- dl(thetanull, xsim)/sqrt(-ddl(thetanull, xsim))
 }  
 
 sum(D < simD)/simn
 2*sum(ZW < simZW)/simn 
-2*min(sum(ZR < simZR)/simn, sum(ZR > simZR)/simn)
+2*sum(ZR < simZR)/simn
 
 cat("Uskottavuusosamäärän testi: ", p1, "\nWaldin testi: ", p2, "\nRaon skooritesti: ", p3)
 
@@ -160,10 +160,26 @@ simn <- 100000
 simthetahat <- rep(NA,simn)
 
 for(i in 1:simn){
-  simthetahat[i] <- 45/rgamma(1, 45, 1.2)
+  simthetahat[i] <- 45/rgamma(1, shape=45, rate=1.2)
 }
 
 #Lasketaan moniko simuloitu estimaatti on suurempi kuin alkuperäinen.
 sum(simthetahat > thetahat)/simn
+
+#=====================================
+
+library(metafor)
+
+dat2 <- escalc(measure="SMD",
+               m1i=c(16,44,0.134,2.8),
+               sd1i=c(0.1,0.1,0.1,2.4),
+               m2i=c(1,224,0.138,3.2),
+               sd2i=c(0.1,0.1,0.1,2.1),
+               n1i=c(16,44,72,28),
+               n2i=c(1,224,1,32))
+
+fem2 <- rma(dat2$yi, dat2$vi, weights = c(0.119, 0.02, 0.43, 0.431), data = dat2, method = "FE")
+summary(fem2)
+forest(fem2)
 
 

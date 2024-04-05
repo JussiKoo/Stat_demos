@@ -24,7 +24,6 @@ plot(mixm, "density", col ="red")
 lines(density(x,bw="SJ"))
 lines(xs,dnorm(xs,mean(xs),sd(xs)), col="blue")
 
-#==================================================
 #T6
 
 set.seed(20190204)

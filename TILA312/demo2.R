@@ -83,7 +83,6 @@ F_test <- function(K, X, beta, m, sigma)
   F <- t(t(K) %*% beta - m) %*% C %*% (t(K) %*% beta - m) / (q * sigma)
   p_val <- 1 - pf(F, q, n - p - 1)
   list(F = F, p_val = p_val)
-
 }
 
 #a
@@ -97,7 +96,7 @@ K <- cbind(c(0,1,0,0,0,0,0),
 
 m <- c(0,0,0,0,0,0)
 
-F_test(K, X, betahat, m, sigma2hat)
+F_test(K, X, betahat, m, sigmahat^2)
 
 #b
 
@@ -107,9 +106,61 @@ K <- cbind(c(0,0,0,0,1,0,0),
 
 m <- c(0,0,0)
 
-F_test(K, X, betahat, m, sigma2hat)
+F_test(K, X, betahat, m, sigmahat^2)
 
 #c
 
+K <- cbind(c(0,0,0,0,1,0,-1))
 
+m <- c(0)
 
+F_test(K, X, betahat, m, sigmahat^2)
+
+#===============================================================================
+
+#Task 2.9
+
+set.seed(1)
+n <- 1000
+x1 <- runif(n, -1, 1) #random numbers from uniform distribution
+x2 <- rnorm(n, 3, 1.5) #random numbers from normal distribution
+x3 <- gl(4,n/4) #factors
+x4 <- gl(2, n/2)
+x4 <- sample(x4)
+x5 <- rt(n, df=3)
+x6 <- runif(n,1,4)
+x7 <- rnorm(n, 1, 5)
+beta1 <- c(2,0.1,0.5,1,0.5,1, -0.5,1.3)
+beta2 <- c(2,0.1,0.5)
+beta3 <- c(2,0.1,0.5,0.75)
+
+MM1 <- model.matrix(~x1+x2+x3+x4+x5)
+MM2 <- model.matrix(~x1+x2)
+MM3 <- model.matrix(~x1+x2+I(x2^2))
+head(MM1)
+head(MM2)
+head(MM3)
+eps1 <- rnorm(n)
+eps2 <- rnorm(n, 0, x6)
+y1 <- MM1 %*% beta1 + eps1
+y2 <- exp(MM2 %*% beta2 + eps1)/10
+y3 <- MM2 %*% beta2 + eps2
+y4 <- MM2 %*% beta2 + eps1
+y5 <- MM3 %*% beta3 + eps1
+y6 <- MM2 %*% beta2 + 1.5*eps1
+y7 <- MM2 %*% beta2 + 2.5*eps1
+y8 <- MM2 %*% beta2 + 0.5*eps1
+DF <- data.frame(y1, y2, y3, y4, y5, y6, y7, y8, x1, x2, x3, x4, x5, x6, x7)
+summary(DF)
+lm1 <- lm(y1 ~ x1 + x2 + x3 + x4 + x5, data=DF)
+lm2 <- lm(y1 ~ x1 + x2 + x3 + x4, data=DF)
+lm3 <- lm(y1 ~ x1 + x2 + x3 + x5 + x7, data=DF)
+lm4 <- lm(y2 ~ x1 + x2 , data=DF)
+lm5 <- lm(log(y2) ~ x1 + x2 , data=DF)
+lm6 <- lm(y3 ~ x1 + x2 , data=DF)
+lm7 <- lm(y4 ~ x1 + x2 , data=DF)
+lm8 <- lm(y5 ~ x1 + x2 , data=DF)
+lm9 <- lm(y5 ~ x1 + x2 + I(x2^2) , data=DF)
+lm10 <- lm(y6 ~ x1 + x2 , data=DF)
+lm11 <- lm(y7 ~ x1 + x2 , data=DF)
+lm12 <- lm(y8 ~ x1 + x2 , data=DF)
