@@ -4,29 +4,34 @@ author: "Jussi Kauppinen"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
-data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAXklEQVR42mNgAIL///8zMYSGhjIDGYIMIiIMvECGMwMDN4M4kFEDUqIIZKwDMdSBjAsghj6Q8QPEMAAy/lOBoQekv4AYKkDGfgZeXl4RICOLQUtLiw3IUAJJMQIZ7AC2tU2tXJxOYgAAAABJRU5ErkJggg==
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Excercise 4
+## Task 3.4
 
-```{r cars}
-#a
 
+```{r include=FALSE}
 library(nlme)
 library(dplyr)
 library(tidyr)
+library(lattice)
+```
 
+
+```{r }
+#a
 orth <- Orthodont
 head(orth)
 
-#Orthodont contains data of change in orthodontic measurement over time for several young subjects. One row contains a distance measurement, age, Subject and Sex.
+#Orthodont contains data of change in orthodontic measurement over time for several young subjects. 
+#One row contains a distance measurement, age, Subject and Sex.
 
 #b
 
 #How many subjects dataset contains
 subjectcount <- n_distinct(orth$Subject)
+subjectcount
 
 #How many measurements there are per subject
 nrow(orth)/subjectcount
@@ -35,7 +40,7 @@ nrow(orth)/subjectcount
 
 xyplot(orth$distance ~ orth$age|orth$Subject, data=orth, type="b")
 
-xyplot(orth$distance ~ orth$age, group = Sex, data=orth, type="b", as.table=T)
+xyplot(orth$distance ~ orth$age | Sex, group = Sex, data=orth, type="b", as.table=T, layout=c(2,1))
 
 xyplot(orth$distance ~ orth$age, group = Subject, data=orth, type="b", as.table=T)
 
@@ -51,9 +56,12 @@ meansM <- aggregate(orth$distance, list(orth$age, orth$Sex), mean)
 
 xyplot(meansM$Group.1~meansM$x, col=meansM$Group.2)
 
-#Linear model is justifiable since the mean distance seems to raise linearly for both sexes.
-#It also seems like the rate of change is different between sexes so interaction term would also be justifiable.
+```
 
+Linear model is justifiable since the mean distance seems to raise linearly for both sexes.
+It also seems like the rate of change is different between sexes so interaction term would also be justifiable.
+
+```{r}
 #f
 
 orth$age_c <- orth$age-min(orth$age)
@@ -65,20 +73,118 @@ orth$sex <- as.numeric(Sex == "Female")
 
 mm1 <- gls(distance ~ age_c*sex, data=orth, method="ML")
 summary(mm1)
+```
+$\beta_0$ is 22,62 which means that 8-year old male subject has distance of 22,6 mm.
+$\beta_1$ is 0,78 so for males 1 year makes a 0,78 mm difference in distance.
+$\beta_2$ is -1.41 so for 8-year old female subject has distance of 22,62 mm - 1,41 mm = 21,21 mm
+$\beta_3$ is -0.31 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm = 0,48 mm difference in distance.
 
-#Intercept is 22,62 which means that 8-year old male subject has distance of 22,6 mm.
-#Beta1 is 0,78 so for males 1 year makes a 0,78 mm difference in distance.
-#Beta2 is -1.41 so for 8-year old female subject hasdistance of 22,62 mm - 1,41 mm = 21,21 mm
-#Beta3 is -0.31 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm = 0,48 mm difference in distance.
+## Task 3.5
+
+```{r}
+#h
+
+#Let's assume compound symmetry for observations of the same subject
+mm2 <- gls(distance ~ age_c*sex, data=orth,
+           correlation = corCompSymm(form = ~ 1 | Subject),
+           method="ML")
+summary(mm2)
 
 ```
 
-## Including Plots
+Residuals are pretty much the same looking at the standardized residuals and
+residual standard errors. There is some dependency since $\rho \approx 0,62$.
 
-You can also embed plots, for example:
+```{r}
+#i
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+mm3 <- gls(distance ~ age_c*sex, data=orth,
+           correlation = corAR1(form = ~ 1 | Subject),
+           method="ML")
+summary(mm3)
+
 ```
+$\phi \approx 0,61$ so dependency is slightly smaller. Residuals seem to be a bit different looking at standardized residuals.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#mm1 and mm2 are nested. mm1 and mm3 are nested. mm2 and mm3 are not nested.
+#Nested models can be compared with likelihood ratio.
+
+anova(mm1, mm2)
+anova(mm1, mm3)
+anova(mm2, mm3)
+
+#mm2 is the best model looking at the AIC-values.
+```
+```{r}
+#k
+
+#Let's assume compound symmetry for observations of the same subject
+mm2reml <- gls(distance ~ age_c*sex, data=orth,
+           correlation = corCompSymm(form = ~ 1 | Subject),
+           method="REML")
+s2 <- summary(mm2reml)
+s2
+
+```
+Standard errors of coefficients changed a bit. Also the residuals changed a bit.
+Value of $\rho$ also slightly raised. 
+Restricted maximum likelihood estimation corrects the bias of covariance estimates.
+
+```{r}
+
+#l
+
+betahat <- coef(mm2reml)
+betahat
+
+p <- length(betahat)
+n <- length(distance)
+
+sdbetahat <- sqrt(diag(s2$varBeta))
+sdbetahat
+
+#Hypothesis: Beta1 is 0.8
+#t-statistic
+
+t <- (betahat[2] - 0.8)/sdbetahat[2]
+t
+
+1-pt(t, n-p-1)
+
+#Hypothesis can't be rejected.
+
+#Hypothesis: Beta1 + Beta3 is 0.5
+
+```
+## Task 3.6
+
+```{r}
+#a
+
+pisa <- read.table("http://users.jyu.fi/~knordhau/GLM2/pisafull.txt", header=TRUE)
+head(pisa)
+attach(pisa)
+
+#b
+
+gendermeans <- aggregate(sciescore, list(matem=matem,gender=gender), data=pisa, mean)
+gendermeans
+
+xyplot(gendermeans$x ~ gendermeans$matem | gendermeans$gender, type="b")
+
+motivmeans <- aggregate(sciescore, list(matem=matem, motiv=motiv), mean)
+motivmeans
+
+xyplot(motivmeans$x ~ motivmeans$matem | motivmeans$motiv, type="b")
+
+xyplot(sciescore ~ ESCS)
+
+```
+There seems to be linearity between science score and math grade.
+Students with higher motivation seem to get higher scores whereas scores between
+boys and girls seem to be very similar in this data.
+
+
+
+
