@@ -180,11 +180,83 @@ xyplot(motivmeans$x ~ motivmeans$matem | motivmeans$motiv, type="b")
 
 xyplot(sciescore ~ ESCS)
 
+schoolmeans <- aggregate(sciescore, list(SCHOOLID=SCHOOLID), data=pisa, mean)
+
+regionmeans <- aggregate(sciescore, list(matem=matem, region=region), data=pisa, mean)
+regionmeans
+
+xyplot(regionmeans$x ~ regionmeans$matem | regionmeans$region, type="b")
+
+summary(schoolmeans$x)
+sd(schoolmeans$x)
+
 ```
 There seems to be linearity between science score and math grade.
 Students with higher motivation seem to get higher scores whereas scores between
-boys and girls seem to be very similar in this data.
+boys and girls seem to be very similar in this data. ESCS also seems to have positive
+effect on science score. There also seems to be lots of variation in the mean scores
+between schools. Region doesn't seem to make a huge difference.
 
+```{r}
+#c and d
 
+library(nlme)
 
+fit1 <- gls(sciescore ~ matem + motiv + SCHOOLID + gender + ESCS + urban + region,
+            correlation = corCompSymm(form = ~ 1 | SCHOOLID),
+            method="ML")
+summary(fit1)
+
+```
+## Task 3.7
+
+```{r}
+#f
+
+#reduced model
+fit2 <- gls(sciescore ~ matem + SCHOOLID + gender + ESCS + motiv + urban,
+            correlation = corCompSymm(form = ~ 1 | SCHOOLID),
+            method="ML")
+
+#f-test
+
+anova(fit1, fit2)
+
+```
+
+p-value would indicate now that the region is not needed in the model. Doing the
+similar F-test for other variables we say that matem, SCHOOLID, ESCS and motiv are
+significant. Interaction between matem and SCHOOLID is needed and interaction 
+between matem and motiv is needed. I used anova to investigate significance of
+interactions.
+
+```{r}
+#g
+
+fit <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+            correlation = corCompSymm(form = ~ 1 | SCHOOLID),
+            method="ML")
+summary(fit)
+
+#i
+
+#remove the correlation to make it a regular linear model
+
+fitreg <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+            method="ML")
+
+anova(fit, fitreg)
+
+#general model has slightly lower AIC so it's better.
+
+#j
+
+fitREML <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+            correlation = corCompSymm(form = ~ 1 | SCHOOLID),
+            method="REML")
+summary(fitREML)
+
+#Coefficient standard errors are slightly lower.
+
+```
 
