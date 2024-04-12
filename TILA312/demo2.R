@@ -120,6 +120,7 @@ F_test(K, X, betahat, m, sigmahat^2)
 
 #Task 2.9
 
+#Task 2.9
 set.seed(1)
 n <- 1000
 x1 <- runif(n, -1, 1) #random numbers from uniform distribution
@@ -128,6 +129,7 @@ x3 <- gl(4,n/4) #factors with values 1,2,3,4 each repeating 250 times
 x4 <- gl(2, n/2) #factors with values 1,2 each repeating 500 times
 x4 <- sample(x4) #sampling the previous
 x5 <- rt(n, df=3) #random numbers from t-distribution with 3 degrees of freedom
+
 x6 <- runif(n,1,4) #random numbers from uniform distribution
 x7 <- rnorm(n, 1, 5)
 beta1 <- c(2,0.1,0.5,1,0.5,1, -0.5,1.3) #estimate vectors
@@ -153,9 +155,13 @@ y8 <- MM2 %*% beta2 + 0.5*eps1
 DF <- data.frame(y1, y2, y3, y4, y5, y6, y7, y8, x1, x2, x3, x4, x5, x6, x7)
 summary(DF)
 
+
 #bunch of different linear models are fitted
 
 lm1 <- lm(y1 ~ x1 + x2 + x3 + x4 + x5, data=DF) 
+
+#bunch of different linear models are fitted
+lm1 <- lm(y1 ~ x1 + x2 + x3 + x4 + x5, data=DF)
 lm2 <- lm(y1 ~ x1 + x2 + x3 + x4, data=DF)
 lm3 <- lm(y1 ~ x1 + x2 + x3 + x5 + x7, data=DF)
 lm4 <- lm(y2 ~ x1 + x2 , data=DF)
@@ -168,6 +174,7 @@ lm10 <- lm(y6 ~ x1 + x2 , data=DF)
 lm11 <- lm(y7 ~ x1 + x2 , data=DF)
 lm12 <- lm(y8 ~ x1 + x2 , data=DF)
 
+
 #b
 
 #residuals of the models are plotted against certain other variables
@@ -175,20 +182,34 @@ lm12 <- lm(y8 ~ x1 + x2 , data=DF)
 #lm1 should be a pretty good fit now. I think the residuals should be
 #normally distributed with mean 0 and variance 1.
 
+
+#b
+#residuals of the models are plotted against certain other variables
+#lm1 should be a pretty good fit now. I think the residuals should be
+#normally distributed with mean 0 and variance 1.
 plot(residuals(lm1)~fitted(lm1))
 #x1 is uniformly distributed to plot should be very symmetrical all around.
 plot(residuals(lm1)~DF$x1)
 #x7 is normally distributed with mean 1 and variance 1.5 so it should be seen
 #in x-axis.
+
 plot(residuals(lm1)~DF$x7) 
 
 #there's one less explaining variable now so there is probably more variance
 plot(residuals(lm2)~fitted(lm2))
 plot(residuals(lm2)~DF$x1) #x1 is uniform 
+
+plot(residuals(lm1)~DF$x7)
+
+#there's one less explaining variable now so there is probably more variance
+plot(residuals(lm2)~fitted(lm2))
+plot(residuals(lm2)~DF$x1) #x1 is uniform
 plot(residuals(lm2)~DF$x5) #x5 has nothing to do with this model so can't tell
 #x7 is normally distributed with mean 1 and variance 1.5 so it should be seen
 #in x-axis.
 plot(residuals(lm2)~DF$x7)
+
+
 
 #probably similar kind of plot compared to lm1
 plot(residuals(lm3)~fitted(lm3))
@@ -235,6 +256,11 @@ summary(lm12)$adj.r.squared #biggest of these, let's say 0.4
 
 beta2
 coef(lm7) #Let's guess 1.6, 0.15, 0.44 
+coef(lm10) #These are more off than previous: 2.15, 0.25, 0.49
+coef(lm11) #even more off: 2.19, 0.3, 0.5
+coef(lm12) #These should be pretty close: 2.03, 0.09, 0.47
+
+coef(lm7) #Let's guess 1.6, 0.15, 0.44
 coef(lm10) #These are more off than previous: 2.15, 0.25, 0.49
 coef(lm11) #even more off: 2.19, 0.3, 0.5
 coef(lm12) #These should be pretty close: 2.03, 0.09, 0.47

@@ -1,0 +1,84 @@
+---
+title: "GLM2 Demo 3"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAUCAYAAACnOeyiAAAAXklEQVR42mNgAIL///8zMYSGhjIDGYIMIiIMvECGMwMDN4M4kFEDUqIIZKwDMdSBjAsghj6Q8QPEMAAy/lOBoQekv4AYKkDGfgZeXl4RICOLQUtLiw3IUAJJMQIZ7AC2tU2tXJxOYgAAAABJRU5ErkJggg==
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Excercise 4
+
+```{r cars}
+#a
+
+library(nlme)
+library(dplyr)
+library(tidyr)
+
+orth <- Orthodont
+head(orth)
+
+#Orthodont contains data of change in orthodontic measurement over time for several young subjects. One row contains a distance measurement, age, Subject and Sex.
+
+#b
+
+#How many subjects dataset contains
+subjectcount <- n_distinct(orth$Subject)
+
+#How many measurements there are per subject
+nrow(orth)/subjectcount
+
+#c
+
+xyplot(orth$distance ~ orth$age|orth$Subject, data=orth, type="b")
+
+xyplot(orth$distance ~ orth$age, group = Sex, data=orth, type="b", as.table=T)
+
+xyplot(orth$distance ~ orth$age, group = Subject, data=orth, type="b", as.table=T)
+
+#d
+
+#data is now in long format
+
+orthw <- pivot_wider(data = orth, names_from = age, values_from = distance)
+
+#e
+
+meansM <- aggregate(orth$distance, list(orth$age, orth$Sex), mean)
+
+xyplot(meansM$Group.1~meansM$x, col=meansM$Group.2)
+
+#Linear model is justifiable since the mean distance seems to raise linearly for both sexes.
+#It also seems like the rate of change is different between sexes so interaction term would also be justifiable.
+
+#f
+
+orth$age_c <- orth$age-min(orth$age)
+attach(orth)
+
+#g
+
+orth$sex <- as.numeric(Sex == "Female")
+
+mm1 <- gls(distance ~ age_c*sex, data=orth, method="ML")
+summary(mm1)
+
+#Intercept is 22,62 which means that 8-year old male subject has distance of 22,6 mm.
+#Beta1 is 0,78 so for males 1 year makes a 0,78 mm difference in distance.
+#Beta2 is -1.41 so for 8-year old female subject hasdistance of 22,62 mm - 1,41 mm = 21,21 mm
+#Beta3 is -0.31 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm = 0,48 mm difference in distance.
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
