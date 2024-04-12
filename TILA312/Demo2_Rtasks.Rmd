@@ -1,3 +1,17 @@
+---
+title: "GLM2 demo 2 R tasks"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 2.6
+
+```{r Task 2.6}
 pisa <- read.table("http://users.jyu.fi/~knordhau/GLM2/pisa.txt", header = TRUE)
 
 mat <- pisa$matem
@@ -50,9 +64,10 @@ SSR <- sum((yhat-mean(y))^2) #variation explained by the model
 
 R2 <- SSR/SST
 R2 
+```
+# Task 2.7
 
-#===============================================================================
-
+```{r Task 2.7}
 #Task 2.7
 
 #Test the hypothesis H0: Beta2 = 0 with t-test
@@ -66,9 +81,11 @@ t <- betahat[3]/sdbeta[3]
 2*pt(t, n-p-1)
 
 #null hypotesis can't be rejected
+```
 
-#===============================================================================
+# Task 2.8
 
+```{r Task 2.8}
 #Task 2.8
 
 #Test with an F-test
@@ -115,9 +132,11 @@ K <- cbind(c(0,0,0,0,1,0,-1))
 m <- c(0)
 
 F_test(K, X, betahat, m, sigmahat^2)
+```
 
-#===============================================================================
+# Task 2.9
 
+```{r eval=FALSE}
 #Task 2.9
 
 set.seed(1)
@@ -238,3 +257,4 @@ coef(lm7) #Let's guess 1.6, 0.15, 0.44
 coef(lm10) #These are more off than previous: 2.15, 0.25, 0.49
 coef(lm11) #even more off: 2.19, 0.3, 0.5
 coef(lm12) #These should be pretty close: 2.03, 0.09, 0.47
+```
