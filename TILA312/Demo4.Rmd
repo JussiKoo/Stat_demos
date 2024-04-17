@@ -1,0 +1,114 @@
+---
+title: "Demo 4"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 4.1
+
+a)  
+
+
+\begin{equation}
+\begin{split}
+L(\mu, \sigma^2) &= \left(\frac{1}{\sqrt{2\pi\sigma^2}}\right)^n exp(-\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \mu)^2)\\
+l(\mu, \sigma^2) &= n \log \left( \frac{1}{\sqrt{2\pi\sigma^2}} \right) - \frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \mu)^2\\
+S(\mu) &= - \frac{1}{2\sigma^2} \sum_{i=1}^n \frac{\partial}{\partial \mu} (y_i - \mu)^2\\
+&= - \frac{1}{2\sigma^2} \sum_{i=1}^n -2(y_i - \mu)\\
+&= \frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)\\
+\end{split}
+\end{equation}
+
+b)  
+
+
+\begin{equation}
+\begin{split}
+L(\lambda) &= e^{-\lambda n} \frac{\lambda^{\sum_{i=1}^n y_i}}{\prod_{i=1}^n y_i !}\\
+l(\lambda) &= -\lambda n + \log \lambda \sum_{i=1}^n y_i - \sum_{i=1}^n \log y_i !\\
+S(\lambda) &= \frac{1}{\lambda} \sum_{i=1}^n y_i - n\\
+\end{split}
+\end{equation}
+
+
+## Task 4.2
+
+```{r include=TRUE, eval=TRUE}
+#a
+
+# Score function for the normal distribution
+# where the root should be at the origin
+ScN <- function(y, mu, n) { n * (mean(y) - mu) }
+
+
+plotScoresN <- function(n){
+  y <- rnorm(n, 0, 1)
+  mu <- seq(-2, 2, 0.1)
+  plot(mu, ScN(y, mu, n), type = "l", xlab = "mu", ylab = "S(mu)")
+  abline(0,0)
+  for (i in 1:19) {
+  y <- rnorm(n, 0, 1)
+  lines(mu, ScN(y, mu, n))
+  }
+}
+
+par(mfrow = c(2, 2))
+plotScoresN(10)
+plotScoresN(100)
+plotScoresN(1000)
+plotScoresN(10000)
+
+#b
+
+ScP <- function(y, lambda, n) { n * (mean(y)/lambda - 1) }
+
+plotScoresP <- function(n){
+  y <- rpois(n, 4)
+  lambda <- seq(2, 6, 0.1)
+  plot(lambda, ScP(y, lambda, n), type = "l", xlab = "lambda", ylab = "S(lambda)")
+  abline(0,0)
+  for (i in 1:19) {
+  y <- rpois(n, 4)
+  lines(lambda, ScP(y, lambda, n))
+  }
+}
+
+par(mfrow = c(2, 2))
+plotScoresP(10)
+plotScoresP(100)
+plotScoresP(1000)
+plotScoresP(10000)
+
+```
+As the sample size gets larger the score functions values vary less. This can be explained by central limit theorem since both score functions here include the mean of the samples.
+
+## Task 4.3
+
+```{r}
+
+densP <- function(n){
+  scores <- numeric(100)
+  for (i in 1:100){
+    y <- rpois(n, 4)
+    scores[i] <- ScP(y, 4, n)
+  }
+  
+  plot(density(scores), main=paste("Sample size: ", n))
+}
+
+par(mfrow = c(2, 2))
+densP(10)
+densP(100)
+densP(1000)
+densP(10000)
+
+```
+
+We notice from the scale of the y-axis that the density plot gets flatter as sample size gets larger. One could also say that score functions values distribute more evenly.
+
+

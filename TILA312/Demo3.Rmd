@@ -1,5 +1,5 @@
 ---
-title: "GLM2 Demo 3"
+title: "GLM2 Demo 3 R tasks"
 author: "Jussi Kauppinen"
 date: "`r Sys.Date()`"
 output: pdf_document
@@ -8,7 +8,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Task 3.4
+# Task 3.4
 
 
 ```{r include=FALSE}
@@ -16,15 +16,16 @@ library(nlme)
 library(dplyr)
 library(tidyr)
 library(lattice)
+library(lme4)
 ```
-
-
+  
 ```{r }
 #a
 orth <- Orthodont
 head(orth)
 
-#Orthodont contains data of change in orthodontic measurement over time for several young subjects. 
+#Orthodont contains data of change in orthodontic measurement 
+#over time for several young subjects. 
 #One row contains a distance measurement, age, Subject and Sex.
 
 #b
@@ -69,23 +70,21 @@ attach(orth)
 
 #g
 
-orth$sex <- as.numeric(Sex == "Female")
-
-mm1 <- gls(distance ~ age_c*sex, data=orth, method="ML")
+mm1 <- gls(distance ~ age_c*Sex, data=orth, method="ML")
 summary(mm1)
 ```
 $\beta_0$ is 22,62 which means that 8-year old male subject has distance of 22,6 mm.
 $\beta_1$ is 0,78 so for males 1 year makes a 0,78 mm difference in distance.
-$\beta_2$ is -1.41 so for 8-year old female subject has distance of 22,62 mm - 1,41 mm = 21,21 mm
-$\beta_3$ is -0.31 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm = 0,48 mm difference in distance.
+$\beta_2$ is -1,41 so for 8-year old female subject has distance of 22,62 mm - 1,41 mm = 21,21 mm
+$\beta_3$ is -0,30 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm = 0,48 mm difference in distance.
 
-## Task 3.5
+# Task 3.5
 
 ```{r}
 #h
 
 #Let's assume compound symmetry for observations of the same subject
-mm2 <- gls(distance ~ age_c*sex, data=orth,
+mm2 <- gls(distance ~ age_c*Sex, data=orth,
            correlation = corCompSymm(form = ~ 1 | Subject),
            method="ML")
 summary(mm2)
@@ -98,15 +97,18 @@ residual standard errors. There is some dependency since $\rho \approx 0,62$.
 ```{r}
 #i
 
-mm3 <- gls(distance ~ age_c*sex, data=orth,
+mm3 <- gls(distance ~ age_c*Sex, data=orth,
            correlation = corAR1(form = ~ 1 | Subject),
            method="ML")
 summary(mm3)
 
 ```
+
 $\phi \approx 0,61$ so dependency is slightly smaller. Residuals seem to be a bit different looking at standardized residuals.
 
 ```{r}
+#j
+
 #mm1 and mm2 are nested. mm1 and mm3 are nested. mm2 and mm3 are not nested.
 #Nested models can be compared with likelihood ratio.
 
@@ -120,13 +122,14 @@ anova(mm2, mm3)
 #k
 
 #Let's assume compound symmetry for observations of the same subject
-mm2reml <- gls(distance ~ age_c*sex, data=orth,
+mm2reml <- gls(distance ~ age_c*Sex, data=orth,
            correlation = corCompSymm(form = ~ 1 | Subject),
            method="REML")
 s2 <- summary(mm2reml)
 s2
 
 ```
+
 Standard errors of coefficients changed a bit. Also the residuals changed a bit.
 Value of $\rho$ also slightly raised. 
 Restricted maximum likelihood estimation corrects the bias of covariance estimates.
@@ -155,6 +158,25 @@ t
 #Hypothesis can't be rejected.
 
 #Hypothesis: Beta1 + Beta3 is 0.5
+#Define model matrix
+
+X <- model.matrix(mm2reml)
+
+F_test <- function(K, X, beta, m, sigma)
+{
+  q <- qr(K)$rank; n <- nrow(X); p <- ncol(X)
+  C <- solve(t(K) %*% solve(t(X) %*% X) %*% K)
+  F <- t(t(K) %*% beta - m) %*% C %*% (t(K) %*% beta - m) / (q * sigma)
+  p_val <- 1 - pf(F, q, n - p - 1)
+  list(F = F, p_val = p_val)
+}
+
+K <- cbind(c(0,1,0,1))
+m <- c(0.5)
+
+#I couldn't figure out how to test this in R. I don't think the F-test
+#provided in the last demo works here.
+
 
 ```
 ## Task 3.6
@@ -202,7 +224,7 @@ between schools. Region doesn't seem to make a huge difference.
 
 library(nlme)
 
-fit1 <- gls(sciescore ~ matem + motiv + SCHOOLID + gender + ESCS + urban + region,
+fit1 <- gls(sciescore ~ matem + motiv + gender + ESCS + urban + region,
             correlation = corCompSymm(form = ~ 1 | SCHOOLID),
             method="ML")
 summary(fit1)
@@ -214,7 +236,7 @@ summary(fit1)
 #f
 
 #reduced model
-fit2 <- gls(sciescore ~ matem + SCHOOLID + gender + ESCS + motiv + urban,
+fit2 <- gls(sciescore ~ matem + gender + ESCS + motiv + urban,
             correlation = corCompSymm(form = ~ 1 | SCHOOLID),
             method="ML")
 
@@ -225,15 +247,14 @@ anova(fit1, fit2)
 ```
 
 p-value would indicate now that the region is not needed in the model. Doing the
-similar F-test for other variables we say that matem, SCHOOLID, ESCS and motiv are
-significant. Interaction between matem and SCHOOLID is needed and interaction 
-between matem and motiv is needed. I used anova to investigate significance of
+similar F-test for other variables we say that matem, ESCS and motiv are
+significant. Interaction between matem and motiv is needed. I used anova to investigate significance of
 interactions.
 
 ```{r}
 #g
 
-fit <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+fit <- gls(sciescore ~ matem * motiv + ESCS,
             correlation = corCompSymm(form = ~ 1 | SCHOOLID),
             method="ML")
 summary(fit)
@@ -242,16 +263,20 @@ summary(fit)
 
 #remove the correlation to make it a regular linear model
 
-fitreg <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+fitreg <- gls(sciescore ~ matem * motiv + ESCS,
             method="ML")
 
 anova(fit, fitreg)
 
-#general model has slightly lower AIC so it's better.
+```
 
+general model has lower AIC so it's better.
+
+
+```{r}
 #j
 
-fitREML <- gls(sciescore ~ matem * SCHOOLID + matem * motiv + ESCS,
+fitREML <- gls(sciescore ~ matem * motiv + ESCS,
             correlation = corCompSymm(form = ~ 1 | SCHOOLID),
             method="REML")
 summary(fitREML)
@@ -259,4 +284,34 @@ summary(fitREML)
 #Coefficient standard errors are slightly lower.
 
 ```
+## Task 3.8
 
+```{r}
+
+#a
+
+#hierarchial model with single random effect
+fit1 <- lme(sciescore ~ matem * motiv + ESCS, random = ~ 1 | SCHOOLID, data=pisa)
+
+#generalized linear model with compound symmetry structure
+#for correlation
+fit2 <- gls(sciescore ~ matem * motiv + ESCS,
+correlation = corCompSymm(form = ~ 1 | SCHOOLID), data = pisa)
+
+summary(fit1)
+summary(fit2)
+anova(fit1, fit2)
+```
+Model estimates and their standard errors are identical. Anova also doesn't make a difference between models.
+
+
+```{r}
+
+#c
+
+#random effects for schools
+ref <- random.effects(fit1)
+
+plot(ref)
+
+```
