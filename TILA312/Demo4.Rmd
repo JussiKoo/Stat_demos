@@ -111,4 +111,47 @@ densP(10000)
 
 We notice from the scale of the y-axis that the density plot gets flatter as sample size gets larger. One could also say that score functions values distribute more evenly.
 
+## Task 4.4
+
+a)
+
+Score test statistic is $\frac{S}{\sqrt{I}}$.
+
+\begin{equation}
+\begin{split}
+I &= -E\left[ \frac{\partial}{\partial \mu} S(\mu)\right]\\
+&= -E\left[ \frac{\partial}{\partial \mu} \frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)\right]\\
+&= -E\left[ -\frac{n}{\sigma^2}\right]\\
+&= \frac{n}{\sigma^2}
+\end{split}
+\end{equation}
+
+So the test statistic is
+
+\begin{equation}
+\begin{split}
+\frac{S}{\sqrt{I}} = \frac{\frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)}{\sqrt{\frac{n}{\sigma^2}}} = \frac{1}{\sqrt{\sigma^2 n}} \sum_{i=1}^n (y_i - \mu)\\
+\end{split}
+\end{equation}
+
+b)
+
+\begin{equation}
+\begin{split}
+I &= -E\left[ \frac{\partial}{\partial \lambda} S(\lambda)\right]\\
+&= -E\left[ \frac{\partial}{\partial \lambda} \frac{1}{\lambda} \sum_{i=1}^n y_i - n\right]\\
+&= -E\left[-\frac{1}{\lambda^2} \sum_{i=1}^n y_i\right]\\
+&= \frac{1}{\lambda^2} \sum_{i=1}^n E[y_i] = \frac{1}{\lambda^2} \cdot n\lambda = \frac{n}{\lambda}\\
+\end{split}
+\end{equation}
+
+So the test statistic is
+
+\begin{equation}
+\begin{split}
+\frac{S}{\sqrt{I}} = \frac{\frac{1}{\lambda} \sum_{i=1}^n y_i - n}{\sqrt{\frac{n}{\lambda}}} = \frac{1}{\sqrt{\lambda n}} \sum_{i=1}^n y_i - \sqrt{\lambda n}\\
+\end{split}
+\end{equation}
+
+## Task 4.5
 
