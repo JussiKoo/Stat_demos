@@ -1,0 +1,320 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Demo 4},
+  pdfauthor={Jussi Kauppinen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Demo 4}
+\author{Jussi Kauppinen}
+\date{2024-04-20}
+
+\begin{document}
+\maketitle
+
+\hypertarget{task-4.1}{%
+\subsection{Task 4.1}\label{task-4.1}}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{equation}
+\begin{split}
+L(\mu, \sigma^2) &= \left(\frac{1}{\sqrt{2\pi\sigma^2}}\right)^n exp(-\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \mu)^2)\\
+l(\mu, \sigma^2) &= n \log \left( \frac{1}{\sqrt{2\pi\sigma^2}} \right) - \frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \mu)^2\\
+S(\mu) &= - \frac{1}{2\sigma^2} \sum_{i=1}^n \frac{\partial}{\partial \mu} (y_i - \mu)^2\\
+&= - \frac{1}{2\sigma^2} \sum_{i=1}^n -2(y_i - \mu)\\
+&= \frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)\\
+\end{split}
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{equation}
+\begin{split}
+L(\lambda) &= e^{-\lambda n} \frac{\lambda^{\sum_{i=1}^n y_i}}{\prod_{i=1}^n y_i !}\\
+l(\lambda) &= -\lambda n + \log \lambda \sum_{i=1}^n y_i - \sum_{i=1}^n \log y_i !\\
+S(\lambda) &= \frac{1}{\lambda} \sum_{i=1}^n y_i - n\\
+\end{split}
+\end{equation}
+
+\hypertarget{task-4.2}{%
+\subsection{Task 4.2}\label{task-4.2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#a}
+
+\CommentTok{\# Score function for the normal distribution}
+\CommentTok{\# where the root should be at the origin}
+\NormalTok{ScN }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(y, mu, n) \{ n }\SpecialCharTok{*}\NormalTok{ (}\FunctionTok{mean}\NormalTok{(y) }\SpecialCharTok{{-}}\NormalTok{ mu) \}}
+
+
+\NormalTok{plotScoresN }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n)\{}
+\NormalTok{  y }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{  mu }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\FloatTok{0.1}\NormalTok{)}
+  \FunctionTok{plot}\NormalTok{(mu, }\FunctionTok{ScN}\NormalTok{(y, mu, n), }\AttributeTok{type =} \StringTok{"l"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"mu"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"S(mu)"}\NormalTok{)}
+  \FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{19}\NormalTok{) \{}
+\NormalTok{  y }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(mu, }\FunctionTok{ScN}\NormalTok{(y, mu, n))}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plotScoresN}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\FunctionTok{plotScoresN}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\FunctionTok{plotScoresN}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\FunctionTok{plotScoresN}\NormalTok{(}\DecValTok{10000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo4_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#b}
+
+\NormalTok{ScP }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(y, lambda, n) \{ n }\SpecialCharTok{*}\NormalTok{ (}\FunctionTok{mean}\NormalTok{(y)}\SpecialCharTok{/}\NormalTok{lambda }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{) \}}
+
+\NormalTok{plotScoresP }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n)\{}
+\NormalTok{  y }\OtherTok{\textless{}{-}} \FunctionTok{rpois}\NormalTok{(n, }\DecValTok{4}\NormalTok{)}
+\NormalTok{  lambda }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{6}\NormalTok{, }\FloatTok{0.1}\NormalTok{)}
+  \FunctionTok{plot}\NormalTok{(lambda, }\FunctionTok{ScP}\NormalTok{(y, lambda, n), }\AttributeTok{type =} \StringTok{"l"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"lambda"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"S(lambda)"}\NormalTok{)}
+  \FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{)}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{19}\NormalTok{) \{}
+\NormalTok{  y }\OtherTok{\textless{}{-}} \FunctionTok{rpois}\NormalTok{(n, }\DecValTok{4}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(lambda, }\FunctionTok{ScP}\NormalTok{(y, lambda, n))}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plotScoresP}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\FunctionTok{plotScoresP}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\FunctionTok{plotScoresP}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\FunctionTok{plotScoresP}\NormalTok{(}\DecValTok{10000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo4_files/figure-latex/unnamed-chunk-1-2.pdf} As the
+sample size gets larger the score functions values vary less. This can
+be explained by central limit theorem since both score functions here
+include the mean of the samples.
+
+\hypertarget{task-4.3}{%
+\subsection{Task 4.3}\label{task-4.3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{densP }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n)\{}
+\NormalTok{  scores }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{100}\NormalTok{)\{}
+\NormalTok{    y }\OtherTok{\textless{}{-}} \FunctionTok{rpois}\NormalTok{(n, }\DecValTok{4}\NormalTok{)}
+\NormalTok{    scores[i] }\OtherTok{\textless{}{-}} \FunctionTok{ScP}\NormalTok{(y, }\DecValTok{4}\NormalTok{, n)}
+\NormalTok{  \}}
+  
+  \FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(scores), }\AttributeTok{main=}\FunctionTok{paste}\NormalTok{(}\StringTok{"Sample size: "}\NormalTok{, n))}
+\NormalTok{\}}
+
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{densP}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+\FunctionTok{densP}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\FunctionTok{densP}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\FunctionTok{densP}\NormalTok{(}\DecValTok{10000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo4_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+We notice from the scale of the y-axis that the density plot gets
+flatter as sample size gets larger. One could also say that score
+functions values distribute more evenly.
+
+\hypertarget{task-4.4}{%
+\subsection{Task 4.4}\label{task-4.4}}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\tightlist
+\item
+\end{enumerate}
+
+Score test statistic is \(\frac{S}{\sqrt{I}}\).
+
+\begin{equation}
+\begin{split}
+I &= -E\left[ \frac{\partial}{\partial \mu} S(\mu)\right]\\
+&= -E\left[ \frac{\partial}{\partial \mu} \frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)\right]\\
+&= -E\left[ -\frac{n}{\sigma^2}\right]\\
+&= \frac{n}{\sigma^2}
+\end{split}
+\end{equation}
+
+So the test statistic is
+
+\begin{equation}
+\begin{split}
+\frac{S}{\sqrt{I}} = \frac{\frac{1}{\sigma^2} \sum_{i=1}^n (y_i - \mu)}{\sqrt{\frac{n}{\sigma^2}}} = \frac{1}{\sqrt{\sigma^2 n}} \sum_{i=1}^n (y_i - \mu)\\
+\end{split}
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+\end{enumerate}
+
+\begin{equation}
+\begin{split}
+I &= -E\left[ \frac{\partial}{\partial \lambda} S(\lambda)\right]\\
+&= -E\left[ \frac{\partial}{\partial \lambda} \frac{1}{\lambda} \sum_{i=1}^n y_i - n\right]\\
+&= -E\left[-\frac{1}{\lambda^2} \sum_{i=1}^n y_i\right]\\
+&= \frac{1}{\lambda^2} \sum_{i=1}^n E[y_i] = \frac{1}{\lambda^2} \cdot n\lambda = \frac{n}{\lambda}\\
+\end{split}
+\end{equation}
+
+So the test statistic is
+
+\begin{equation}
+\begin{split}
+\frac{S}{\sqrt{I}} = \frac{\frac{1}{\lambda} \sum_{i=1}^n y_i - n}{\sqrt{\frac{n}{\lambda}}} = \frac{1}{\sqrt{\lambda n}} \sum_{i=1}^n y_i - \sqrt{\lambda n}\\
+\end{split}
+\end{equation}
+
+\hypertarget{task-4.5}{%
+\subsection{Task 4.5}\label{task-4.5}}
+
+\begin{equation}
+\begin{split}
+D &= 2\log \Lambda = 2l(\hat\theta_{max}) - 2l(\hat\theta)\\
+&= 2\sum_{i=1}^n \frac{y_i \hat\theta_{i,max} - b(\hat\theta_{i,max})}{a_i(\phi)} + 2\sum_{i=1}^n c(y_i, \phi) - 2\sum_{i=1}^n \frac{y_i \hat\theta_{i} - b(\hat\theta_{i})}{a_i(\phi)} - 2\sum_{i=1}^n c(y_i, \phi)\\
+&= 2\left( \sum_{i=1}^n \frac{y_i (\hat\theta_{i,max} - \hat\theta_{i}) - b(\hat\theta_{i,max}) + b(\hat\theta_{i})}{a_i(\phi)}  \right)\\
+\end{split}
+\end{equation}
+
+\hypertarget{task-4.6}{%
+\subsection{Task 4.6}\label{task-4.6}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ei }\OtherTok{\textless{}{-}} \FunctionTok{read.table}\NormalTok{(}\StringTok{"http://users.jyu.fi/\textasciitilde{}knordhau/GLM2/korvatul.txt"}\NormalTok{, }\AttributeTok{header=}\ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\tightlist
+\item
+\end{enumerate}
+
+\end{document}

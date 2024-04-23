@@ -1,0 +1,1049 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={GLM2 Demo 3 R tasks},
+  pdfauthor={Jussi Kauppinen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{GLM2 Demo 3 R tasks}
+\author{Jussi Kauppinen}
+\date{2024-04-20}
+
+\begin{document}
+\maketitle
+
+\hypertarget{task-3.4}{%
+\section{Task 3.4}\label{task-3.4}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#a}
+\NormalTok{orth }\OtherTok{\textless{}{-}}\NormalTok{ Orthodont}
+\FunctionTok{head}\NormalTok{(orth)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Grouped Data: distance ~ age | Subject
+##   distance age Subject  Sex
+## 1     26.0   8     M01 Male
+## 2     25.0  10     M01 Male
+## 3     29.0  12     M01 Male
+## 4     31.0  14     M01 Male
+## 5     21.5   8     M02 Male
+## 6     22.5  10     M02 Male
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Orthodont contains data of change in orthodontic measurement }
+\CommentTok{\#over time for several young subjects. }
+\CommentTok{\#One row contains a distance measurement, age, Subject and Sex.}
+
+\CommentTok{\#b}
+
+\CommentTok{\#How many subjects dataset contains}
+\NormalTok{subjectcount }\OtherTok{\textless{}{-}} \FunctionTok{n\_distinct}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{Subject)}
+\NormalTok{subjectcount}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 27
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#How many measurements there are per subject}
+\FunctionTok{nrow}\NormalTok{(orth)}\SpecialCharTok{/}\NormalTok{subjectcount}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#c}
+
+\FunctionTok{xyplot}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ orth}\SpecialCharTok{$}\NormalTok{age}\SpecialCharTok{|}\NormalTok{orth}\SpecialCharTok{$}\NormalTok{Subject, }\AttributeTok{data=}\NormalTok{orth, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ orth}\SpecialCharTok{$}\NormalTok{age }\SpecialCharTok{|}\NormalTok{ Sex, }\AttributeTok{group =}\NormalTok{ Sex, }\AttributeTok{data=}\NormalTok{orth, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{, }\AttributeTok{as.table=}\NormalTok{T, }\AttributeTok{layout=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-2-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ orth}\SpecialCharTok{$}\NormalTok{age, }\AttributeTok{group =}\NormalTok{ Subject, }\AttributeTok{data=}\NormalTok{orth, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{, }\AttributeTok{as.table=}\NormalTok{T)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-2-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#d}
+
+\CommentTok{\#data is now in long format}
+
+\NormalTok{orthw }\OtherTok{\textless{}{-}} \FunctionTok{pivot\_wider}\NormalTok{(}\AttributeTok{data =}\NormalTok{ orth, }\AttributeTok{names\_from =}\NormalTok{ age, }\AttributeTok{values\_from =}\NormalTok{ distance)}
+
+\CommentTok{\#e}
+
+\NormalTok{meansM }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{distance, }\FunctionTok{list}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{age, orth}\SpecialCharTok{$}\NormalTok{Sex), mean)}
+
+\FunctionTok{xyplot}\NormalTok{(meansM}\SpecialCharTok{$}\NormalTok{Group}\FloatTok{.1}\SpecialCharTok{\textasciitilde{}}\NormalTok{meansM}\SpecialCharTok{$}\NormalTok{x, }\AttributeTok{col=}\NormalTok{meansM}\SpecialCharTok{$}\NormalTok{Group}\FloatTok{.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-2-4.pdf}
+
+Linear model is justifiable since the mean distance seems to raise
+linearly for both sexes. It also seems like the rate of change is
+different between sexes so interaction term would also be justifiable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#f}
+
+\NormalTok{orth}\SpecialCharTok{$}\NormalTok{age\_c }\OtherTok{\textless{}{-}}\NormalTok{ orth}\SpecialCharTok{$}\NormalTok{age}\SpecialCharTok{{-}}\FunctionTok{min}\NormalTok{(orth}\SpecialCharTok{$}\NormalTok{age)}
+\FunctionTok{attach}\NormalTok{(orth)}
+
+\CommentTok{\#g}
+
+\NormalTok{mm1 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age\_c}\SpecialCharTok{*}\NormalTok{Sex, }\AttributeTok{data=}\NormalTok{orth, }\AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(mm1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by maximum likelihood
+##   Model: distance ~ age_c * Sex 
+##   Data: orth 
+##        AIC      BIC    logLik
+##   488.2418 501.6524 -239.1209
+## 
+## Coefficients:
+##                     Value Std.Error  t-value p-value
+## (Intercept)     22.615625 0.4720747 47.90687  0.0000
+## age_c            0.784375 0.1261673  6.21694  0.0000
+## SexFemale       -1.406534 0.7395990 -1.90175  0.0600
+## age_c:SexFemale -0.304830 0.1976661 -1.54214  0.1261
+## 
+##  Correlation: 
+##                 (Intr) age_c  SexFml
+## age_c           -0.802              
+## SexFemale       -0.638  0.512       
+## age_c:SexFemale  0.512 -0.638 -0.802
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -2.53554652 -0.59684818 -0.07593684  0.60047185  2.36904986 
+## 
+## Residual standard error: 2.214759 
+## Degrees of freedom: 108 total; 104 residual
+\end{verbatim}
+
+\(\beta_0\) is 22,62 which means that 8-year old male subject has
+distance of 22,6 mm. \(\beta_1\) is 0,78 so for males 1 year makes a
+0,78 mm difference in distance. \(\beta_2\) is -1,41 so for 8-year old
+female subject has distance of 22,62 mm - 1,41 mm = 21,21 mm \(\beta_3\)
+is -0,30 so so for female subjects 1 year makes a 0,78 mm - 0,30 mm =
+0,48 mm difference in distance.
+
+\hypertarget{task-3.5}{%
+\section{Task 3.5}\label{task-3.5}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#h}
+
+\CommentTok{\#Let\textquotesingle{}s assume compound symmetry for observations of the same subject}
+\NormalTok{mm2 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age\_c}\SpecialCharTok{*}\NormalTok{Sex, }\AttributeTok{data=}\NormalTok{orth,}
+           \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ Subject),}
+           \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(mm2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by maximum likelihood
+##   Model: distance ~ age_c * Sex 
+##   Data: orth 
+##        AIC      BIC    logLik
+##   440.6391 456.7318 -214.3195
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | Subject 
+##  Parameter estimate(s):
+##       Rho 
+## 0.6178309 
+## 
+## Coefficients:
+##                     Value Std.Error  t-value p-value
+## (Intercept)     22.615625 0.5309074 42.59806  0.0000
+## age_c            0.784375 0.0779963 10.05656  0.0000
+## SexFemale       -1.406534 0.8317721 -1.69101  0.0938
+## age_c:SexFemale -0.304830 0.1221968 -2.49458  0.0142
+## 
+##  Correlation: 
+##                 (Intr) age_c  SexFml
+## age_c           -0.441              
+## SexFemale       -0.638  0.281       
+## age_c:SexFemale  0.281 -0.638 -0.441
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -2.53554804 -0.59684854 -0.07593689  0.60047221  2.36905128 
+## 
+## Residual standard error: 2.214758 
+## Degrees of freedom: 108 total; 104 residual
+\end{verbatim}
+
+Residuals are pretty much the same looking at the standardized residuals
+and residual standard errors. There is some dependency since
+\(\rho \approx 0,62\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#i}
+
+\NormalTok{mm3 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age\_c}\SpecialCharTok{*}\NormalTok{Sex, }\AttributeTok{data=}\NormalTok{orth,}
+           \AttributeTok{correlation =} \FunctionTok{corAR1}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ Subject),}
+           \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(mm3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by maximum likelihood
+##   Model: distance ~ age_c * Sex 
+##   Data: orth 
+##       AIC      BIC    logLik
+##   452.681 468.7738 -220.3405
+## 
+## Correlation Structure: AR(1)
+##  Formula: ~1 | Subject 
+##  Parameter estimate(s):
+##       Phi 
+## 0.6071166 
+## 
+## Coefficients:
+##                     Value Std.Error  t-value p-value
+## (Intercept)     22.748571 0.5532835 41.11558  0.0000
+## age_c            0.769572 0.1169026  6.58302  0.0000
+## SexFemale       -1.556993 0.8668287 -1.79619  0.0754
+## age_c:SexFemale -0.285840 0.1831511 -1.56068  0.1216
+## 
+##  Correlation: 
+##                 (Intr) age_c  SexFml
+## age_c           -0.634              
+## SexFemale       -0.638  0.405       
+## age_c:SexFemale  0.405 -0.638 -0.634
+## 
+## Standardized residuals:
+##        Min         Q1        Med         Q3        Max 
+## -2.5993844 -0.6176776 -0.0866274  0.5525954  2.3391875 
+## 
+## Residual standard error: 2.211512 
+## Degrees of freedom: 108 total; 104 residual
+\end{verbatim}
+
+\(\phi \approx 0,61\) so dependency is slightly smaller. Residuals seem
+to be a bit different looking at standardized residuals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#j}
+
+\CommentTok{\#mm1 and mm2 are nested. mm1 and mm3 are nested. mm2 and mm3 are not nested.}
+\CommentTok{\#Nested models can be compared with likelihood ratio.}
+
+\FunctionTok{anova}\NormalTok{(mm1, mm2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Model df      AIC      BIC    logLik   Test L.Ratio p-value
+## mm1     1  5 488.2418 501.6524 -239.1209                       
+## mm2     2  6 440.6391 456.7318 -214.3195 1 vs 2 49.6027  <.0001
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(mm1, mm3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Model df      AIC      BIC    logLik   Test  L.Ratio p-value
+## mm1     1  5 488.2418 501.6524 -239.1209                        
+## mm3     2  6 452.6810 468.7738 -220.3405 1 vs 2 37.56075  <.0001
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(mm2, mm3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     Model df      AIC      BIC    logLik
+## mm2     1  6 440.6391 456.7318 -214.3195
+## mm3     2  6 452.6810 468.7738 -220.3405
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#mm2 is the best model looking at the AIC{-}values.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#k}
+
+\CommentTok{\#Let\textquotesingle{}s assume compound symmetry for observations of the same subject}
+\NormalTok{mm2reml }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(distance }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age\_c}\SpecialCharTok{*}\NormalTok{Sex, }\AttributeTok{data=}\NormalTok{orth,}
+           \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ Subject),}
+           \AttributeTok{method=}\StringTok{"REML"}\NormalTok{)}
+\NormalTok{s2 }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(mm2reml)}
+\NormalTok{s2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by REML
+##   Model: distance ~ age_c * Sex 
+##   Data: orth 
+##        AIC      BIC    logLik
+##   445.7572 461.6236 -216.8786
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | Subject 
+##  Parameter estimate(s):
+##       Rho 
+## 0.6318381 
+## 
+## Coefficients:
+##                     Value Std.Error  t-value p-value
+## (Intercept)     22.615625 0.5387523 41.97778  0.0000
+## age_c            0.784375 0.0775011 10.12082  0.0000
+## SexFemale       -1.406534 0.8440627 -1.66639  0.0986
+## age_c:SexFemale -0.304830 0.1214209 -2.51052  0.0136
+## 
+##  Correlation: 
+##                 (Intr) age_c  SexFml
+## age_c           -0.432              
+## SexFemale       -0.638  0.275       
+## age_c:SexFemale  0.275 -0.638 -0.432
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -2.45773173 -0.57853118 -0.07360637  0.58204364  2.29634479 
+## 
+## Residual standard error: 2.284881 
+## Degrees of freedom: 108 total; 104 residual
+\end{verbatim}
+
+Standard errors of coefficients changed a bit. Also the residuals
+changed a bit. Value of \(\rho\) also slightly raised. Restricted
+maximum likelihood estimation corrects the bias of covariance estimates.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#l}
+
+\NormalTok{betahat }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(mm2reml)}
+\NormalTok{betahat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     (Intercept)           age_c       SexFemale age_c:SexFemale 
+##      22.6156250       0.7843750      -1.4065341      -0.3048295
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(betahat)}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(distance)}
+
+\NormalTok{sdbetahat }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{diag}\NormalTok{(s2}\SpecialCharTok{$}\NormalTok{varBeta))}
+\NormalTok{sdbetahat}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     (Intercept)           age_c       SexFemale age_c:SexFemale 
+##      0.53875233      0.07750113      0.84406269      0.12142094
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Hypothesis: Beta1 is 0.8}
+\CommentTok{\#t{-}statistic}
+
+\NormalTok{t }\OtherTok{\textless{}{-}}\NormalTok{ (betahat[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{{-}} \FloatTok{0.8}\NormalTok{)}\SpecialCharTok{/}\NormalTok{sdbetahat[}\DecValTok{2}\NormalTok{]}
+\NormalTok{t}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age_c 
+## -0.20161
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1}\SpecialCharTok{{-}}\FunctionTok{pt}\NormalTok{(t, n}\SpecialCharTok{{-}}\NormalTok{p}\DecValTok{{-}1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     age_c 
+## 0.5796904
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Hypothesis can\textquotesingle{}t be rejected.}
+
+\CommentTok{\#Hypothesis: Beta1 + Beta3 is 0.5}
+\CommentTok{\#Define model matrix}
+
+\NormalTok{X }\OtherTok{\textless{}{-}} \FunctionTok{model.matrix}\NormalTok{(mm2reml)}
+
+\NormalTok{F\_test }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(K, X, beta, m, sigma)}
+\NormalTok{\{}
+\NormalTok{  q }\OtherTok{\textless{}{-}} \FunctionTok{qr}\NormalTok{(K)}\SpecialCharTok{$}\NormalTok{rank; n }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(X); p }\OtherTok{\textless{}{-}} \FunctionTok{ncol}\NormalTok{(X)}
+\NormalTok{  C }\OtherTok{\textless{}{-}} \FunctionTok{solve}\NormalTok{(}\FunctionTok{t}\NormalTok{(K) }\SpecialCharTok{\%*\%} \FunctionTok{solve}\NormalTok{(}\FunctionTok{t}\NormalTok{(X) }\SpecialCharTok{\%*\%}\NormalTok{ X) }\SpecialCharTok{\%*\%}\NormalTok{ K)}
+\NormalTok{  F }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{t}\NormalTok{(K) }\SpecialCharTok{\%*\%}\NormalTok{ beta }\SpecialCharTok{{-}}\NormalTok{ m) }\SpecialCharTok{\%*\%}\NormalTok{ C }\SpecialCharTok{\%*\%}\NormalTok{ (}\FunctionTok{t}\NormalTok{(K) }\SpecialCharTok{\%*\%}\NormalTok{ beta }\SpecialCharTok{{-}}\NormalTok{ m) }\SpecialCharTok{/}\NormalTok{ (q }\SpecialCharTok{*}\NormalTok{ sigma)}
+\NormalTok{  p\_val }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{pf}\NormalTok{(F, q, n }\SpecialCharTok{{-}}\NormalTok{ p }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{F =}\NormalTok{ F, }\AttributeTok{p\_val =}\NormalTok{ p\_val)}
+\NormalTok{\}}
+
+\NormalTok{K }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{)}
+
+\CommentTok{\#I couldn\textquotesingle{}t figure out how to test this in R. I don\textquotesingle{}t think the F{-}test}
+\CommentTok{\#provided in the last demo works here.}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{task-3.6}{%
+\subsection{Task 3.6}\label{task-3.6}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#a}
+
+\NormalTok{pisa }\OtherTok{\textless{}{-}} \FunctionTok{read.table}\NormalTok{(}\StringTok{"http://users.jyu.fi/\textasciitilde{}knordhau/GLM2/pisafull.txt"}\NormalTok{, }\AttributeTok{header=}\ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(pisa)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   SCHOOLID sciescore matem gender    ESCS motiv    urban      region
+## 1     1001   550.110     9  tytto  0.7996     1 kaupunki Etela-Suomi
+## 2     1001   564.658     8  tytto  0.6701     1 kaupunki Etela-Suomi
+## 3     1001   586.944     8  tytto -0.0894     1 kaupunki Etela-Suomi
+## 4     1001   562.234     8  tytto  0.4199     0 kaupunki Etela-Suomi
+## 5     1001   541.720     6  tytto -0.0576     0 kaupunki Etela-Suomi
+## 6     1001   466.094     8  tytto  0.5304     1 kaupunki Etela-Suomi
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{attach}\NormalTok{(pisa)}
+
+\CommentTok{\#b}
+
+\NormalTok{gendermeans }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sciescore, }\FunctionTok{list}\NormalTok{(}\AttributeTok{matem=}\NormalTok{matem,}\AttributeTok{gender=}\NormalTok{gender), }\AttributeTok{data=}\NormalTok{pisa, mean)}
+\NormalTok{gendermeans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    matem gender        x
+## 1      4  poika 508.0884
+## 2      5  poika 484.9579
+## 3      6  poika 510.6315
+## 4      7  poika 535.2071
+## 5      8  poika 569.3102
+## 6      9  poika 612.9041
+## 7     10  poika 637.7585
+## 8      4  tytto 479.8884
+## 9      5  tytto 488.8087
+## 10     6  tytto 517.6730
+## 11     7  tytto 541.1598
+## 12     8  tytto 572.2610
+## 13     9  tytto 612.5006
+## 14    10  tytto 640.2685
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(gendermeans}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gendermeans}\SpecialCharTok{$}\NormalTok{matem }\SpecialCharTok{|}\NormalTok{ gendermeans}\SpecialCharTok{$}\NormalTok{gender, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{motivmeans }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sciescore, }\FunctionTok{list}\NormalTok{(}\AttributeTok{matem=}\NormalTok{matem, }\AttributeTok{motiv=}\NormalTok{motiv), mean)}
+\NormalTok{motivmeans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    matem motiv        x
+## 1      4     0 494.4746
+## 2      5     0 486.7446
+## 3      6     0 511.5962
+## 4      7     0 531.2166
+## 5      8     0 558.4361
+## 6      9     0 599.3288
+## 7     10     0 623.6475
+## 8      5     1 482.2789
+## 9      6     1 530.7197
+## 10     7     1 567.7123
+## 11     8     1 592.3025
+## 12     9     1 623.8847
+## 13    10     1 646.0476
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(motivmeans}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textasciitilde{}}\NormalTok{ motivmeans}\SpecialCharTok{$}\NormalTok{matem }\SpecialCharTok{|}\NormalTok{ motivmeans}\SpecialCharTok{$}\NormalTok{motiv, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-9-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ESCS)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-9-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{schoolmeans }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sciescore, }\FunctionTok{list}\NormalTok{(}\AttributeTok{SCHOOLID=}\NormalTok{SCHOOLID), }\AttributeTok{data=}\NormalTok{pisa, mean)}
+
+\NormalTok{regionmeans }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sciescore, }\FunctionTok{list}\NormalTok{(}\AttributeTok{matem=}\NormalTok{matem, }\AttributeTok{region=}\NormalTok{region), }\AttributeTok{data=}\NormalTok{pisa, mean)}
+\NormalTok{regionmeans}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    matem        region        x
+## 1      4   Etela-Suomi 488.1180
+## 2      5   Etela-Suomi 493.6236
+## 3      6   Etela-Suomi 509.5127
+## 4      7   Etela-Suomi 543.0433
+## 5      8   Etela-Suomi 569.6209
+## 6      9   Etela-Suomi 609.3345
+## 7     10   Etela-Suomi 636.9624
+## 8      4     Ita-Suomi 520.3660
+## 9      5     Ita-Suomi 479.5116
+## 10     6     Ita-Suomi 520.3514
+## 11     7     Ita-Suomi 530.9050
+## 12     8     Ita-Suomi 583.3025
+## 13     9     Ita-Suomi 611.9397
+## 14    10     Ita-Suomi 630.7544
+## 15     4   Lansi-Suomi 520.9383
+## 16     5   Lansi-Suomi 482.0647
+## 17     6   Lansi-Suomi 508.8008
+## 18     7   Lansi-Suomi 537.0325
+## 19     8   Lansi-Suomi 566.4821
+## 20     9   Lansi-Suomi 614.0339
+## 21    10   Lansi-Suomi 639.1730
+## 22     4 Pohjois-Suomi 468.7060
+## 23     5 Pohjois-Suomi 469.9465
+## 24     6 Pohjois-Suomi 534.1549
+## 25     7 Pohjois-Suomi 534.0501
+## 26     8 Pohjois-Suomi 570.5432
+## 27     9 Pohjois-Suomi 621.9386
+## 28    10 Pohjois-Suomi 668.9071
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{xyplot}\NormalTok{(regionmeans}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{\textasciitilde{}}\NormalTok{ regionmeans}\SpecialCharTok{$}\NormalTok{matem }\SpecialCharTok{|}\NormalTok{ regionmeans}\SpecialCharTok{$}\NormalTok{region, }\AttributeTok{type=}\StringTok{"b"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-9-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(schoolmeans}\SpecialCharTok{$}\NormalTok{x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   492.8   545.9   560.6   562.6   581.2   639.1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(schoolmeans}\SpecialCharTok{$}\NormalTok{x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 26.4
+\end{verbatim}
+
+There seems to be linearity between science score and math grade.
+Students with higher motivation seem to get higher scores whereas scores
+between boys and girls seem to be very similar in this data. ESCS also
+seems to have positive effect on science score. There also seems to be
+lots of variation in the mean scores between schools. Region doesn't
+seem to make a huge difference.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#c and d}
+
+\FunctionTok{library}\NormalTok{(nlme)}
+
+\NormalTok{fit1 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{+}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ gender }\SpecialCharTok{+}\NormalTok{ ESCS }\SpecialCharTok{+}\NormalTok{ urban }\SpecialCharTok{+}\NormalTok{ region,}
+            \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID),}
+            \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by maximum likelihood
+##   Model: sciescore ~ matem + motiv + gender + ESCS + urban + region 
+##   Data: NULL 
+##        AIC      BIC    logLik
+##   42671.25 42740.01 -21324.63
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | SCHOOLID 
+##  Parameter estimate(s):
+##        Rho 
+## 0.08269918 
+## 
+## Coefficients:
+##                        Value Std.Error  t-value p-value
+## (Intercept)         346.1510  6.366260 54.37274  0.0000
+## matem                26.7657  0.793951 33.71198  0.0000
+## motiv                22.9981  2.460494  9.34694  0.0000
+## gendertytto           1.1537  2.035626  0.56676  0.5709
+## ESCS                 10.0617  1.390200  7.23762  0.0000
+## urbanmaaseutu         0.9967  4.924001  0.20242  0.8396
+## regionIta-Suomi       3.4383  5.897022  0.58306  0.5599
+## regionLansi-Suomi     0.9044  4.663206  0.19394  0.8462
+## regionPohjois-Suomi   6.9273  5.824185  1.18941  0.2344
+## 
+##  Correlation: 
+##                     (Intr) matem  motiv  gndrty ESCS   urbnms rgnI-S rgnL-S
+## matem               -0.879                                                 
+## motiv                0.232 -0.353                                          
+## gendertytto         -0.117 -0.042 -0.086                                   
+## ESCS                 0.062 -0.142 -0.222  0.030                            
+## urbanmaaseutu       -0.054 -0.026  0.037 -0.014  0.066                     
+## regionIta-Suomi     -0.169 -0.013 -0.004  0.004  0.032 -0.223              
+## regionLansi-Suomi   -0.239 -0.004  0.006  0.016  0.043 -0.143  0.300       
+## regionPohjois-Suomi -0.181 -0.005 -0.017 -0.003  0.048 -0.186  0.257  0.299
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -4.14686482 -0.61082663  0.05745733  0.68362227  3.06064989 
+## 
+## Residual standard error: 64.57977 
+## Degrees of freedom: 3831 total; 3822 residual
+\end{verbatim}
+
+\hypertarget{task-3.7}{%
+\subsection{Task 3.7}\label{task-3.7}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#f}
+
+\CommentTok{\#reduced model}
+\NormalTok{fit2 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{+}\NormalTok{ gender }\SpecialCharTok{+}\NormalTok{ ESCS }\SpecialCharTok{+}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ urban,}
+            \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID),}
+            \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+
+\CommentTok{\#f{-}test}
+
+\FunctionTok{anova}\NormalTok{(fit1, fit2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      Model df      AIC      BIC    logLik   Test  L.Ratio p-value
+## fit1     1 11 42671.25 42740.01 -21324.63                        
+## fit2     2  8 42666.81 42716.81 -21325.40 1 vs 2 1.552104  0.6703
+\end{verbatim}
+
+p-value would indicate now that the region is not needed in the model.
+Doing the similar F-test for other variables we say that matem, ESCS and
+motiv are significant. Interaction between matem and motiv is needed. I
+used anova to investigate significance of interactions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#g}
+
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{*}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ ESCS,}
+            \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID),}
+            \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by maximum likelihood
+##   Model: sciescore ~ matem * motiv + ESCS 
+##   Data: NULL 
+##        AIC     BIC    logLik
+##   42661.54 42705.3 -21323.77
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | SCHOOLID 
+##  Parameter estimate(s):
+##        Rho 
+## 0.08468446 
+## 
+## Coefficients:
+##                Value Std.Error  t-value p-value
+## (Intercept) 354.8309  6.886599 51.52484  0.0000
+## matem        25.8952  0.918818 28.18318  0.0000
+## motiv        -4.8689 14.522959 -0.33525  0.7375
+## ESCS         10.0118  1.382511  7.24177  0.0000
+## matem:motiv   3.4456  1.762029  1.95549  0.0506
+## 
+##  Correlation: 
+##             (Intr) matem  motiv  ESCS  
+## matem       -0.956                     
+## motiv       -0.444  0.447              
+## ESCS         0.105 -0.140 -0.079       
+## matem:motiv  0.486 -0.507 -0.986  0.041
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -4.08718640 -0.61932285  0.06581522  0.68885387  3.00586909 
+## 
+## Residual standard error: 64.61355 
+## Degrees of freedom: 3831 total; 3826 residual
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#i}
+
+\CommentTok{\#remove the correlation to make it a regular linear model}
+
+\NormalTok{fitreg }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{*}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ ESCS,}
+            \AttributeTok{method=}\StringTok{"ML"}\NormalTok{)}
+
+\FunctionTok{anova}\NormalTok{(fit, fitreg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        Model df      AIC      BIC    logLik   Test  L.Ratio p-value
+## fit        1  7 42661.54 42705.30 -21323.77                        
+## fitreg     2  6 42827.08 42864.58 -21407.54 1 vs 2 167.5382  <.0001
+\end{verbatim}
+
+general model has lower AIC so it's better.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#j}
+
+\NormalTok{fitREML }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{*}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ ESCS,}
+            \AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID),}
+            \AttributeTok{method=}\StringTok{"REML"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(fitREML)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by REML
+##   Model: sciescore ~ matem * motiv + ESCS 
+##   Data: NULL 
+##        AIC      BIC    logLik
+##   42648.23 42691.98 -21317.12
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | SCHOOLID 
+##  Parameter estimate(s):
+##        Rho 
+## 0.08540801 
+## 
+## Coefficients:
+##                Value Std.Error  t-value p-value
+## (Intercept) 354.8296  6.887853 51.51527  0.0000
+## matem        25.8955  0.918761 28.18525  0.0000
+## motiv        -4.8836 14.521758 -0.33630  0.7367
+## ESCS         10.0110  1.382499  7.24120  0.0000
+## matem:motiv   3.4470  1.761879  1.95644  0.0505
+## 
+##  Correlation: 
+##             (Intr) matem  motiv  ESCS  
+## matem       -0.956                     
+## motiv       -0.444  0.447              
+## ESCS         0.105 -0.140 -0.079       
+## matem:motiv  0.486 -0.507 -0.986  0.041
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -4.08342861 -0.61872592  0.06580468  0.68819471  3.00308100 
+## 
+## Residual standard error: 64.67349 
+## Degrees of freedom: 3831 total; 3826 residual
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Coefficient standard errors are slightly lower.}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{task-3.8}{%
+\subsection{Task 3.8}\label{task-3.8}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#a}
+
+\CommentTok{\#hierarchial model with single random effect}
+\NormalTok{fit1 }\OtherTok{\textless{}{-}} \FunctionTok{lme}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{*}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ ESCS, }\AttributeTok{random =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID, }\AttributeTok{data=}\NormalTok{pisa)}
+
+\CommentTok{\#generalized linear model with compound symmetry structure}
+\CommentTok{\#for correlation}
+\NormalTok{fit2 }\OtherTok{\textless{}{-}} \FunctionTok{gls}\NormalTok{(sciescore }\SpecialCharTok{\textasciitilde{}}\NormalTok{ matem }\SpecialCharTok{*}\NormalTok{ motiv }\SpecialCharTok{+}\NormalTok{ ESCS,}
+\AttributeTok{correlation =} \FunctionTok{corCompSymm}\NormalTok{(}\AttributeTok{form =} \SpecialCharTok{\textasciitilde{}} \DecValTok{1} \SpecialCharTok{|}\NormalTok{ SCHOOLID), }\AttributeTok{data =}\NormalTok{ pisa)}
+
+\FunctionTok{summary}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Linear mixed-effects model fit by REML
+##   Data: pisa 
+##        AIC      BIC    logLik
+##   42648.23 42691.98 -21317.12
+## 
+## Random effects:
+##  Formula: ~1 | SCHOOLID
+##         (Intercept) Residual
+## StdDev:     18.9006 61.85004
+## 
+## Fixed effects:  sciescore ~ matem * motiv + ESCS 
+##                Value Std.Error   DF  t-value p-value
+## (Intercept) 354.8296  6.887853 3687 51.51527  0.0000
+## matem        25.8955  0.918761 3687 28.18525  0.0000
+## motiv        -4.8836 14.521758 3687 -0.33630  0.7367
+## ESCS         10.0110  1.382499 3687  7.24120  0.0000
+## matem:motiv   3.4470  1.761879 3687  1.95644  0.0505
+##  Correlation: 
+##             (Intr) matem  motiv  ESCS  
+## matem       -0.956                     
+## motiv       -0.444  0.447              
+## ESCS         0.105 -0.140 -0.079       
+## matem:motiv  0.486 -0.507 -0.986  0.041
+## 
+## Standardized Within-Group Residuals:
+##         Min          Q1         Med          Q3         Max 
+## -4.06999561 -0.60839072  0.06135842  0.68317387  2.92857744 
+## 
+## Number of Observations: 3831
+## Number of Groups: 140
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(fit2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Generalized least squares fit by REML
+##   Model: sciescore ~ matem * motiv + ESCS 
+##   Data: pisa 
+##        AIC      BIC    logLik
+##   42648.23 42691.98 -21317.12
+## 
+## Correlation Structure: Compound symmetry
+##  Formula: ~1 | SCHOOLID 
+##  Parameter estimate(s):
+##        Rho 
+## 0.08540801 
+## 
+## Coefficients:
+##                Value Std.Error  t-value p-value
+## (Intercept) 354.8296  6.887853 51.51527  0.0000
+## matem        25.8955  0.918761 28.18525  0.0000
+## motiv        -4.8836 14.521758 -0.33630  0.7367
+## ESCS         10.0110  1.382499  7.24120  0.0000
+## matem:motiv   3.4470  1.761879  1.95644  0.0505
+## 
+##  Correlation: 
+##             (Intr) matem  motiv  ESCS  
+## matem       -0.956                     
+## motiv       -0.444  0.447              
+## ESCS         0.105 -0.140 -0.079       
+## matem:motiv  0.486 -0.507 -0.986  0.041
+## 
+## Standardized residuals:
+##         Min          Q1         Med          Q3         Max 
+## -4.08342861 -0.61872592  0.06580468  0.68819471  3.00308100 
+## 
+## Residual standard error: 64.67349 
+## Degrees of freedom: 3831 total; 3826 residual
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(fit1, fit2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      Model df      AIC      BIC    logLik
+## fit1     1  7 42648.23 42691.98 -21317.12
+## fit2     2  7 42648.23 42691.98 -21317.12
+\end{verbatim}
+
+Model estimates and their standard errors are identical. Anova also
+doesn't make a difference between models.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#c}
+
+\CommentTok{\#random effects for schools}
+\NormalTok{ref }\OtherTok{\textless{}{-}} \FunctionTok{random.effects}\NormalTok{(fit1)}
+
+\FunctionTok{plot}\NormalTok{(ref)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Demo3_files/figure-latex/unnamed-chunk-15-1.pdf}
+
+\end{document}

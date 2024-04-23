@@ -1,10 +1,8 @@
 ---
-title: "GLM2 Demo 4"
-author: "Jussi Kauppinen 2891068547"
+title: "Demo 4"
+author: "Jussi Kauppinen"
 date: "`r Sys.Date()`"
-output: 
-  pdf_document:
-    extra_dependencies: ["enumitem"]
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -176,71 +174,10 @@ D &= 2\log \Lambda = 2l(\hat\theta_{max}) - 2l(\hat\theta)\\
 
 ## Task 4.6
 
-a)
-
-\begin{enumerate}[label=(\roman*)]
-  \item Let the intercept be $\beta_0$. $\text{logit}^{-1}(\beta_0)$ is the probability for the case where all predictors are equal to $0$.
-  \item Let $\beta_1$ be a continuous predictor coefficient. $e^{\beta_1}$ is the OR between two cases where the predictors value differs with one unit and all the other predictors values remain the same.
-  \item Let $\beta_2$ be a predictor coefficient for a categorical predictor. $e^{\beta_2}$ is the OR between two subsequent values of the predictor. 
-\end{enumerate}
-
 ```{r}
 ei <- read.table("http://users.jyu.fi/~knordhau/GLM2/korvatul.txt", header=TRUE)
-attach(ei)
-
-fit <- glm(tulehdus ~ tupak * lapsia, data=ei, family = binomial)
 ```
 
-Mathematical model for this fit is
-
-$$\text{logit} (\pi_i) =  \beta_0 + \beta_1 Sm + \beta_2 Si + \beta_3 Si*Sm$$
-where $\pi_i$ is probability at which a child has had an ear infection in the last two years. $Sm$ equals $1$ if at least one of the parents smokes and $0$ otherwise. $Si$ equals $1$ if the child has no siblings, $2$ if the child has one or two siblings and $3$ otherwise.
-
-## Task 4.7
-
-a) 
-
-```{r}
-summary(fit)
-
-beta <- coef(fit)
-
-#child A and B from two non-smoking families. A has no siblings and B has 1-2. 
-#OR between these is
-
-exp(beta[3])
-
-#meaning that child B is more likely to have had an ear infection in last 
-#two years. If we assume that both probabilites are small we can approximate
-#that child B is two times more likely to have had an ear infetion in last
-#two years
-
-#Let's assume now that child A and B are from families who smoke. OR is
-
-exp(beta[3] + beta[4])
-
-#So still child B is more likely to have had an ear infection in last two years
-#but difference is now smaller.
-```
-b)
-
-```{r}
-#drop the interaction term
-fit2 <- glm(tulehdus ~ tupak + lapsia, data=ei, family = binomial)
-q <- length(coef(fit2))
-p <- length(coef(fit))
-
-#H0: Model fit2 is correct
-
-#Test statistic
-
-D <- deviance(fit2) - deviance(fit)
-
-1 - pchisq(D, p-q)
-
-#p-value is 0,28 so it would seem like we cant reject the null hypothesis.
-#Interaction term can be dropped.
-```
-
+a)
 
 
