@@ -1,0 +1,64 @@
+---
+title: "Demo 5"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 5.1
+
+## Task 5.2
+
+## Task 5.3
+
+```{r}
+tul <- read.table("http://users.jyu.fi/~knordhau/GLM2/korvatul.txt", TRUE)
+
+# response and design
+y <- tul[,1]
+X0 <- rep(1,length(y))
+X1 <- tul[,2]
+X2 <- (tul[,3] == 2)
+X3 <- (tul[,3] == 3)
+X <- cbind(X0, X1, X2, X3)
+
+# Starting values for beta and eps
+beta <- c(1,1,1,1) #Muuta näitä tarpeen mukaan
+eps <- c(0.1, 0.1, 0.1, 0.1)
+while (eps > 1e-4) {
+
+# eta, mu and score function
+eta <- X %*% beta
+mu <- exp(eta) / (1 + exp(eta))
+S <- t(X) %*% (y - mu)
+
+# W matrix
+Wii <- 
+W <- diag(c(Wii))
+# Fisher information matrix
+I <- 
+# Iteration step
+betanew <- beta + solve(I) %*% S
+# performance measure
+eps <- t(betanew-beta) %*% (betanew-beta)
+# updating the estimate
+beta <- betanew
+}
+# return a list of the coefficients and their standard errors
+list(beta = , se = )
+```
+
+
+## Task 5.4
+
+## Task 5.5
+
+## Task 5.6
+
+## Task 5.7
+
+
