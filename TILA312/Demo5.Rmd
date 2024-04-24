@@ -11,7 +11,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Task 5.1
 
+\begin{equation}
+\begin{split}
+L(\pi_1,...,\pi_k) &= \prod_{i=1}^k \binom{n_i}{y_i} \pi_i^{i_i} (1 - \pi_i)^{n_i-y_i}\\
+l((\pi_1,...,\pi_k) &= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} + y_i \log \pi_i + (n_i - y_i) \log(1-\pi_i) \right]\\
+&= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} + n_i \log (1-\pi_i) + y_i \log \left( \frac{\pi_i}{1-\pi_i}\right) \right]\\
+&= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} - n_i \log (1+e^{x_i^T \beta}) + y_i x_i^T \beta \right]\\
+\frac{\partial}{\partial \beta_j} l(\beta) &= \sum_{i=1}^k -n_i \frac{x_{ij}e^{x_i^T \beta}}{1+e^{x_i^T \beta}} + y_i x_i^T \beta\\
+&= \sum_{i=1}^k x_{ij} \left( y_i - n_i \frac{e^{x_i^T \beta}}{1+e^{x_i^T \beta}} \right)\\
+&= \sum_{i=1}^k x_{ij} ( y_i - n_i \pi_i )\\
+\end{split}
+\end{equation}
+
+
+
 ## Task 5.2
+
+\begin{equation}
+\begin{split}
+D &= 2(l(y_1,...,y_k) - l(\hat y_1,...,\hat y_k))\\
+&= 2\sum_{i=1}^k y_i \log y_i + (1 - y_i) \log (1 - y_i) - y_i \log \hat y_i - (1 - y_i) \log (1 - \hat y_i)\\
+&= 2\sum_{i=1}^k y_i \log \left( \frac{y_i}{\hat y_i} \right) + (1 - y_i) \log \left( \frac{1-y_i}{1-\hat y_i} \right)\\
+\end{split}
+\end{equation}
 
 ## Task 5.3
 
