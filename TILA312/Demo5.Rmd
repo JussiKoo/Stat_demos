@@ -83,6 +83,36 @@ list(beta = beta, se = diag(sqrt(solve(t(X) %*% W %*% X))))
 
 ## Task 5.4
 
+```{r}
+bw <- read.table("http://users.jyu.fi/~knordhau/GLM2/lapset.txt", header=TRUE)
+head(bw)
+
+bw$lapsia <- cut(bw$parit, c(-1,0,1,20), labels=c(0,1,2))
+bw$kesk <- as.numeric(bw$syntpaino < 2500)
+
+plot(bw$kesk ~ bw$tup)
+
+#Mean-weights for each smoking type of the mother
+aggregate(bw$syntpaino, list(bw$tup), data=bw, FUN=mean)
+
+smoke0 <- bw[bw$tup == 0,]
+smoke1 <- bw[bw$tup == 1,]
+smoke2 <- bw[bw$tup == 2,]
+
+#Frequencies of premature babies for each smoking group divided by
+#number of observations
+sum(smoke0$kesk)/nrow(smoke0)
+sum(smoke1$kesk)/nrow(smoke1)
+sum(smoke2$kesk)/nrow(smoke2)
+
+#According to these statistics it would seem like smokers have a higher risk
+#of having premature baby
+
+#One could assume that social class could affect mothers smoking.
+
+```
+
+
 ## Task 5.5
 
 ## Task 5.6
