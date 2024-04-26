@@ -115,6 +115,46 @@ sum(smoke2$kesk)/nrow(smoke2)
 
 ## Task 5.5
 
+```{r}
+bw$tup <- as.factor(bw$tup)
+
+fit1 <- glm(bw$kesk ~ bw$tup * bw$lapsia, data = bw, family=binomial)
+summary(fit1)
+
+fit2 <- glm(bw$kesk ~ bw$tup + bw$lapsia, data = bw, family=binomial)
+summary(fit2)
+
+#Difference of deviances
+anova(fit2, fit1)
+
+#Test statistic is 2.5685 and difference in number of parameters is 2
+1 - pchisq(2.5685,4)
+
+#p-value is 0,63 indicates that smaller model is true
+
+exp(coef(fit2))
+
+#OR-between smoker types 1 and 0 is 1.40 when other factors are the same
+
+#OR between smoker types 2 and 0 is 1.92 when other factors are the same
+
+#OR between second child and first child is 0.47 when other factors are the same
+
+#OR between later than second child and first child is 0.76 
+#when other factors are the same
+
+#odds for premature baby is thus higher the more the mother smokes
+#when other factors are the same
+
+#odds for child to be premature is lower for those with
+#more one has previous pregnancies when other factors are the same
+
+#confidence intervals
+exp(confint(fit2))
+
+```
+
+
 ## Task 5.6
 
 ## Task 5.7
