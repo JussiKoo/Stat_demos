@@ -130,11 +130,14 @@ anova(fit2, fit1)
 #Test statistic is 2.5685 and difference in number of parameters is 2
 1 - pchisq(2.5685,4)
 
-#p-value is 0,63 indicates that smaller model is true
+#H0: smaller model is true
+#p-value 0,63 indicates that we can't reject H0 so we choose smaller model
 
 exp(coef(fit2))
 
-#OR-between smoker types 1 and 0 is 1.40 when other factors are the same
+#Odds for non-smokers first child to be a premature is 0.06
+
+#OR between smoker types 1 and 0 is 1.40 when other factors are the same
 
 #OR between smoker types 2 and 0 is 1.92 when other factors are the same
 
@@ -157,6 +160,61 @@ exp(confint(fit2))
 
 ## Task 5.6
 
+```{r}
+invlogit <- function(x) plogis(x)
+
+beta <- coef(fit2)
+beta
+
+#Probability for non-smokers first child to be premature
+invlogit(beta[1])
+
+#Probability for moderate smokers first child to be premature
+invlogit(beta[1]+beta[2])
+
+#Probability for heavy smokers first child to be premature
+invlogit(beta[1]+beta[3])
+
+#Probability for non-smokers second child to be premature
+invlogit(beta[1] + beta[4])
+
+#Probability for non-smokers later than second child to be premature
+invlogit(beta[1] + beta[5])
+
+#Probability for moderate smokers second child to be premature
+invlogit(beta[1] + beta[2] + beta[4])
+
+#Probability for moderate smokers later than second child to be premature
+invlogit(beta[1] + beta[2] + beta[5])
+
+#Probability for heavy smokers second child to be premature
+invlogit(beta[1] + beta[3] + beta[4])
+
+#Probability for heavy smokers later than second child to be premature
+invlogit(beta[1] + beta[3] + beta[5])
+```
+
 ## Task 5.7
 
+```{r}
+fit3 <- glm(bw$kesk ~ bw$tup + bw$lapsia +bw$rviik, data = bw, family=binomial)
+
+coef(fit2)
+coef(fit3)
+
+
+#Effect of previous pregnancies seems to remain about the same.
+#However effect of smoking changes a lot. It would even look like that
+#moderate smoking has positive effect whereas heavy smoking has negative
+#effect
+
+b <- coef(fit3)
+
+#Probabilities for non-smokers, moderate smokers and heavy smokers first child
+#to be premature when child is born in week 39.
+
+invlogit(b[1] + 39*b[6])
+invlogit(b[1] + b[2] + 39*b[6])
+invlogit(b[1] + b[3] + 39*b[6])
+```
 
