@@ -1,6 +1,6 @@
 ---
 title: "Demo 5"
-author: "Jussi Kauppinen"
+author: "Jussi Kauppinen 2891068547"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
@@ -17,11 +17,15 @@ L(\pi_1,...,\pi_k) &= \prod_{i=1}^k \binom{n_i}{y_i} \pi_i^{i_i} (1 - \pi_i)^{n_
 l((\pi_1,...,\pi_k) &= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} + y_i \log \pi_i + (n_i - y_i) \log(1-\pi_i) \right]\\
 &= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} + n_i \log (1-\pi_i) + y_i \log \left( \frac{\pi_i}{1-\pi_i}\right) \right]\\
 &= \sum_{i=1}^k \left[ \log\binom{n_i}{y_i} - n_i \log (1+e^{x_i^T \beta}) + y_i x_i^T \beta \right]\\
-\frac{\partial}{\partial \beta_j} l(\beta) &= \sum_{i=1}^k -n_i \frac{x_{ij}e^{x_i^T \beta}}{1+e^{x_i^T \beta}} + y_i x_i^T \beta\\
+\frac{\partial}{\partial \beta_j} l(\beta) &= \sum_{i=1}^k -n_i \frac{x_{ij}e^{x_i^T \beta}}{1+e^{x_i^T \beta}} + y_i x_{ij}\\
 &= \sum_{i=1}^k x_{ij} \left( y_i - n_i \frac{e^{x_i^T \beta}}{1+e^{x_i^T \beta}} \right)\\
 &= \sum_{i=1}^k x_{ij} ( y_i - n_i \pi_i )\\
 \end{split}
 \end{equation}
+
+Estimating equation is then
+
+$$\sum_{i=1}^k x_{ij} ( y_i - n_i \pi_i ) = 0$$
 
 
 
@@ -90,8 +94,6 @@ head(bw)
 bw$lapsia <- cut(bw$parit, c(-1,0,1,20), labels=c(0,1,2))
 bw$kesk <- as.numeric(bw$syntpaino < 2500)
 
-plot(bw$kesk ~ bw$tup)
-
 #Mean-weights for each smoking type of the mother
 aggregate(bw$syntpaino, list(bw$tup), data=bw, FUN=mean)
 
@@ -108,6 +110,7 @@ sum(smoke2$kesk)/nrow(smoke2)
 #According to these statistics it would seem like smokers have a higher risk
 #of having premature baby
 
+#Week of gestation should definitely affect childs birthweight.
 #One could assume that social class could affect mothers smoking.
 
 ```

@@ -1,0 +1,31 @@
+---
+title: "Demo 6"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 6.1
+
+\begin{equation}
+\begin{split}
+L(\lambda_1,..., \lambda_k) &= \prod_{i=1}^k \frac{\lambda_i^{y_i}}{y_i !} e^{-\lambda_i}\\
+l(\lambda_1,..., \lambda_k) &= \sum_{i=1}^k x\\
+\end{split}
+\end{equation}
+
+## Task 6.2
+
+## Task 6.3
+
+## Task 6.4
+
+## Task 6.5
+
+## Task 6.6
+
+
