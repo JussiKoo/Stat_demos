@@ -14,11 +14,51 @@ knitr::opts_chunk$set(echo = TRUE)
 \begin{equation}
 \begin{split}
 L(\lambda_1,..., \lambda_k) &= \prod_{i=1}^k \frac{\lambda_i^{y_i}}{y_i !} e^{-\lambda_i}\\
-l(\lambda_1,..., \lambda_k) &= \sum_{i=1}^k x\\
+l(\lambda_1,..., \lambda_k) &= \sum_{i=1}^k y_i \log \lambda_i -\lambda_i - \log y_i !\\
+&= \sum_{i=1}^k y_i x_i^T \beta - e^{x_i^T \beta} - \log y_i !\\
+\frac{\partial}{\partial \beta}  l(\beta) &= \sum_{i=1}^k y_i x_{ij} - x_{ij} e^{x_i^T \beta}\\
 \end{split}
 \end{equation}
 
+Estimating equations
+
+$$\sum_{i=1}^k y_i x_{ij} - x_{ij} e^{x_i^T \beta} = 0$$
+
 ## Task 6.2
+
+```{r}
+library(lattice)
+Bfly <- read.table("http://users.jyu.fi/~knordhau/GLM2/perhoset.txt", header=TRUE)
+Bfly$habitat <- as.factor(Bfly$habitat)
+Bfly$time <- Bfly$time-1 #Shift time by 1 for better interpretations
+attach(Bfly)
+head(Bfly)
+
+xyplot(Colias ~ time|habitat, group=site, data=Bfly, type="b", layout=c(2,2))
+
+#Habitat seems to have an effect on number of butterflies.
+
+ag <- aggregate(Colias, by=list(building), FUN=mean)
+
+xyplot(ag$x ~ ag$Group.1, data=Bfly, type="b")
+
+#Percentage of built in area on site seems to have negative effect on number
+#of butterflies
+
+fit1 <- glm(Colias ~ time + habitat + building, data=Bfly, family=poisson)
+fit2 <- glm(Colias ~ time * habitat + building, data=Bfly, family=poisson)
+anova(fit2, fit1, test="Chisq")
+
+summary(fit2)
+
+#It would seem like interaction between time and habitat is necessary.
+
+ex.data <- data.frame(time = c(0,1,2,3,4), habitat = c("Hayfield","Hayfield","Hayfield","Hayfield", "Hayfield"), building = c(0,0,0,0,0))
+
+p1 <- predict(fit2, ex.data, type="response", se.fit=TRUE)
+
+```
+
 
 ## Task 6.3
 
