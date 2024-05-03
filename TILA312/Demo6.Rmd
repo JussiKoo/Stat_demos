@@ -69,7 +69,36 @@ lines(ex.data2$time, p2$fit, type="l", col="blue")
 
 ## Task 6.3
 
+```{r}
+b <- coef(fit2)
+b
+
+#exp(beta0) means the expected number of butterflies in the zero case
+#(short habitat, year 1)
+exp(b[1])
+
+#exp(beta1) is the percentual change in number of butterflies in one year in
+#short habitat
+
+exp(b[2])
+
+#percentual difference in number of butterflies between mixed and short habitat
+#is exp(beta2)
+
+exp(b[3])
+
+```
+
+
 ## Task 6.4
+
+```{r}
+library(MASS)
+
+fitnb <- glm.nb(Colias ~ time * habitat + building, data=Bfly)
+coef(fitnb)
+coef(fit2)
+```
 
 ## Task 6.5
 
