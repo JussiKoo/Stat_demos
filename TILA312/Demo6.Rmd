@@ -29,7 +29,8 @@ $$\sum_{i=1}^k y_i x_{ij} - x_{ij} e^{x_i^T \beta} = 0$$
 ```{r}
 library(lattice)
 Bfly <- read.table("http://users.jyu.fi/~knordhau/GLM2/perhoset.txt", header=TRUE)
-Bfly$habitat <- as.factor(Bfly$habitat)
+Bfly$habitat <- factor(Bfly$habitat, levels=c("Short", "Mixed", "Tall", "Hayfield"))
+
 Bfly$time <- Bfly$time-1 #Shift time by 1 for better interpretations
 attach(Bfly)
 head(Bfly)
@@ -53,9 +54,15 @@ summary(fit2)
 
 #It would seem like interaction between time and habitat is necessary.
 
-ex.data <- data.frame(time = c(0,1,2,3,4), habitat = c("Hayfield","Hayfield","Hayfield","Hayfield", "Hayfield"), building = c(0,0,0,0,0))
+ex.data1 <- data.frame(time = c(0,1,2,3,4), habitat = rep("Short", 5), building = c(0,0,0,0,0))
 
-p1 <- predict(fit2, ex.data, type="response", se.fit=TRUE)
+ex.data2 <- data.frame(time = c(0,1,2,3,4), habitat = rep("Hayfield", 5), building = c(0,0,0,0,0))
+
+p1 <- predict(fit2, ex.data1, type="response", se.fit=TRUE)
+p2 <- predict(fit2, ex.data2, type="response", se.fit=TRUE)
+
+plot(ex.data1$time, p1$fit, type="l", col="red", ylim=c(0,25))
+lines(ex.data2$time, p2$fit, type="l", col="blue")
 
 ```
 
