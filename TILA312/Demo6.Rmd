@@ -74,18 +74,26 @@ b <- coef(fit2)
 b
 
 #exp(beta0) means the expected number of butterflies in the zero case
-#(short habitat, year 1)
+#(short habitat, year 1, building 0)
 exp(b[1])
 
 #exp(beta1) is the percentual change in number of butterflies in one year in
 #short habitat
 
-exp(b[2])
+100*(exp(b[2])-1)
 
 #percentual difference in number of butterflies between mixed and short habitat
-#is exp(beta2)
+#when other conditions are the same is exp(beta2).
+100*exp(b[3])
 
-exp(b[3])
+#Percentual change in number of butterflies when percentage of built area on
+#site increases by one percent when other factors stay the same is given by
+
+100*(exp(b[6])-1)
+
+#Percentual change in number of butterflies in one year mixed habitat is 
+#given by
+100*(exp(b[2]+b[7])-1)
 
 ```
 
@@ -98,9 +106,63 @@ library(MASS)
 fitnb <- glm.nb(Colias ~ time * habitat + building, data=Bfly)
 coef(fitnb)
 coef(fit2)
+
+#There is notable differences in all coefficients. Negative binomial model
+#takes the overdispersion into account.
+
+r <- residuals(fit2, type="pearson")
+X2 <- sum(r^2)
+
+1-pchisq(X2, 321)
+
+eta <- log(fitted(fit2))
+plot(r ~ eta)
+
+r <- residuals(fitnb, type="pearson")
+X2 <- sum(r^2)
+
+1-pchisq(X2, 321)
+
+eta <- log(fitted(fit2))
+plot(r ~ eta)
 ```
 
 ## Task 6.5
+
+```{r}
+#a
+
+WPD <- read.table ("http://users.jyu.fi/~knordhau/GLM2/verenkierto.txt", header = TRUE)
+attach(WPD)
+head(WPD)
+
+WPD$deaths100k <- ceiling(1e5*kuolleet/vaki)
+
+library(ggplot2)
+ggplot(data = WPD, aes(x = vuosi, y = deaths100k)) +
+geom_point(aes(shape = factor(sukup))) +
+theme_bw()
+
+#b
+
+fitd <- glm(kuolleet ~ I(vuosi-1970) * sukup + offset(log(vaki)), data=WPD, family="poisson")
+
+summary(fitd)
+
+b <- coef(fitd)
+
+#Expected number of male deaths per 100k persons at working age
+#in 1970
+
+1e5*exp(b[1])
+
+1e5*exp(confint(fitd))[1,]
+
+#Change in one year
+
+exp(b[2])
+```
+
 
 ## Task 6.6
 
