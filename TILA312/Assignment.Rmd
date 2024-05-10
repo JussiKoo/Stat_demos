@@ -1,0 +1,44 @@
+---
+title: "Assignment"
+author: "Jussi Kauppinen 2891068547"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Task 1
+
+a) 
+
+The reason why normal distribution is so special in context of general linear models is statistical inference. Usually in case of general linear models the confidence intervals and hypothesis testing for the model parameters are important parts of the process. In cases where random variables error terms follow the normal distribution with same variance the exact distribution for the MLE of parameter vector can be determined. The MLE is actually normally distributed. This makes statistical inference simple. In cases where variances are not constant similar results arise. In cases where error terms are not normally distributed the sampling distributions can be obtained with asymptotic distributions. For large samples the standardized estimator can be approximated by normal distribution.
+
+b) Probability density function of the $\chi^2$-distribution is
+
+\begin{equation}
+\begin{split}
+f(y, k) &= \frac{1}{2^{k/2} \Gamma(k/2)} y^{k/2 - 1} e^{-y/2}\\
+&= \text{exp} \left( \log \left( \frac{1}{2^{k/2} \Gamma(k/2)} y^{k/2 - 1} e^{-y/2} \right) \right)\\
+&= \text{exp} \left( - \frac{k}{2} \log 2 - \log \Gamma(\frac{k}{2}) + (\frac{k}{2} - 1) \log y - \frac{y}{2} \right)\\
+&= \text{exp} \left( (\frac{k}{2} - 1) \log y - (\frac{k}{2} \log 2 + \log \Gamma(\frac{k}{2})) -\frac{y}{2} \right)\\
+\end{split}
+\end{equation}
+
+Let's set $\theta = \frac{k}{2}-1$, $b(\theta) = (\theta+1) \log2 + \log \Gamma(\theta+1)$, $c(y, \phi) = -\frac{y}{2}$, $\phi = 1$ and $a(\phi)=1$. Now we can see that $\log y$ belongs to exponential family. Canonical link is $\theta = \frac{k}{2}-1$. I think GLM might not include this distribution because of the 
+
+
+# Task 2
+
+Hurdle-model consists of two components. One component for positive counts such as Poisson model and one hurdle component for zero-counts. The hurdle models probability density function is
+
+\begin{equation}
+f_{hurdle}(y;x,z,\beta, \gamma) = 
+\begin{cases}
+f_{zero}(0;x,\gamma) &, \quad \text{if} y=0\\
+(1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if} y>0\\
+\end{cases}
+\end{equation}
+
+# Task 3

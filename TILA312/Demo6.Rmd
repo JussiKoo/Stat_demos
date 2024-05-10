@@ -1,6 +1,6 @@
 ---
 title: "Demo 6"
-author: "Jussi Kauppinen"
+author: "Jussi Kauppinen 2891068547"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
@@ -136,10 +136,10 @@ WPD <- read.table ("http://users.jyu.fi/~knordhau/GLM2/verenkierto.txt", header 
 attach(WPD)
 head(WPD)
 
-WPD$deaths100k <- ceiling(1e5*kuolleet/vaki)
+#WPD$deaths100k <- ceiling(1e5*kuolleet/vaki)
 
 library(ggplot2)
-ggplot(data = WPD, aes(x = vuosi, y = deaths100k)) +
+ggplot(data = WPD, aes(x = vuosi, y = ceiling(1e5*kuolleet/vaki))) +
 geom_point(aes(shape = factor(sukup))) +
 theme_bw()
 
@@ -158,12 +158,41 @@ b <- coef(fitd)
 
 1e5*exp(confint(fitd))[1,]
 
-#Change in one year
+#Percentual change in one year.
 
-exp(b[2])
+100*(exp(b[2])-1)
+100*(exp(confint(fitd))[2,]-1)
+
+new.data <- data.frame(vuosi=vuosi, sukup=sukup, vaki=1e5)
+
+pred <- predict(fitd, new.data, type="response")
+
+d <- data.frame(intensiteetti = c(1e5 * kuolleet / vaki, pred),
+                vuosi = vuosi, sukup = factor(sukup, labels=c("Mies", "Nainen")),
+                type = rep(c("Havaittu", "Mallinnettu"), each = nrow(WPD)))
+
+ggplot(data=d, aes(x=vuosi, y=intensiteetti))+
+  geom_line(aes(linetype=sukup, colour=type))+
+  geom_point(aes(shape=sukup, colour=type), position = position_jitter(1,0, seed=1))+
+  theme_classic()
+
 ```
 
 
 ## Task 6.6
 
+```{r}
+new.data2 <- data.frame(sukup = rep(0:1, 7), vuosi = rep(2015:2021, each=2), vaki=1e5)
+
+pred2 <- predict(fitd, new.data2, type="response", se.fit = TRUE)
+
+new.data2$ennuste <- pred2$fit
+
+new.data2$ala <- pred2$fit - qnorm(0.975) * sqrt(pred2$fit + pred2$se.fit^2)
+
+new.data2$yla <- pred2$fit + qnorm(0.975) * sqrt(pred2$fit + pred2$se.fit^2)
+
+new.data2
+
+```
 
