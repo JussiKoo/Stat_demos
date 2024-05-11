@@ -31,7 +31,7 @@ Let's set $\theta = \frac{k}{2}-1$, $b(\theta) = (\theta+1) \log2 + \log \Gamma(
 
 # Task 2
 
-Hurdle-model consists of two components. One component for positive counts such as Poisson model and one hurdle component for zero-counts. The hurdle models probability density function is
+Hurdle-model consists of two components. One component for positive counts such as Poisson model and one hurdle component to account the excess zero-counts. The hurdle models probability density function is
 
 \begin{equation}
 f_{hurdle}(y;x,z,\beta, \gamma) = 
@@ -40,5 +40,33 @@ f_{zero}(0;x,\gamma) &, \quad \text{if} y=0\\
 (1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if} y>0\\
 \end{cases}
 \end{equation}
+
+```{r}
+library(glmmTMB)
+library(pscl)
+library(ggplot2)
+library(lattice)
+
+salam <- Salamanders
+attach(salam)
+
+plot(table(count))
+
+plot(count ~ mined)
+
+plot(count ~ DOP)
+
+plot(count ~ cover)
+
+xyplot(count ~ cover|spp, data=salam)
+
+fit <- glm(count ~ mined + cover, data = salam, family="poisson")
+summary(fit)
+
+fith <- hurdle(count ~ mined + cover, data = salam)
+summary(fith)
+```
+For the interpretations here the hurdle component basically gives the probability to encounter lizards. The count component models the positive counts of lizards.
+
 
 # Task 3
