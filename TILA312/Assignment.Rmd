@@ -31,7 +31,7 @@ Let's set $\theta = \frac{k}{2}-1$, $b(\theta) = (\theta+1) \log2 + \log \Gamma(
 
 # Task 2
 
-Hurdle-model consists of two components. One component for positive counts such as Poisson model and one hurdle component to account the excess zero-counts. The hurdle models probability density function is
+Hurdle model consists of two components. One component for positive counts such as Poisson model and one hurdle component models if the count is zero vs larger. The hurdle models probability density function is
 
 \begin{equation}
 f_{hurdle}(y;x,z,\beta, \gamma) = 
@@ -41,31 +41,60 @@ f_{zero}(0;x,\gamma) &, \quad \text{if} y=0\\
 \end{cases}
 \end{equation}
 
-```{r}
+Basically the 
+
+Let's choose some example model from the data. It seems like mountain top removal mining affects the number of salamanders on sites. Also the amount of cover objects also seems to have an effect. It can also be seen that there's lots of zero-observations which calls for hurdle model.
+
+```{r include=FALSE}
 library(glmmTMB)
 library(pscl)
 library(ggplot2)
 library(lattice)
+library(mltest)
+```
 
+```{r}
 salam <- Salamanders
 attach(salam)
 
 plot(table(count))
 
+#Mining's effect on the observed number of salamanders
 plot(count ~ mined)
 
-plot(count ~ DOP)
-
+#Covers effect on the observed number of salamanders
 plot(count ~ cover)
+```
 
-xyplot(count ~ cover|spp, data=salam)
-
+```{r}
+#Regular Poisson model
 fit <- glm(count ~ mined + cover, data = salam, family="poisson")
 summary(fit)
 
-fith <- hurdle(count ~ mined + cover, data = salam)
+#Hurdle model
+fith <- hurdle(count ~ mined + cover, data = salam,
+               dist="poisson", zero.dist="binomial", link="logit")
 summary(fith)
 ```
+
+Let's compare maximum log-likelihoods of the models and compare what kind to estimations both models give for 
+
+```{r}
+#AIC for both models
+AIC(fit, fith)
+
+#Compare log-likelihoods
+logLik(fit)
+logLik(fith)
+
+#Expected number of zero-observations from both models and the actual number.
+sum(dpois(0, fitted(fit)))
+sum(predict(fith, type="prob")[,1])
+sum(as.numeric(salam$count==0))
+```
+
+We can see from all this criteria that hurdle model is better in this case.
+
 For the interpretations here the hurdle component basically gives the probability to encounter lizards. The count component models the positive counts of lizards.
 
 
