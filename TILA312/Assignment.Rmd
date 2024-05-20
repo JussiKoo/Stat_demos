@@ -97,5 +97,48 @@ We can see from all this criteria that hurdle model is better in this case.
 
 For the interpretations here the hurdle component basically gives the probability to encounter lizards. The count component models the positive counts of lizards.
 
-
 # Task 3
+
+```{r}
+discharge <- read.table("discharge.txt", header=TRUE, sep=";")
+
+set.seed(8547)
+
+#sample indexes
+s <- sample(nrow(discharge), 850)
+
+#Split discharge data into modeling data and test data
+data <- discharge[s,]
+test <- discharge[-s,]
+
+#Shift indexes to 0 and 1
+data$death <- data$death - 1  
+data$gender <- data$gender - 1
+data$inh_inj <- data$inh_inj - 1
+data$flame <- data$flame - 1
+
+#Convert age and tbsa to numeric values
+data$age <- as.numeric(gsub(",", ".", data$age))
+data$tbsa <- as.numeric(gsub(",", ".", data$tbsa))
+
+#Center age to mean age
+data$c_age <- data$age - mean(data$age)
+
+attach(data)
+
+
+#Compute ratio of deaths vs cases for each age. Ages are rounded.
+dratioage <- aggregate(death, by=list(round(age)), FUN=mean)
+
+plot(dratioage$x ~ dratioage$Group.1, ylab="Probability of dying", xlab="Age")
+```
+Effect of age to probability of dying seems to be relatively linear.
+
+Next: similarly effect of total burn area to probability of dying.
+
+effect of inhalation injury to probability of dying.
+
+```{r}
+
+```
+
