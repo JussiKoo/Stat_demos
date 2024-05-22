@@ -112,25 +112,33 @@ data <- discharge[s,]
 test <- discharge[-s,]
 
 #Shift indexes to 0 and 1
-data$death <- data$death - 1  
+data$death <- data$death - 1
 data$gender <- data$gender - 1
 data$inh_inj <- data$inh_inj - 1
 data$flame <- data$flame - 1
+data$race <- data$race - 1
+data$gender <- factor(data$gender, levels=c(0,1), labels=c("Female", "Male"))
+data$inh_inj <- factor(data$inh_inj, levels=c(0,1), labels=c("No", "Yes"))
+data$flame <- factor(data$flame, levels=c(0,1), labels=c("No", "Yes"))
+data$race <- factor(data$race, levels=c(0,1), labels=c("Non-white", "White"))
 
 #Convert age and tbsa to numeric values
 data$age <- as.numeric(gsub(",", ".", data$age))
 data$tbsa <- as.numeric(gsub(",", ".", data$tbsa))
 
-#Center age to mean age
+#New variable where age is centered to mean age
 data$c_age <- data$age - mean(data$age)
 
 attach(data)
 
-
-#Compute ratio of deaths vs cases for each age. Ages are rounded.
+#Compute ratio of deaths vs cases for each age. Ages are rounded to whole numbers.
 dratioage <- aggregate(death, by=list(round(age)), FUN=mean)
 
-plot(dratioage$x ~ dratioage$Group.1, ylab="Probability of dying", xlab="Age")
+ggplot(data=dratioage, aes(x=Group.1, y=x))+
+  geom_point()+
+  xlab("Age")+
+  ylab("Mortality rate")+
+  theme_bw()
 ```
 Effect of age to probability of dying seems to be relatively linear.
 
@@ -139,6 +147,55 @@ Next: similarly effect of total burn area to probability of dying.
 effect of inhalation injury to probability of dying.
 
 ```{r}
+dratioburn <- aggregate(death, by=list(round(tbsa)), FUN=mean)
 
+ggplot(data=dratioburn, aes(x=Group.1, y=x))+
+  geom_point()+
+  xlab("Total burn area")+
+  ylab("Mortality rate")+
+  theme_bw()
 ```
+
+Total surface burn area has obvious effect on probability of dying. We can notice that almost all the patients died after burn area exceeds certain limit.
+
+```{r}
+dratioinh <- aggregate(death, by=list(inh_inj), FUN=mean)
+
+ggplot(data=dratioinh, aes(x=as.factor(Group.1), y=x))+
+  geom_bar(stat="identity")+
+  xlab("Burn involved inhalation injury")+
+  ylab("Mortality rate")+
+  ylim(0,1)
+```
+Inhalation injury has major effect on mortality rate.
+
+```{r}
+dratioflame <- aggregate(death, by=list(flame), FUN=mean)
+
+ggplot(data=dratioflame, aes(x=as.factor(Group.1), y=x))+
+  geom_bar(stat="identity")+
+  xlab("Flame involved in burn injury")+
+  ylab("Mortality rate")+
+  ylim(0,1)
+```
+Flame being involved in injury has some effect too.
+
+```{r}
+dratiogender <- aggregate(death, by=list(gender), FUN=mean)
+
+ggplot(data=dratiogender, aes(x=as.factor(Group.1), y=x))+
+  geom_bar(stat="identity")+
+  xlab("Gender")+
+  ylab("Mortality rate")+
+  ylim(0,1)
+
+dratiorace <- aggregate(death, by=list(race), FUN=mean)
+
+ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
+  geom_bar(stat="identity")+
+  xlab("Race")+
+  ylab("Mortality rate")+
+  ylim(0,1)
+```
+Gender and race seems to have little to no effect.
 
