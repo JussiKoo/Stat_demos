@@ -26,7 +26,11 @@ f(y, k) &= \frac{1}{2^{k/2} \Gamma(k/2)} y^{k/2 - 1} e^{-y/2}\\
 \end{split}
 \end{equation}
 
-Let's set $\theta = \frac{k}{2}-1$, $b(\theta) = (\theta+1) \log2 + \log \Gamma(\theta+1)$, $c(y, \phi) = -\frac{y}{2}$, $\phi = 1$ and $a(\phi)=1$. Now we can see that $\log y$ belongs to exponential family. Canonical link is $\theta = \frac{k}{2}-1$. I think GLM might not include this distribution because of the 
+Let's set $\theta = \frac{k}{2}-1$, $b(\theta) = (\theta+1) \log2 + \log \Gamma(\theta+1)$, $c(y, \phi) = -\frac{y}{2}$, $\phi = 1$ and $a(\phi)=1$. We can see that this is almost fulfills the form of exponential family. Only thing is that we have $\log y$ instead of $y$. Apparently this is sufficient and $\chi^2$-distribution is a member of exponential family. Canonical link is $\theta = \frac{k}{2}-1$. However the form of the distribution yields following results:
+
+$$E(\log(y)) = b'(\theta)$$
+$$Var(\log(y)) = a(\phi)b''(\theta)$$
+I think this might be the reason why glm-function in R doesn't support $\chi^2$-distribution.
 
 
 # Task 2
@@ -198,4 +202,12 @@ ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
   ylim(0,1)
 ```
 Gender and race seems to have little to no effect.
+
+Let's begin by fitting a model with all variables.
+
+```{r}
+fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data, family="binomial")
+summary(fitall)
+```
+
 
