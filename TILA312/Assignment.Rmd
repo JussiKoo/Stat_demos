@@ -209,5 +209,14 @@ Let's begin by fitting a model with all variables.
 fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data, family="binomial")
 summary(fitall)
 ```
+Significance of gender and race is in line with what we saw earlier so they are dropped from the model. Flame being included in burn injury seemed to be somewhat relevant earlier but now it doesn't seem to be significant. It is dropped as well.
+
+Let's consider interactions between remaining variables.
+
+```{r}
+fit <- glm(death ~ age * inh_inj + tbsa, data=data, family="binomial")
+summary(fit)
+```
+
 
 
