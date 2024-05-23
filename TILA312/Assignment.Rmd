@@ -182,7 +182,21 @@ ggplot(data=dratioflame, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 ```
-Flame being involved in injury has some effect too.
+
+Flame being involved in injury has some effect too. However both flame involved in injury and inhalation injury can be both correlated with the total burnt surface area.
+
+```{r}
+ggplot(data=data, aes(x=inh_inj, y=tbsa))+
+  geom_boxplot()
+
+ggplot(data=data, aes(x=flame, y=tbsa))+
+  geom_boxplot()
+
+ggplot(data=data, aes(x=inh_inj, y=flame))+
+  geom_jitter()
+```
+Inhalation injury and flame involved burn injury seem to correlate with total burnt surface area. Inhalation injury also correlates with flame involved in burn injury.
+
 
 ```{r}
 dratiogender <- aggregate(death, by=list(gender), FUN=mean)
@@ -206,16 +220,20 @@ Gender and race seems to have little to no effect.
 Let's begin by fitting a model with all variables.
 
 ```{r}
-fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data, family="binomial")
+fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data,
+              family="binomial")
 summary(fitall)
 ```
 Significance of gender and race is in line with what we saw earlier so they are dropped from the model. Flame being included in burn injury seemed to be somewhat relevant earlier but now it doesn't seem to be significant. It is dropped as well.
 
-Let's consider interactions between remaining variables.
+Let's consider first order interactions between remaining variables.
 
 ```{r}
-fit <- glm(death ~ age * inh_inj + tbsa, data=data, family="binomial")
+fit <- glm(death ~ age*inh_inj + age*tbsa + inh_inj*tbsa, data=data,
+           family="binomial")
 summary(fit)
+
+plot(inh_inj ~ tbsa)
 ```
 
 
