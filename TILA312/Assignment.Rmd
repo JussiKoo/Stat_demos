@@ -106,6 +106,23 @@ For the interpretations here the hurdle component basically gives the probabilit
 ```{r}
 discharge <- read.table("discharge.txt", header=TRUE, sep=";")
 
+#Shift binary values to 0 and 1
+discharge$death <- discharge$death - 1
+discharge$gender <- discharge$gender - 1
+discharge$inh_inj <- discharge$inh_inj - 1
+discharge$flame <- discharge$flame - 1
+discharge$race <- discharge$race - 1
+discharge$gender <- factor(discharge$gender, levels=c(0,1), labels=c("Female", "Male"))
+discharge$inh_inj <- factor(discharge$inh_inj, levels=c(0,1), labels=c("No", "Yes"))
+discharge$flame <- factor(discharge$flame, levels=c(0,1), labels=c("No", "Yes"))
+discharge$race <- factor(discharge$race, levels=c(0,1), labels=c("Non-white", "White"))
+
+discharge$tbsa40 <- as.numeric(discharge$tbsa >= 40)
+
+#Convert age and tbsa to numeric values
+discharge$age <- as.numeric(gsub(",", ".", discharge$age))
+discharge$tbsa <- as.numeric(gsub(",", ".", discharge$tbsa))
+
 set.seed(8547)
 
 #sample indexes
@@ -115,55 +132,57 @@ s <- sample(nrow(discharge), 850)
 data <- discharge[s,]
 test <- discharge[-s,]
 
-#Shift indexes to 0 and 1
-data$death <- data$death - 1
-data$gender <- data$gender - 1
-data$inh_inj <- data$inh_inj - 1
-data$flame <- data$flame - 1
-data$race <- data$race - 1
-data$gender <- factor(data$gender, levels=c(0,1), labels=c("Female", "Male"))
-data$inh_inj <- factor(data$inh_inj, levels=c(0,1), labels=c("No", "Yes"))
-data$flame <- factor(data$flame, levels=c(0,1), labels=c("No", "Yes"))
-data$race <- factor(data$race, levels=c(0,1), labels=c("Non-white", "White"))
-
-#Convert age and tbsa to numeric values
-data$age <- as.numeric(gsub(",", ".", data$age))
-data$tbsa <- as.numeric(gsub(",", ".", data$tbsa))
-
 #New variable where age is centered to mean age
-data$c_age <- data$age - mean(data$age)
+#data$c_age <- data$age - round(mean(data$age))
 
-attach(data)
+#New variable where tbsa is centered to mean tbsa
+#data$c_tbsa <- data$tbsa - round(mean(data$tbsa))
+
+#breaks <- c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90)
+breaks <- seq(0,90,5)
+
+labels <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35", "35-40",
+            "40-45", "45-50", "50-55", "55-60", "60-65", "65-70", "70-75", "75-80",
+            "80-85", "85-90")
+
+#labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90")
+
+#Age-groups for visualization
+data$age_group <- cut(data$age, breaks = breaks, labels = labels, right = FALSE)
 
 #Compute ratio of deaths vs cases for each age. Ages are rounded to whole numbers.
-dratioage <- aggregate(death, by=list(round(age)), FUN=mean)
+dratioage <- aggregate(data$death, by=list(data$age_group), FUN=mean)
 
 ggplot(data=dratioage, aes(x=Group.1, y=x))+
-  geom_point()+
+  geom_bar(stat="identity")+
   xlab("Age")+
   ylab("Mortality rate")+
   theme_bw()
 ```
-Effect of age to probability of dying seems to be relatively linear.
-
-Next: similarly effect of total burn area to probability of dying.
-
-effect of inhalation injury to probability of dying.
+Effect of age to probability of dying seems to be relatively linear. One thing to consider would be dropping observations with age over 75 since they mess up the linearity a bit and it doesn't seem to affect the rate after age raises above this limit. The instruction was to use all 850 observations for modeling so they are kept in the modeling data for this task.
 
 ```{r}
-dratioburn <- aggregate(death, by=list(round(tbsa)), FUN=mean)
+breaks <- seq(0,100, 10)
+
+labels <- c("0-10", "10-20", "20-30", "30-40",
+            "40-50", "50-60", "60-70", "70-80",
+            "80-90", "90-100")
+
+data$tbsa_group <- cut(data$tbsa, breaks = breaks, labels = labels, right = FALSE)
+
+dratioburn <- aggregate(data$death, by=list(data$tbsa_group), FUN=mean)
 
 ggplot(data=dratioburn, aes(x=Group.1, y=x))+
-  geom_point()+
+  geom_bar(stat="identity")+
   xlab("Total burn area")+
   ylab("Mortality rate")+
   theme_bw()
 ```
 
-Total surface burn area has obvious effect on probability of dying. We can notice that almost all the patients died after burn area exceeds certain limit.
+Total surface burn area has obvious effect on probability of dying. We can notice that crossing 40% doesn't seem to affect mortality rate. This is why relationship doesn't look linear so transforming this variable to binary might be necessary.
 
 ```{r}
-dratioinh <- aggregate(death, by=list(inh_inj), FUN=mean)
+dratioinh <- aggregate(data$death, by=list(data$inh_inj), FUN=mean)
 
 ggplot(data=dratioinh, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -174,7 +193,7 @@ ggplot(data=dratioinh, aes(x=as.factor(Group.1), y=x))+
 Inhalation injury has major effect on mortality rate.
 
 ```{r}
-dratioflame <- aggregate(death, by=list(flame), FUN=mean)
+dratioflame <- aggregate(data$death, by=list(data$flame), FUN=mean)
 
 ggplot(data=dratioflame, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -195,11 +214,11 @@ ggplot(data=data, aes(x=flame, y=tbsa))+
 ggplot(data=data, aes(x=inh_inj, y=flame))+
   geom_jitter()
 ```
-Inhalation injury and flame involved burn injury seem to correlate with total burnt surface area. Inhalation injury also correlates with flame involved in burn injury.
+Inhalation injury and flame involved burn injury seem to correlate with total burnt surface area. Inhalation injury also correlates with flame involved in burn injury. 
 
 
 ```{r}
-dratiogender <- aggregate(death, by=list(gender), FUN=mean)
+dratiogender <- aggregate(data$death, by=list(data$gender), FUN=mean)
 
 ggplot(data=dratiogender, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -207,7 +226,7 @@ ggplot(data=dratiogender, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 
-dratiorace <- aggregate(death, by=list(race), FUN=mean)
+dratiorace <- aggregate(data$death, by=list(data$race), FUN=mean)
 
 ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -215,26 +234,72 @@ ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 ```
-Gender and race seems to have little to no effect.
+Gender and race seem to have little to no effect to mortality rate.
 
 Let's begin by fitting a model with all variables.
 
 ```{r}
-fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data,
+fitall <- glm(death ~ c_age + gender + race + tbsa + inh_inj + flame, data=data,
               family="binomial")
 summary(fitall)
 ```
-Significance of gender and race is in line with what we saw earlier so they are dropped from the model. Flame being included in burn injury seemed to be somewhat relevant earlier but now it doesn't seem to be significant. It is dropped as well.
-
-Let's consider first order interactions between remaining variables.
+Significance of gender and race is in line with what we saw earlier so they are dropped from the model. There was also correlation between some variables. That's why flame is dropped from the model and inhalation injury and tbsa can be considered to be added but not together.
 
 ```{r}
-fit <- glm(death ~ age*inh_inj + age*tbsa + inh_inj*tbsa, data=data,
-           family="binomial")
-summary(fit)
 
-plot(inh_inj ~ tbsa)
+fit1 <- glm(death ~ age*tbsa40, data=data,
+           family="binomial")
+summary(fit1)
+
+fit2 <- glm(death ~ age+tbsa, data=data,
+           family="binomial")
+summary(fit2)
+
+
+
+fit4 <- glm(death ~ age+inh_inj, data=data,
+           family="binomial")
+summary(fit4)
+
+fit5 <- glm(death ~ age, data=data,
+           family="binomial")
+summary(fit5)
+
+
+
+fit3 <- glm(death ~ I(age-round(mean(data$age)))*inh_inj + I(tbsa-round(mean(data$tbsa)))*inh_inj, data=data,
+           family="binomial")
+summary(fit3)
+
+test <- data.frame(death = test$death, age = test$age, tbsa = test$tbsa, inh_inj = test$inh_inj)
+
+pred <- predict(fit3, newdata = test, se.fit=TRUE, type="response")
+
+test <- cbind(test, preds = round(pred$fit,2))
+test$error <- abs(test$death-test$preds)
+
+ggplot(data=test, aes(error))+
+  geom_histogram(binwidth=0.005)+
+  xlab("Prediction error")+
+  ylab("Frequency")
+
+ggplot(data=test, aes(error))+
+  geom_dotplot()+
+  xlab("Prediction error")+
+  ylab("Frequency")
+
+ggplot(data=test, aes(x=preds, y=death))+
+  geom_point()+
+  xlab("Prediction")+
+  ylab("Outcome")+
+  ylim(0,1)
+
+b <- exp(coef(fit3))
+b
 ```
+Odds for 33 year old person with
+
+
 
 
 
