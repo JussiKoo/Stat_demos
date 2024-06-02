@@ -40,12 +40,34 @@ Hurdle model consists of two components. One component for positive counts such 
 \begin{equation}
 f_{hurdle}(y;x,z,\beta, \gamma) = 
 \begin{cases}
-f_{zero}(0;x,\gamma) &, \quad \text{if} y=0\\
-(1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if} y>0\\
+f_{zero}(0;z,\gamma) &, \quad \text{if } y=0\\
+(1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if } y>0\\
 \end{cases}
 \end{equation}
 
-Basically the 
+From here we can see that the log-likelihood function will be
+
+\begin{equation}
+\begin{split}
+l(y;x,z,\beta,\gamma) &= \sum_{i=1}^k \log f_{zero}(0;z_i,\gamma) + \sum_{i=k+1}^n \log(1 - f_{zero}(0;x_i,\gamma)) + \log f_{count}(y_i;x_i;\beta) - \log(1 - f_{count}(0;x_i;\beta))\\
+\end{split}
+\end{equation}
+
+assuming that the first $k$ observations are $0$. So the model parameters can be solved from separate estimating equations.
+
+\begin{equation}
+\begin{split}
+l'(\gamma) &= \frac{\partial}{\partial \gamma} \left(\sum_{i=1}^k \log f_{zero}(0;z_i,\gamma) + \sum_{i=k+1}^n \log(1 - f_{zero}(0;z_i,\gamma))\right) = 0\\
+\end{split}
+\end{equation}
+
+and
+
+\begin{equation}
+\begin{split}
+l'(\beta) &= \frac{\partial}{\partial \beta} \left(\sum_{i=k+1}^n \log f_{count}(y_i;x_i;\beta) - \log(1 - f_{count}(0;x_i;\beta))\right) = 0\\
+\end{split}
+\end{equation}
 
 Let's choose some example model from the data. It seems like mountain top removal mining affects the number of salamanders on sites. Also the amount of cover objects also seems to have an effect. It can also be seen that there's lots of zero-observations which calls for hurdle model.
 
