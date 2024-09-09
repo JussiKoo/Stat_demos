@@ -40,21 +40,45 @@ Hurdle model consists of two components. One component for positive counts such 
 \begin{equation}
 f_{hurdle}(y;x,z,\beta, \gamma) = 
 \begin{cases}
-f_{zero}(0;x,\gamma) &, \quad \text{if} y=0\\
-(1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if} y>0\\
+f_{zero}(0;z,\gamma) &, \quad \text{if } y=0\\
+(1-f_{zero}(0;x,\gamma)) \frac{f_{count}(y;x,\beta)}{1-f_{count}(0;x,\beta)} &, \quad \text{if } y>0\\
 \end{cases}
 \end{equation}
 
-Basically the 
+From here we can see that the log-likelihood function will be
+
+\begin{equation}
+\begin{split}
+l(y;x,z,\beta,\gamma) &= \sum_{i=1}^k \log f_{zero}(0;z_i,\gamma) + \sum_{i=k+1}^n \log(1 - f_{zero}(0;x_i,\gamma)) + \log f_{count}(y_i;x_i;\beta) - \log(1 - f_{count}(0;x_i;\beta))\\
+\end{split}
+\end{equation}
+
+assuming that the first $k$ observations are $0$. So the model parameters can be solved from separate estimating equations.
+
+\begin{equation}
+\begin{split}
+l'(\gamma) &= \frac{\partial}{\partial \gamma} \left(\sum_{i=1}^k \log f_{zero}(0;z_i,\gamma) + \sum_{i=k+1}^n \log(1 - f_{zero}(0;z_i,\gamma))\right) = 0\\
+\end{split}
+\end{equation}
+
+and
+
+\begin{equation}
+\begin{split}
+l'(\beta) &= \frac{\partial}{\partial \beta} \left(\sum_{i=k+1}^n \log f_{count}(y_i;x_i;\beta) - \log(1 - f_{count}(0;x_i;\beta))\right) = 0\\
+\end{split}
+\end{equation}
 
 Let's choose some example model from the data. It seems like mountain top removal mining affects the number of salamanders on sites. Also the amount of cover objects also seems to have an effect. It can also be seen that there's lots of zero-observations which calls for hurdle model.
 
-```{r include=FALSE}
+```{r echo=FALSE}
 library(glmmTMB)
 library(pscl)
 library(ggplot2)
 library(lattice)
 library(mltest)
+library(ResourceSelection)
+library(xtable)
 ```
 
 ```{r}
@@ -92,19 +116,41 @@ logLik(fit)
 logLik(fith)
 
 #Expected number of zero-observations from both models and the actual number.
+
+#Poisson
 sum(dpois(0, fitted(fit)))
+
+#Hurdle
 sum(predict(fith, type="prob")[,1])
+
+#Actual
 sum(as.numeric(salam$count==0))
 ```
-
 We can see from all this criteria that hurdle model is better in this case.
 
-For the interpretations here the hurdle component basically gives the probability to encounter lizards. The count component models the positive counts of lizards.
+For the interpretations here the hurdle component basically gives the probability to encounter any lizards. The count component models the positive counts of lizards.
+
+Let's make some interpretations first from regular model.
 
 # Task 3
 
 ```{r}
 discharge <- read.table("discharge.txt", header=TRUE, sep=";")
+
+#Shift binary values to 0 and 1
+discharge$death <- discharge$death - 1
+discharge$gender <- discharge$gender - 1
+discharge$inh_inj <- discharge$inh_inj - 1
+discharge$flame <- discharge$flame - 1
+discharge$race <- discharge$race - 1
+discharge$gender <- factor(discharge$gender, levels=c(0,1), labels=c("Female", "Male"))
+discharge$inh_inj <- factor(discharge$inh_inj, levels=c(0,1), labels=c("No", "Yes"))
+discharge$flame <- factor(discharge$flame, levels=c(0,1), labels=c("No", "Yes"))
+discharge$race <- factor(discharge$race, levels=c(0,1), labels=c("Non-white", "White"))
+
+#Convert age and tbsa to numeric values
+discharge$age <- as.numeric(gsub(",", ".", discharge$age))
+discharge$tbsa <- as.numeric(gsub(",", ".", discharge$tbsa))
 
 set.seed(8547)
 
@@ -115,55 +161,60 @@ s <- sample(nrow(discharge), 850)
 data <- discharge[s,]
 test <- discharge[-s,]
 
-#Shift indexes to 0 and 1
-data$death <- data$death - 1
-data$gender <- data$gender - 1
-data$inh_inj <- data$inh_inj - 1
-data$flame <- data$flame - 1
-data$race <- data$race - 1
-data$gender <- factor(data$gender, levels=c(0,1), labels=c("Female", "Male"))
-data$inh_inj <- factor(data$inh_inj, levels=c(0,1), labels=c("No", "Yes"))
-data$flame <- factor(data$flame, levels=c(0,1), labels=c("No", "Yes"))
-data$race <- factor(data$race, levels=c(0,1), labels=c("Non-white", "White"))
 
-#Convert age and tbsa to numeric values
-data$age <- as.numeric(gsub(",", ".", data$age))
-data$tbsa <- as.numeric(gsub(",", ".", data$tbsa))
 
-#New variable where age is centered to mean age
-data$c_age <- data$age - mean(data$age)
+breaks <- c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90)
+#breaks <- seq(0,90,5)
 
-attach(data)
+#labels <- c("0-5", "5-10", "10-15", "15-20", "20-25", "25-30", "30-35", "35-40",
+#            "40-45", "45-50", "50-55", "55-60", "60-65", "65-70", "70-75", "75-80",
+#            "80-85", "85-90")
+
+labels <- c("0-10", "10-20", "20-30", "30-40", "40-50", "50-60", "60-70", "70-80", "80-90")
+
+#Age-groups for visualization
+data$age_group <- cut(data$age, breaks = breaks, labels = labels, right = FALSE)
+
+#logit-function to investigate linearity of the effects
+logit <- function(data){
+  log(mean(data)/(1-mean(data)))
+}
 
 #Compute ratio of deaths vs cases for each age. Ages are rounded to whole numbers.
-dratioage <- aggregate(death, by=list(round(age)), FUN=mean)
+dratioage <- aggregate(data$death, by=list(data$age_group), FUN=logit)
 
 ggplot(data=dratioage, aes(x=Group.1, y=x))+
   geom_point()+
   xlab("Age")+
-  ylab("Mortality rate")+
+  ylab("log-odds of dying")+
   theme_bw()
 ```
-Effect of age to probability of dying seems to be relatively linear.
-
-Next: similarly effect of total burn area to probability of dying.
-
-effect of inhalation injury to probability of dying.
+Relationship of age to odds of dying seems to be relatively linear.
 
 ```{r}
-dratioburn <- aggregate(death, by=list(round(tbsa)), FUN=mean)
+breaks <- seq(0,100, 10)
+
+labels <- c("0-10", "10-20", "20-30", "30-40",
+            "40-50", "50-60", "60-70", "70-80",
+            "80-90", "90-100")
+
+
+
+data$tbsa_group <- cut(data$tbsa, breaks = breaks, labels=labels, right = FALSE)
+
+dratioburn <- aggregate(data$death, by=list(data$tbsa_group), FUN=logit)
 
 ggplot(data=dratioburn, aes(x=Group.1, y=x))+
   geom_point()+
   xlab("Total burn area")+
-  ylab("Mortality rate")+
+  ylab("log-odds of dying")+
   theme_bw()
 ```
 
-Total surface burn area has obvious effect on probability of dying. We can notice that almost all the patients died after burn area exceeds certain limit.
+Total surface burn area has obvious effect on probability of dying. Relationship looks somewhat linear.
 
 ```{r}
-dratioinh <- aggregate(death, by=list(inh_inj), FUN=mean)
+dratioinh <- aggregate(data$death, by=list(data$inh_inj), FUN=mean)
 
 ggplot(data=dratioinh, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -174,7 +225,7 @@ ggplot(data=dratioinh, aes(x=as.factor(Group.1), y=x))+
 Inhalation injury has major effect on mortality rate.
 
 ```{r}
-dratioflame <- aggregate(death, by=list(flame), FUN=mean)
+dratioflame <- aggregate(data$death, by=list(data$flame), FUN=mean)
 
 ggplot(data=dratioflame, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -182,10 +233,21 @@ ggplot(data=dratioflame, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 ```
-Flame being involved in injury has some effect too.
+
+Flame being involved in injury has some effect too. However both flame involved in injury and inhalation injury can be both correlated with the total burnt surface area.
 
 ```{r}
-dratiogender <- aggregate(death, by=list(gender), FUN=mean)
+ggplot(data=data, aes(x=inh_inj, y=tbsa))+
+  geom_boxplot()
+
+ggplot(data=data, aes(x=flame, y=tbsa))+
+  geom_boxplot()
+```
+It seems like patients with inhalation injuries also have much more total burnt surface area which makes sense. Inhalation injury seemed like it has major effect on mortality on it's own so it might be worth to keep it in the final model. Flame being involved didn't have that much effect on mortality and it doesn't seem that of a relevant variable here.
+
+
+```{r}
+dratiogender <- aggregate(data$death, by=list(data$gender), FUN=mean)
 
 ggplot(data=dratiogender, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -193,7 +255,7 @@ ggplot(data=dratiogender, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 
-dratiorace <- aggregate(death, by=list(race), FUN=mean)
+dratiorace <- aggregate(data$death, by=list(data$race), FUN=mean)
 
 ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
   geom_bar(stat="identity")+
@@ -201,13 +263,144 @@ ggplot(data=dratiorace, aes(x=as.factor(Group.1), y=x))+
   ylab("Mortality rate")+
   ylim(0,1)
 ```
-Gender and race seems to have little to no effect.
+Gender and race seem to have little to no effect to mortality rate.
 
 Let's begin by fitting a model with all variables.
 
 ```{r}
-fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data, family="binomial")
+fitall <- glm(death ~ age + gender + race + tbsa + inh_inj + flame, data=data,
+              family="binomial")
 summary(fitall)
 ```
+Significance of gender and race is in line with what we saw earlier so they are dropped from the model. Flame is also dropped since it seems like it is not significant. Let's see if interaction with inhalation injury is needed.
+
+```{r}
+
+fit1 <- glm(death ~ I(age-30)*inh_inj + I(tbsa-15)*inh_inj, data=data,
+           family="binomial")
+
+fit2 <- glm(death ~ I(age-30) + I(tbsa-15)*inh_inj, data=data,
+           family="binomial")
+
+fit3 <- glm(death ~ I(age-30)*inh_inj + I(tbsa-15), data=data,
+           family="binomial")
+
+fit4 <- glm(death ~ I(age-30) + I(tbsa-15), data=data,
+           family="binomial")
+
+AIC(fit1)
+AIC(fit2)
+AIC(fit3)
+AIC(fit4)
+```
+
+It seems like interaction terms can be kept in the model. Let's investigate the final model with Hosmer-Lemeshow test. Small p-value from Hosmer-Lemeshow test would indicate bad fit.
+
+```{r}
+#Small p-value from Hosmer-Lemeshow test would indicate bad fit.
+#p-value is quite high now so we can't reject the model.
+hoslem.test(data$death, fitted(fit1))
+```
+Tests p-value is quite high now so we can't reject the model. Let's use the model to make predictions for test data. If probability to die is over 0,5 let's say that the prediction is that patient will die.
+
+```{r}
+test <- data.frame(death = test$death, age = test$age, tbsa = test$tbsa, inh_inj = test$inh_inj)
+
+pred <- predict(fit1, newdata = test, se.fit=TRUE, type="response")
+
+test <- cbind(test, probs = round(pred$fit,2))
+
+test$preds <- as.numeric(test$probs > 0.5)
+
+#Ratio of correct predictions
+sum(test$death == test$preds)/nrow(test)
+```
+
+The final model could predict the outcome in the test data with approximately 91 % accuracy. This seems like a reasonably good result.
+
+The models assumptions are that all observations are independent. That means in this case that there's no patients that got hospitalized from same burn accident. Relationships between predictors and log-odds should be linear. Predictors for the final model are age, total burnt surface area and their interactions with inhalation injury. Age is centered at 30 years and total burnt surface area at 15 % for easier interpretations. Model can be interpreted using odds and odds ratios (OR) and at the probability level.
+
+```{r}
+expb <- exp(coef(fit1))
+expb
+```
+Main interest was effect of age. Let's see related odds and odds ratios.
+
+```{r}
+#OR between two patients with same tbsa and no inhalation injury with age
+#difference of one year.
+expb[2]
+
+#OR between two patients with same tbsa and inhalation injury with age
+#difference of one year.
+expb[2]+expb[5]
+```
+This means that older patient is more likely to die in hospital and even more likely if inhalation injury is present. Intercept can be interpreted as the odds for a 30 year old patient with 15 % total burnt surface area and no inhalation injury to die in hospital.
+
+```{r}
+expb[1]
+```
+Let's examine the effect of total burnt surface area and inhalation injury with odds and odds ratios.
+
+```{r}
+#OR between patients of same age and no inhalation injury with one percentage
+#point difference in total burnt surface area
+expb[4]
+
+#OR between patients of same age and inhalation injury with one percentage
+#point difference in total burnt surface area
+expb[4]+expb[6]
+
+#OR between patients of same age and with same burnt surface area. Other has
+#inhalation injury and other has not.
+expb[3]
+```
+So higher total burnt surface area raises the odds to die in a hospital and even more if patient also has inhalation injury. Inhalation injury has major effect on odds to die in a hospital. However the 95 % confidence interval for the last OR is quite large but one can still say that there's a major effect.
+
+```{r}
+exp(confint(fit1))
+```
+
+Let's look at the interpretations at the probability level.
+
+```{r}
+b <- coef(fit1)
+b
+
+invlogit <- function(x){
+  plogis(x)
+}
+
+ages <- seq(-20, 60, 10)
+
+probs1 <- invlogit(b[1] + ages*b[2])
+probs2 <- invlogit(b[1] + ages*(b[2]+b[5]) + b[3])
+
+d1 <- data.frame(age = ages+30, no_inh_inj = probs1, inh_inj = probs2)
+
+#Probabilities to die in a hospital for different ages with tbsa of 15%.
+d1
+
+tbsas <- seq(-5, 75, 10)
+
+probs3 <- invlogit(b[1] + tbsas*b[4])
+probs4 <- invlogit(b[1] + tbsas*(b[4]+b[6]) + b[3])
+
+d2 <- data.frame(tbsa = tbsas+15, no_inh_inj = probs3, inh_inj = probs4)
+
+#Probabilities for 30-year old patients with different tbsa to die in a 
+#hospital.
+d2
+```
+So to summarize the results it looks like age definitely has an effect to patients chances to survive the burn injuries. Older patients are more likely to die to their injuries than younger patients. Inhalation injury has also severe effect and even somewhat healthy young adults have fairly high probabilities to die if they have inhalation injury and no major burn injuries. Total burnt surface area also has an effect on chances to survive. The more severe the burns are the more likely the patient is to die in a hospital.
+
+
+
+
+
+
+
+
+
 
 
