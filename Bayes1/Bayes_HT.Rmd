@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## 
 
 ```{r}
 siemenluku <- 2891068547 # LAITA TÄHÄN OPISKELIJANUMEROSI

@@ -1,0 +1,52 @@
+---
+title: "Bayes_demo3"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tehtävä 1
+
+\begin{equation}
+p(\theta|y) = \frac12 \theta^2 e^{-\theta}
+\end{equation}
+
+Jakauma on gammajakauma parametrein $\alpha=3$ ja $\beta=1$. Täten jakauman odotusarvo on $E(\theta|y) = 3$ ja keskihajonta $\sqrt{Var(\theta|y)}=\sqrt{3}$. Lasketaan 90% posterioriväli:
+
+```{r}
+qgamma(c(0.05,0.95), shape=3, rate=1)
+```
+
+## Tehtävä 2 
+
+Posteriorijakauma on normaalijakauma odotusarvolla $\frac{\frac{1}{\sigma_0^2}\mu_0 + \frac{n}{\sigma^2}\overline{y}}{\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}} = \frac{\frac{1}{9^2}\cdot 8 + \frac{9}{4^2}\cdot 13,35}{\frac{1}{9^2} + \frac{9}{4^2}}$
+
+```{r}
+y <- c(18.36, 16.17, 10.21, 11.07, 18.32, 6.03, 18.42, 8.04, 13.53)
+my <- mean(y)
+mu0 <- 8
+sigma0 <- 9
+sigma <- 4
+n <- length(y)
+
+postmu <- ((1/sigma0^2)*mu0 + (n/sigma^2)*my)/(1/sigma0^2 + n/sigma^2)
+
+postsigma2 <- 1/(1/sigma0^2 + n/sigma^2)
+
+qnorm(c(0.05,0.95), postmu, postsigma2)
+```
+
+
+## Tehtävä 3
+
+## Tehtävä 4
+
+## Tehtävä 5
+
+## Tehtävä 6
+
+## Tehtävä 7
