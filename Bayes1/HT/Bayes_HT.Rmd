@@ -8,6 +8,8 @@ bibliography: references.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(brms)
 ```
 
 ## 
@@ -47,7 +49,7 @@ d <- read_spss("daF2076_eng.por") |>
   # käytetään vain täysiä havaintorivejä yksinkertaisuuden vuoksi
   drop_na()
 ```
-
+# Datan tarkastelua (mieti otsikko)
 ```{r}
 plot(density(d$tulot))
 
@@ -58,6 +60,29 @@ plot(d$tulot ~ d$sukupuoli)
 plot(d$tulot ~ d$koulutustaso)
 
 plot(d$tulot ~ d$ITPA)
-```
 
+ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
+  geom_point()
+
+#Sukupuolella on ainakin vaikutusta tuloihin. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Miehillä ilmenee poikkeuksellisen korkeita tuloja joissain kohdissa minkä voisi katsoa poikkeamaksi.
+
+ggplot(data=d, mapping=aes(x=ITPA, y=tulot, colour = sukupuoli))+
+  geom_point()
+
+#ITPA-älykkyystestin tulos näyttää kasvattavan tuloja lineaarisesti. Naisten ja miesten välillä
+#ei ole suuria eroja.
+
+ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
+  geom_boxplot()
+
+#Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä. Voisimme siis pelkistää dataa.
+```
+# Mallinnus (mieti otsikko)
+
+```{r}
+fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
+fit1
+
+get_prior(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
+```
 
