@@ -3,6 +3,7 @@ title: "Bayes_HT"
 author: "Jussi Kauppinen"
 date: "`r Sys.Date()`"
 output: pdf_document
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -11,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 
 
-```{r}
-siemenluku <- 2891068547 # LAITA TÄHÄN OPISKELIJANUMEROSI
+```{r, include=FALSE}
+siemenluku <- 8547 # LAITA TÄHÄN OPISKELIJANUMEROSI
 # jos set.seed(siemenluku antaa virheilmoituksen), 
 # vaihda siemenluvuksi opiskelijanumerosi neljä viimeistä numeroa
 set.seed(siemenluku)
@@ -21,7 +22,7 @@ library("haven")
 library("tidyr")
 library("dplyr")
 
-d <- read_spss("daF2076e.por") |> 
+d <- read_spss("daF2076_eng.por") |> 
   select(
     arvosana = K82,
     sukupuoli = T3,
@@ -46,3 +47,17 @@ d <- read_spss("daF2076e.por") |>
   # käytetään vain täysiä havaintorivejä yksinkertaisuuden vuoksi
   drop_na()
 ```
+
+```{r}
+plot(density(d$tulot))
+
+plot(tulot ~ arvosana, data=d, col=sukupuoli)
+
+plot(d$tulot ~ d$sukupuoli)
+
+plot(d$tulot ~ d$koulutustaso)
+
+plot(d$tulot ~ d$ITPA)
+```
+
+

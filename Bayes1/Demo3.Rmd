@@ -40,8 +40,14 @@ postsigma2 <- 1/(1/sigma0^2 + n/sigma^2)
 qnorm(c(0.05,0.95), postmu, postsigma2)
 ```
 
-
 ## Tehtävä 3
+
+```{r}
+library(brms)
+
+fit <- brm()
+```
+
 
 ## Tehtävä 4
 

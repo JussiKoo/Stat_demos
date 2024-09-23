@@ -1,0 +1,98 @@
+FSD2076 Life Course 1971 - 2002
+July 2013, HAL
+********************************************
+
+Translation notes
+
+
+T14 Information on the creation of the variable
+
+The three-level categorisation of the variable T14 was done in two stages. The occupations of parents were first classified according to a nine-class classification of occupations. The Classification of Education drawn up by Heikki Havén in the 1960s was used as a basis for the classification. Additionally, status and wage factors were taken into consideration. Nine different occupational fields were divided into nine different levels: 1. Non-vocational, general education, 2. Non-vocational education received at workplace, 3. First level of upper secondary education 4. Second level of upper secondary education, 5. Third level of secondary education, 6. First level of higher education, 7. Second level of higher education, 8. Third level of higher education and 9. Fourth level of higher education. The division into the three categories in T14 was done by arranging levels 1 and 2 in the low status, levels 3, 4 and 5 in the middle status and levels 6, 7, 8 and 9 in the high status.
+
+
+K2-K83, K87-K94
+
+The grades in the Finnish education system range from 4, the lowest (fail), to 10, the highest.
+
+
+K18-K27
+
+First foreign language refers to the first language that students begin studying, usually when they are in third grade. It is most often English, but can be, for instance, Swedish, French or German.
+
+
+K22, k24, k26, k28, k30, k32, k44, k46, k48
+
+Ability grouping was used in languages and maths in the Finnish lower secondary education system until 1985. There were three ability levels, differing in the amount of information provided for the student: extensive, middle level and basic. In order to be accepted to upper secondary school (general education), students mostly had to complete middle level or extensive courses, in addition to having a high enough grade average of theoretical subjects. Students and their parents chose the ability level, although a teacher could recommend the level for a student based on his/her performance.
+
+
+K82-K85
+
+Students in 9th grade apply for upper secondary education in joint application, in which they can choose to apply for vocational schools, upper secondary schools, commercial schools, nursing schools etc. Several schools can be applied for in the same application. For upper secondary schools, the selection criterion is usually the grade average of theoretical subjects in the school leaving certificate. For vocational schools, the selection criteria often include the grade average of the school leaving certificate as well as other criteria. 
+
+
+K84-K85
+
+Finnish folk high schools are part of the adult education system, providing a broad range of courses for adults. Many are residential schools where students participate in full-time study. Folk schools do not provide formal education certificates.
+
+
+K86
+
+The matriculation examination is the final examination in Finnish upper secondary schools, held nationally in autumn and in spring. More information on the matriculation examination: http://www.ylioppilastutkinto.fi/fi/english
+
+
+K95-K100, K101
+
+The grades of the matriculation examination range from Improbatur, the lowest (failed), to Laudatur, the highest.
+
+
+K99
+
+Second domestic language would be Swedish for the majority of students.
+
+
+K101
+
+Compensatory points are points granted for grades Approbatur to Laudatur in the matriculation examination, which makes it possible for a student to compensate for a failing grade (Improbatur) in one or more subjects by performing well in others and complete the examination successfully (although the grade will remain Improbatur). Compensatory points can be used, as they have been used here, to enable numerical measurement of performance in the matriculation examination. It is to be noted, however, that because not all students complete the same number of tests in the examination, the points are not directly comparable between the respondents. The corresponding points for each grade were: Approbatur=2, Lubenter Approbatur=3, Cum laude approbatur=4, Magna cum laude approbatur=5 and Laudatur=6.
+
+
+KOULU1-KOULU28
+
+These categorised variables are based on the responses to open-ended questions 5-11 charting the respondents' education in questionnaire 1. It was not always clear at the archive what the difference between two similar variables was (see the note below).
+
+
+KOULU5_4 & KOULU5_5, KOULU6_4 & KOULU6_5, KOULU7_4 & KOULU7_5
+
+The Finnish variables differ only in terms of the words 'opintosuunta' and 'opintolinja' (both of which refer mostly to the same thing; discipline/field of study/vocational field). The archive was not able to determine the difference between these variables, nor the reason why the response categories do not appear to match the question.
+
+
+KTU16I
+
+The Finnish statement is somewhat ambiguous and could be understood to mean either "Getting an education will prove to be useful for me at the different stages of my life" or "I will need to get more education at different stages of my life."
+
+
+KTU31A_1-KTU31A_29, KTU31B_1-KTU31B_11
+
+These variables are derived from question 31 in the questionnaire in which the respondents were asked to mark events in their life on a line that described their life from age 15 to 26. The question texts in full are as follows: 
+a) Following the example provided, mark events and actions that have structured your life above the line. Notice that your life may have been structured by events other than the ones mentioned in the example, so please mark all mportant events in your own life.
+b) Using the alternatives provided, mark below the line what your main activity was at each point in your life.
+
+
+KTU31A14 Stability vs. unstability of career
+
+It is somewhat unclear even in Finnish what the first response category (1) means. The literal translation is 'education career'.
+
+
+EK6_1-EK6_7
+
+Similarly to KOULU1-KOULU28, these variables are based on the responses to open-ended question 6 charting education in questionnaire 2.
+
+
+EK31_1 - EK51_2 Question text in full:
+
+In the following are mentioned some things that structure people's time use in their everyday life. Estimate to what extent the following things give meaning and content to your life and how much time you spend on them.
+
+
+EK86
+
+The introductory text of the question in full:
+There are many things in life which create security, confidence and trust. On the other hand, the same things may cause uncertainty. Assess whether the following things will bring you confidence and security or uncertainty in your own life, when you think about your life from now onwards. Choose the alternative that best describes how you feel.
