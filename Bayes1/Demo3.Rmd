@@ -38,6 +38,8 @@ postmu <- ((1/sigma0^2)*mu0 + (n/sigma^2)*my)/(1/sigma0^2 + n/sigma^2)
 postsigma2 <- 1/(1/sigma0^2 + n/sigma^2)
 
 qnorm(c(0.05,0.95), postmu, postsigma2)
+postmu
+postsigma2
 ```
 
 ## Tehtävä 3
@@ -45,14 +47,80 @@ qnorm(c(0.05,0.95), postmu, postsigma2)
 ```{r}
 library(brms)
 
+<<<<<<< HEAD
 fit <- brm()
 ```
 
 
+=======
+data = data.frame(y=y)
+fit <- brm(y~1, data=data, prior=prior(normal(8,9), class="Intercept"), refresh=0)
+fit
+```
+
+
+
+>>>>>>> d6669a42d66fbe11cc1284de8745bd4322a7157c
 ## Tehtävä 4
+
+```{r}
+y <- c(3.1, 2.2, 1.7, 0.9, 1.5, 2.3, 0.5, 0.1, 0.2, 0.6, 2.1, 0.1)
+mean(y)
+data <- data.frame(y=y)
+
+fit <- brm(y~1, family=Gamma("log"),data=data, refresh=0)
+fit
+```
+
 
 ## Tehtävä 5
 
+```{r}
+logmudist = as_draws_df(fit, variable="Intercept")
+
+logmudist$mu = exp(logmudist$Intercept)
+shapedist = as_draws_df(fit, variable="shape")
+
+#Oikein laskettu odotusarvo
+mu <- mean(logmudist$mu)
+shape <- mean(shapedist$shape)
+
+#Väärin laskettu odotusarvo
+fakemu <- exp(mean(logmudist$Intercept))
+
+#Kuten Jensenin epäyhtälössä
+mu
+fakemu
+print(mu >= fakemu)
+
+#mu=shape/rate
+
+rate <- shape/mu
+shape
+rate
+```
+
 ## Tehtävä 6
 
+```{r}
+pisa <- read.table("http://users.jyu.fi/~santikka/bayes1/data/pisa.txt", header = TRUE)
+
+fitpisa <- brm(mpist ~ matem + sukup + koulusij + koulualue, data=pisa, refresh=0)
+fitpisa
+
+#Posteriorikeskiarvot: Estimate
+#Keskihajonnat: Est.Error
+#Posteriorivälit: l-95% CI ja u-95% CI
+```
+Bayesiläisittäin regressiokertoimet ovat siis satunnaislukuja. Estimaatit kuvaavat jakauman odotusarvoja ja 95% posterioriväli saadaan jakauman kvantiileista. Nyt siis esimerkiksi regressiokerroin $\beta_1$ eli edellisen matematiikan arvosanan vaikutusta kuvaava kerroin on sitä vastaavalla posteriorivälillä 95% todennäköisyydellä.
+
+
 ## Tehtävä 7
+
+```{r}
+hypothesis(fitpisa, "koulualueItaMSuomi>koulualueLansiMSuomi")
+
+otos <- as_draws_df(fitpisa)
+mean(otos$b_koulualueItaMSuomi>otos$b_koulualueLansiMSuomi)
+```
+
