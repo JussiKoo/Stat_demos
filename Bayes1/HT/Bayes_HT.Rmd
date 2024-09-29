@@ -1,0 +1,88 @@
+---
+title: "Bayes_HT"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(brms)
+```
+
+## 
+
+```{r, include=FALSE}
+siemenluku <- 8547 # LAITA TÄHÄN OPISKELIJANUMEROSI
+# jos set.seed(siemenluku antaa virheilmoituksen), 
+# vaihda siemenluvuksi opiskelijanumerosi neljä viimeistä numeroa
+set.seed(siemenluku)
+library("rlang")
+library("haven")
+library("tidyr")
+library("dplyr")
+
+d <- read_spss("daF2076_eng.por") |> 
+  select(
+    arvosana = K82,
+    sukupuoli = T3,
+    koulutustaso = BV2_1,
+    tulot = BV4_1,
+    ITPA = L17,
+  ) |> 
+  mutate(
+    sukupuoli = factor(sukupuoli, labels = c("Mies", "Nainen")),
+    koulutustaso = recode_factor(
+      factor(koulutustaso),
+      "2" = "Korkeintaan toisen asteen koulutus",
+      "3" = "Korkeintaan toisen asteen koulutus",
+      "4" = "Korkeintaan toisen asteen koulutus",
+      "5" = "Alempi korkeakouluaste tai alin korkea-aste",
+      "6" = "Alempi korkeakouluaste tai alin korkea-aste",
+      "7" = "Ylempi korkeakouluaste",
+      "8" = "Ylempi korkeakouluaste"
+    )
+  ) |> 
+  slice(sample(seq_len(n()), size = 300)) |> 
+  # käytetään vain täysiä havaintorivejä yksinkertaisuuden vuoksi
+  drop_na()
+```
+# Datan tarkastelua (mieti otsikko)
+```{r}
+plot(density(d$tulot))
+
+plot(tulot ~ arvosana, data=d, col=sukupuoli)
+
+plot(d$tulot ~ d$sukupuoli)
+
+plot(d$tulot ~ d$koulutustaso)
+
+plot(d$tulot ~ d$ITPA)
+
+ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
+  geom_point()
+
+#Sukupuolella on ainakin vaikutusta tuloihin. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Miehillä ilmenee poikkeuksellisen korkeita tuloja joissain kohdissa minkä voisi katsoa poikkeamaksi.
+
+ggplot(data=d, mapping=aes(x=ITPA, y=tulot, colour = sukupuoli))+
+  geom_point()
+
+#ITPA-älykkyystestin tulos näyttää kasvattavan tuloja lineaarisesti. Naisten ja miesten välillä
+#ei ole suuria eroja.
+
+ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
+  geom_boxplot()
+
+#Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä. Voisimme siis pelkistää dataa.
+```
+# Mallinnus (mieti otsikko)
+
+```{r}
+fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
+fit1
+
+get_prior(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
+```
+

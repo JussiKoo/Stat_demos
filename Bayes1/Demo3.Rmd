@@ -49,6 +49,12 @@ qnorm(c(0.025,0.975), postmu, postsigma)
 ```{r}
 set.seed(1337)
 
+<<<<<<< HEAD
+fit <- brm()
+```
+
+
+=======
 data = data.frame(y=y)
 fit <- brm(y~1, data=data, prior=prior(normal(8,9), class="Intercept"), refresh=0)
 fit
@@ -57,6 +63,7 @@ Posteriorikeskiarvot: $\hat\mu = 13,13$ ja $\hat\sigma = 5,37$.
 
 95%-posteriorivälit: $[9,38; 16,74]$ ja $[3,35; 8,91]$
 
+>>>>>>> d6669a42d66fbe11cc1284de8745bd4322a7157c
 ## Tehtävä 4
 
 ```{r}
