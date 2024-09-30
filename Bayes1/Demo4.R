@@ -10,7 +10,7 @@ priors2 <- c(prior(normal(48.3, 1), class="Intercept"), prior(normal(0,1), class
 fit1 <- brm(y ~ I(x - mean(x)), data = d, prior = priors1)
 fit2 <- brm(y ~ I(x - mean(x)), data = d, prior = priors2)
 
-#Näytteitä posterioriennustejakauman odotusarvon jakaumasta
+#Näytteitä posterioriennustejakauman odotusarvoista
 draw1 <- posterior_epred(fit1)
 draw2 <- posterior_epred(fit2)
 
@@ -37,5 +37,10 @@ ggplot(summary2, aes(y=Estimate, x=xcentered)) +
   geom_ribbon(data=summary2, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
   geom_line()
 
+#T6
 
+beetles <- read.table("http://users.jyu.fi/~santikka/bayes1/data/beetles.txt")
+beetles$aliverate <- beetles$alive/beetles$total
 
+fitbeetle <- brm(alive | trials(total) ~ I(treatment-mean(treatment)), data=beetles, family=binomial("logit"))
+fitbeetle
