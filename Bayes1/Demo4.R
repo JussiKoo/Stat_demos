@@ -48,8 +48,6 @@ draw <- as_draws_df(fitbeetle)
 betahat <- mean(draw$b_ItreatmentMmeantreatment)
 alphahat <- mean(draw$Intercept)
 
-plot(density(draw$b_ItreatmentMmeantreatment))
-
 #Torakalle 1 on annettu 1 mikrogramma/ml enemmän myrkkyä kuin torakalle 2
 #OR näiden välillä on
 exp(betahat)
