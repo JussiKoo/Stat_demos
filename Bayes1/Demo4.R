@@ -10,7 +10,7 @@ priors2 <- c(prior(normal(48.3, 1), class="Intercept"), prior(normal(0,1), class
 fit1 <- brm(y ~ I(x - mean(x)), data = d, prior = priors1)
 fit2 <- brm(y ~ I(x - mean(x)), data = d, prior = priors2)
 
-#Näytteitä posterioriennustejakauman odotusarvon jakaumasta
+#Posterioriennustejakauman odotusarvot
 draw1 <- posterior_epred(fit1)
 draw2 <- posterior_epred(fit2)
 
@@ -29,13 +29,13 @@ summary2 <- as.data.frame(t(apply(draw2, 2, summary_fun)))
 summary1$xcentered <- d$x-mean(d$x)
 summary2$xcentered <- d$x-mean(d$x)
 
+#Kuvataan posterioriennustejakauman odotusarvojen otoskeskiarvoja x:n suhteen.
 ggplot(summary1, aes(y=Estimate, x=xcentered)) +
-  geom_ribbon(data=summary1, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
-  geom_line()
-
-ggplot(summary2, aes(y=Estimate, x=xcentered)) +
-  geom_ribbon(data=summary2, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
-  geom_line()
+  geom_ribbon(mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
+  geom_ribbon(summary2, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="blue", alpha=0.25)+
+  geom_line(summary2, mapping=aes(y=Estimate, x=xcentered), col="blue")+
+  geom_line(col="red") +
+  ggtitle("Epäinformatiiviset priorit vs informatiiviset priorit")
 
 
 
