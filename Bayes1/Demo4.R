@@ -40,7 +40,20 @@ ggplot(summary2, aes(y=Estimate, x=xcentered)) +
 #T6
 
 beetles <- read.table("http://users.jyu.fi/~santikka/bayes1/data/beetles.txt")
-beetles$aliverate <- beetles$alive/beetles$total
 
 fitbeetle <- brm(alive | trials(total) ~ I(treatment-mean(treatment)), data=beetles, family=binomial("logit"))
 fitbeetle
+draw <- as_draws_df(fitbeetle)
+
+betahat <- mean(draw$b_ItreatmentMmeantreatment)
+alphahat <- mean(draw$Intercept)
+
+plot(density(draw$b_ItreatmentMmeantreatment))
+
+#Torakalle 1 on annettu 1 mikrogramma/ml enemmän myrkkyä kuin torakalle 2
+#OR näiden välillä on
+exp(betahat)
+
+#Odds torakan selviytymiselle kun myrkkyannos on keskiarvo 4.36 migrog/ml
+mean(beetles$treatment)
+exp(alphahat)
