@@ -4,7 +4,7 @@ library(ggplot2)
 
 d <- data.frame(y = c(50, 44, 50, 47, 56), x = 1:5)
 
-priors1 <- c(prior(normal(50,10), class="Intercept"), prior(normal(0,10), class="b"), prior(gamma(2, 0.001), class="sigma"))
+priors1 <- c(prior(normal(50,sqrt(10)), class="Intercept"), prior(normal(0,sqrt(10)), class="b"), prior(gamma(2, 0.001), class="sigma"))
 priors2 <- c(prior(normal(48.3, 1), class="Intercept"), prior(normal(0,1), class="b"), prior(gamma(2, 0.001), class="sigma"))
 
 fit1 <- brm(y ~ I(x - mean(x)), data = d, prior = priors1)
@@ -30,12 +30,14 @@ summary1$xcentered <- d$x-mean(d$x)
 summary2$xcentered <- d$x-mean(d$x)
 
 ggplot(summary1, aes(y=Estimate, x=xcentered)) +
-  geom_ribbon(data=summary1, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
-  geom_line()
+  geom_ribbon(mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
+  geom_ribbon(mapping=aes(ymin = Q2.5, ymax = Q97.5), summary2, fill="blue", alpha=0.25)+
+  geom_line(col="red")+
+  geom_line(summary2, mapping=aes(y=Estimate, x=xcentered), col="blue")
 
-ggplot(summary2, aes(y=Estimate, x=xcentered)) +
-  geom_ribbon(data=summary2, mapping=aes(ymin = Q2.5, ymax = Q97.5), fill="red", alpha=0.25) +
-  geom_line()
+draw_small = posterior_epred(fit1, ndraws=50)
+
+
 
 #T6
 
@@ -45,8 +47,14 @@ fitbeetle <- brm(alive | trials(total) ~ I(treatment-mean(treatment)), data=beet
 fitbeetle
 draw <- as_draws_df(fitbeetle)
 
-betahat <- mean(draw$b_ItreatmentMmeantreatment)
-alphahat <- mean(draw$Intercept)
+#Oikein!
+mean(exp(draw$Intercept))
+mean(exp(draw$b_ItreatmentMmeantreatment))
+
+#Väärin! Jensenin epäyhtälö! Ensin muunnos kaikkiin posteriorinäytteisiin
+#ja niistä lasketaan keskiarvo
+exp(mean(draw$b_ItreatmentMmeantreatment)) 
+exp(mean(draw$Intercept))
 
 #Torakalle 1 on annettu 1 mikrogramma/ml enemmän myrkkyä kuin torakalle 2
 #OR näiden välillä on
@@ -55,3 +63,5 @@ exp(betahat)
 #Odds torakan selviytymiselle kun myrkkyannos on keskiarvo 4.36 migrog/ml
 mean(beetles$treatment)
 exp(alphahat)
+
+conditional_effects(fitbeetle)
