@@ -1,18 +1,19 @@
 ---
-title: "Bayes_HT"
+title: "Bayes-tilastotiede 1 harjoitustyö"
 author: "Jussi Kauppinen"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  bookdown::pdf_document2
 bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = FALSE
+)
 library(ggplot2)
 library(brms)
 ```
-
-## 
 
 ```{r, include=FALSE}
 siemenluku <- 8547 # LAITA TÄHÄN OPISKELIJANUMEROSI
@@ -49,17 +50,25 @@ d <- read_spss("daF2076_eng.por") |>
   # käytetään vain täysiä havaintorivejä yksinkertaisuuden vuoksi
   drop_na()
 ```
-# Datan tarkastelua (mieti otsikko)
+
+# Datan analysointia ja visualisointia
+
+Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971–2002 -aineistoa [@elama].
+
+```{r tulojen-jakauma, fig.cap="Tulojen jakauma ja gamma-jakauma"}
+ggplot(data=d, mapping=aes(tulot))+
+  geom_density()+
+  stat_function(fun = dgamma, args = list(shape = 4.5, rate = 4.5/24000), color = "blue", linewidth = 1)
+```
+
+Kuvasta \@ref(fig:tulojen-jakauma) käy ilmi, että tulojen voitaisiin ajatella noudattavan gamma-jakaumaa.
+
+
+
+
 ```{r}
-plot(density(d$tulot))
 
-plot(tulot ~ arvosana, data=d, col=sukupuoli)
-
-plot(d$tulot ~ d$sukupuoli)
-
-plot(d$tulot ~ d$koulutustaso)
-
-plot(d$tulot ~ d$ITPA)
+#Havaintojen jakauma voisi olla gammajakauma
 
 ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
   geom_point()
@@ -76,13 +85,51 @@ ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
   geom_boxplot()
 
 #Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä. Voisimme siis pelkistää dataa.
+
+d$ylempikk <- ifelse(d$koulutustaso == "Ylempi korkeakouluaste", "Kyllä", "Ei")
 ```
+
 # Mallinnus (mieti otsikko)
 
-```{r}
-fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
-fit1
+Priorien valinta: Priorin valinnassa voisi huomioida ennakkokäsitysken esim. sukupuolen vaikutuksesta palkkaan tai kouluarvosanojen keskiarvon merkityksen.
 
-get_prior(tulot ~ arvosana + ITPA + sukupuoli + koulutustaso, data=d)
+Sovitetaan ensin malli jossa selittäjinä ovat arvosana, ITPA, sukupuoli ja ylempikk.
+
+```{r}
+
+# fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
+# fit1
+# 
+# fit2_def <- brm(tulot ~ arvosana + sukupuoli + ylempikk, data=d)
+# fit2_def
+# 
+# #Esimerkkiprioreja
+# priors <- c(
+#   prior(normal(-5000, 5000), class="b", coef="sukupuoliNainen"),
+#   prior(normal(0,5000), class="b", coef="arvosana"),
+#   prior(normal(10000, 5000), class="b", coef="ylempikkKyllä"),
+#   prior(student_t(3, 18874.5, 9625.4), class="Intercept"),
+#   prior(student_t(3, 0, 9625.4), class="sigma")
+#   )
+# 
+# #prioriennustejakaumaa varten
+# fit2_prior <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, sample_prior = "only", data=d)
+# 
+# pp_check(fit2_prior)
+# 
+# fit2_set <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, data=d)
+# fit2_set
+# 
+# #Mallien vertailu LOO-avulla
+# loo1 <- loo(fit2_def)
+# loo2 <- loo(fit2_set)
+# 
+# loo_compare(loo1, loo2)
+# 
+# plot(conditional_effects(fit2_set), points = TRUE)
+# 
+# get_prior(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
+
 ```
 
+# Lähdeviitteet

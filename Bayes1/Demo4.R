@@ -10,7 +10,7 @@ priors2 <- c(prior(normal(48.3, 1), class="Intercept"), prior(normal(0,1), class
 fit1 <- brm(y ~ I(x - mean(x)), data = d, prior = priors1)
 fit2 <- brm(y ~ I(x - mean(x)), data = d, prior = priors2)
 
-#Näytteitä posterioriennustejakauman odotusarvoista
+#Posterioriennustejakauman odotusarvoja
 draw1 <- posterior_epred(fit1)
 draw2 <- posterior_epred(fit2)
 
@@ -43,6 +43,10 @@ beetles <- read.table("http://users.jyu.fi/~santikka/bayes1/data/beetles.txt")
 
 fitbeetle <- brm(alive | trials(total) ~ I(treatment-mean(treatment)), data=beetles, family=binomial("logit"))
 fitbeetle
+
+#Betahat 95% posterioriväli on [-0.15, -0.06]. 
+#Voisi todeta, että annostuksen kasvattaminen vähentää hieman selviytymisen todennäköisyyttä
+
 draw <- as_draws_df(fitbeetle)
 
 betahat <- mean(draw$b_ItreatmentMmeantreatment)
