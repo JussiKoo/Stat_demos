@@ -3,7 +3,7 @@ library(brms)
 #T3
 
 #ennusteen odotusarvon posteriorikeskiarvo, ennusteen 95
-#% ennustevC$li ja ennusteen odotusarvon 95 % posteriorivC$li
+#% ennusteväli ja ennusteen odotusarvon 95 % posterioriväli
 
 rain <- read.table("http://users.jyu.fi/~santikka/bayes1/data/rain.txt")
 
@@ -11,10 +11,10 @@ fitsade <- brm(joulukuu ~ marraskuu, data=rain)
 
 newdata = data.frame(marraskuu=c(50))
 
-#Ennusteen posteriorikeskiarvo ja sen 95% ennustevC$li
+#Ennusteen posteriorikeskiarvo ja sen 95% ennusteväli
 predict(fitsade, newdata = newdata)
 
-#Ennusteen odotusarvon posteriorikeskiarvo 95% posteriorivC$li
+#Ennusteen odotusarvon posteriorikeskiarvo 95% posterioriväli
 fitted(fitsade, newdata = newdata)
 
 #T4
@@ -26,7 +26,7 @@ fitted(fitsade, newdata = newdata)
 #Vaikutuksen voisi kuvitella olevan vähintään positiivinen. Voisi olla
 #esim. N(4,1).
 
-#Simuloidaan nC$ytteitC$ prioriennustejakaumasta
+#Simuloidaan näytteitä prioriennustejakaumasta
 
 alphasim <- rnorm(1000, mean=0, sd=1)
 betasim <- rnorm(1000, mean=4, sd=1)
@@ -34,6 +34,7 @@ musim <- alphasim + 3*betasim
 sigmasim <- rgamma(1000,1,1)
 ysim <- rnorm(1000, mean=musim, sd=sigmasim)
 plot(density(ysim))
+
 #T5
 
 set.seed(1)

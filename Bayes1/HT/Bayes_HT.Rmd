@@ -63,22 +63,14 @@ ggplot(data=d, mapping=aes(tulot))+
 
 Kuvasta \@ref(fig:kuva1) käy ilmi, että tulojen voitaisiin ajatella noudattavan gamma-jakaumaa.
 
-```{r arvosana_tulo_yhteys, fig.cap="Koulukeskiarvon yhteys tuloihin"}
+```{r kuva2, fig.cap="Koulukeskiarvon yhteys tuloihin", fig.height=2.5, fig.width=4}
 ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
   geom_point()
 ```
 
-Sukupuolella on ainakin vaikutusta tuloihin. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Miehillä ilmenee poikkeuksellisen korkeita tuloja joissain kohdissa minkä voisi katsoa poikkeamaksi.
+Sukupuolella näyttäisi olevan vaikutusta tuloihin kuvan \@ref(fig:kuva2) perusteella. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Toisaalta mallin sovittamisvaiheessa voitaisiin myös testata mallia jossa otetaan selittäjäksi koulukeskiarvon ja sukupuolen interaktio.
 
 ```{r}
-
-#Havaintojen jakauma voisi olla gammajakauma
-
-ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
-  geom_point()
-
-#Sukupuolella on ainakin vaikutusta tuloihin. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Miehillä ilmenee poikkeuksellisen korkeita tuloja joissain kohdissa minkä voisi katsoa poikkeamaksi.
-
 ggplot(data=d, mapping=aes(x=ITPA, y=tulot, colour = sukupuoli))+
   geom_point()
 
