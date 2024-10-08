@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
 library(ggplot2)
 library(brms)
 library(bookdown)
+library(patchwork)
+library(scales)
 ```
 
 ```{r, include=FALSE}
@@ -53,78 +55,74 @@ d <- read_spss("daF2076_eng.por") |>
 
 # Datan analysointia ja visualisointia
 
-Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971–2002 -aineistoa [@elama].
+Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971–2002 -aineistoa [@elama]. Tässä raportissa keskitytään tutkimaan peruskoulun keskiarvon, sukupuolen, ITPA-testituloksen ja koulutustason vaikutusta tuloihin. Kuvasta \@ref(fig:kuva1) käy ilmi, että tulojen voitaisiin ajatella noudattavan esimerkiksi gamma-jakaumaa. 
+Kuvassa \@ref(fig:kuva2) on kuvattu eri selittäjien yhteyttä tuloihin. Näyttäisi siltä, että miehillä on keskimäärin naisia suuremmat tulot. Peruskoulun päättötodistuksen keskiarvolla vaikuttaa olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. ITPA-älykkyystestin tuloksella ei näytä olevan suurta vaikutusta tuloihin. Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä.
 
 ```{r kuva1, fig.cap="Tulojen jakauma ja gamma-jakauma", fig.height=2.5, fig.width=4}
 ggplot(data=d, mapping=aes(tulot))+
   geom_density()+
-  stat_function(fun = dgamma, args = list(shape = 4.5, rate = 4.5/24000), color = "blue", linewidth = 1)
+  stat_function(fun = dgamma, args = list(shape = 4.5, rate = 4.5/24000), color = "blue", linewidth = 0.5)
 ```
 
-Kuvasta \@ref(fig:kuva1) käy ilmi, että tulojen voitaisiin ajatella noudattavan gamma-jakaumaa.
-
-```{r kuva2, fig.cap="Koulukeskiarvon yhteys tuloihin", fig.height=2.5, fig.width=4}
-ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
-  geom_point()
-```
-
-Sukupuolella näyttäisi olevan vaikutusta tuloihin kuvan \@ref(fig:kuva2) perusteella. Peruskoulun päättötodistuksen keskiarvolla näyttää olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. Toisaalta mallin sovittamisvaiheessa voitaisiin myös testata mallia jossa otetaan selittäjäksi koulukeskiarvon ja sukupuolen interaktio.
-
-```{r}
-ggplot(data=d, mapping=aes(x=ITPA, y=tulot, colour = sukupuoli))+
-  geom_point()
-
-#ITPA-älykkyystestin tulos näyttää kasvattavan tuloja lineaarisesti. Naisten ja miesten välillä
-#ei ole suuria eroja.
-
-ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
+```{r kuva2, fig.cap="Eri selittäjien yhteys tuloihin"}
+kuva1 <- ggplot(data=d, mapping=aes(x=sukupuoli, y=tulot))+
   geom_boxplot()
 
-#Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä. Voisimme siis pelkistää dataa.
+kuva2 <- ggplot(data=d, mapping=aes(x=arvosana, y=tulot, colour = sukupuoli))+
+  geom_point(shape=20)
 
-d$ylempikk <- ifelse(d$koulutustaso == "Ylempi korkeakouluaste", "Kyllä", "Ei")
+kuva3 <- ggplot(data=d, mapping=aes(x=ITPA, y=tulot))+
+  geom_point(shape=20)
+
+kuva4 <- ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
+  geom_boxplot()+
+  scale_x_discrete(labels = label_wrap(10))
+
+(kuva1 | kuva2) / (kuva3 | kuva4)
 ```
 
-# Mallinnus (mieti otsikko)
+# Mallintaminen
 
-Priorien valinta: Priorin valinnassa voisi huomioida ennakkokäsitysken esim. sukupuolen vaikutuksesta palkkaan tai kouluarvosanojen keskiarvon merkityksen.
+Priorin valinnassa voisi löyhästi huomioida ennakkokäsitysken esimerkiksi sukupuolen vaikutuksesta palkkaan tai kouluarvosanojen keskiarvon vaikutuksen palkkaan.
 
 Sovitetaan ensin malli jossa selittäjinä ovat arvosana, ITPA, sukupuoli ja ylempikk.
 
 ```{r}
+d$sukupuoli <- relevel(d$sukupuoli, "Mies")
+d$ylempikk <- ifelse(d$koulutustaso == "Ylempi korkeakouluaste", "Kyllä", "Ei")
 
-# fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
-# fit1
-# 
-# fit2_def <- brm(tulot ~ arvosana + sukupuoli + ylempikk, data=d)
-# fit2_def
-# 
-# #Esimerkkiprioreja
-# priors <- c(
-#   prior(normal(-5000, 5000), class="b", coef="sukupuoliNainen"),
-#   prior(normal(0,5000), class="b", coef="arvosana"),
-#   prior(normal(10000, 5000), class="b", coef="ylempikkKyllä"),
-#   prior(student_t(3, 18874.5, 9625.4), class="Intercept"),
-#   prior(student_t(3, 0, 9625.4), class="sigma")
-#   )
-# 
-# #prioriennustejakaumaa varten
-# fit2_prior <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, sample_prior = "only", data=d)
-# 
-# pp_check(fit2_prior)
-# 
-# fit2_set <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, data=d)
-# fit2_set
-# 
-# #Mallien vertailu LOO-avulla
-# loo1 <- loo(fit2_def)
-# loo2 <- loo(fit2_set)
-# 
-# loo_compare(loo1, loo2)
-# 
-# plot(conditional_effects(fit2_set), points = TRUE)
-# 
-# get_prior(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
+fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
+fit1
+
+fit2_def <- brm(tulot ~ arvosana + sukupuoli + ylempikk, data=d)
+fit2_def
+
+#Esimerkkiprioreja
+priors <- c(
+  prior(normal(-5000, 5000), class="b", coef="sukupuoliNainen"),
+  prior(normal(0,5000), class="b", coef="arvosana"),
+  prior(normal(10000, 5000), class="b", coef="ylempikkKyllä"),
+  prior(student_t(3, 18874.5, 9625.4), class="Intercept"),
+  prior(student_t(3, 0, 9625.4), class="sigma")
+  )
+
+#prioriennustejakaumaa varten
+fit2_prior <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, sample_prior = "only", data=d)
+
+pp_check(fit2_prior)
+
+fit2_set <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, data=d)
+fit2_set
+
+#Mallien vertailu LOO-avulla
+loo1 <- loo(fit2_def)
+loo2 <- loo(fit2_set)
+
+loo_compare(loo1, loo2)
+
+plot(conditional_effects(fit2_set), points = TRUE)
+
+get_prior(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
 
 ```
 
