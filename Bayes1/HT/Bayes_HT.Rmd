@@ -61,7 +61,8 @@ Kuvassa \@ref(fig:kuva2) on kuvattu eri selittäjien yhteyttä tuloihin. Näytt�
 ```{r kuva1, fig.cap="Tulojen jakauma ja gamma-jakauma", fig.height=2.5, fig.width=4}
 ggplot(data=d, mapping=aes(tulot))+
   geom_density()+
-  stat_function(fun = dgamma, args = list(shape = 4.5, rate = 4.5/24000), color = "blue", linewidth = 0.5)
+  stat_function(fun = dgamma, args = list(shape = 4.7, rate = 3.7/18600), color = "blue", linewidth = 0.5)
+#(shape-1)/rate = 18600
 ```
 
 ```{r kuva2, fig.cap="Eri selittäjien yhteys tuloihin"}
