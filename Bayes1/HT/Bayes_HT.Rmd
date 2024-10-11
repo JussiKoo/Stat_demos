@@ -85,45 +85,65 @@ kuva4 <- ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
 
 Mallinnetaan tuloja lineaarisella regressiomallilla. Oletetaan siis, että tuloille $y_i$ pätee $y_i|\mu_i,\sigma^2 \sim N(\mu_i, \sigma^2)$.
 
-$$y_i = \beta_0 + \beta_1 arvosana + \beta_2 ITPA + \beta_3 sukup + \beta_4koulutus + \epsilon_i, \quad i=1,...,n$$
-Voitaisiin ajatella, että päättötodistuksen keskiarvolla on keskimäärin kasvattava vaikutus tuloihin. Kerroin \beta_1 kuvaa siis yhden arvosanan nousun vaikutusta tuloihin ja tätä on hankalampi arvioida. Valitaan näillä perusteilla $\beta_1 \sim N(5000, 2500)$. ITPA-älykkyystestin vaikutus on epäselkeä. Voisi ajatella, että sitä vastaava kerroin on lähellä nollaa joten valitaan $\beta_2 \sim N(0, 500)$
+$$y_i = \beta_0 + \beta_1 arvosana + \beta_2 ITPA + \beta_3 sukupM + \beta_4ylempikk + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma^2,) \quad i=1,...,n$$
+Sovitetaan tämän lisäksi myös malli josta ITPA on jätetty pois selittäjistä.
+
+Voitaisiin ajatella, että päättötodistuksen keskiarvolla on keskimäärin kasvattava vaikutus tuloihin. Kerroin $\beta_1$ kuvaa siis yhden arvosanan nousun vaikutusta tuloihin ja suuruusluokkaa on hankala arvioida. Valitaan näillä perusteilla $\beta_1 \sim N(5000, 2500)$. ITPA-älykkyystestillä ei välttämät. Voisi ajatella, että sitä vastaava kerroin on lähellä nollaa joten valitaan $\beta_2 \sim N(0, 1000)$. On myös tunnettua, että miehillä on keskimäärin naisia suuremmat tulot joten asetetaan $\beta_3 \sim N(5000, 2500)$. Ylemmän korkeakoulututkinnon omaavien voisi myös olettaa tienaavan keskimäärin enemmän muihin verrattuna joten asetetaan $\beta_4 \sim N(10000, 5000)$. Asetetaan myös $\sigma \sim N(5000, 2500)$ eli havaintotasollakin samat selittäjät omaavilla henkilöillä voisi olettaa olevan jonkun verran vaihtelua tuloissa. Asetetaan priori myös vakiotermille. Tilanteessa jossa henkilö on nainen jolla ei ole korkeakoulututkintoa ja hänen peruskoulun keskiarvonsa on 4 ja ITPA-testitulos on 21 (aineiston minimi) voisi olettaa, että hänen tulonsa ovat melko pienet. Asetetaan siis $\beta_0 \sim N(5000, 1000)$.
+
+Ennen mallin sovittamista sukupuoli-muuttujan oletustasoksi on asetettu "Nainen". On luotu myös uusi muuttuja "ylempikk" joka saa arvon "Kyllä" jos henkilö on suorittanut ylemmän korkeakoulututkinnon ja muuten "Ei". Peruskoulun keskiarvo on siirretty siten, että keskiarvo 4 vastaa lukua 0.
 
 Sovitetaan ensin malli jossa selittäjinä ovat arvosana, ITPA, sukupuoli ja ylempikk.
 
 ```{r}
-d$sukupuoli <- relevel(d$sukupuoli, "Mies")
+d$sukupuoli <- relevel(d$sukupuoli, "Nainen")
+
 d$ylempikk <- ifelse(d$koulutustaso == "Ylempi korkeakouluaste", "Kyllä", "Ei")
 
-fit1 <- brm(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
+priors1 <- c(
+  prior(normal(5000, 2500), class="b", coef="sukupuoliMies"),
+  prior(normal(5000,2500), class="b", coef="IarvosanaM4"),
+  prior(normal(10000, 5000), class="b", coef="ylempikkKyllä"),
+  prior(normal(0, 1000), class="b", coef="IITPAM21"),
+  prior(normal(5000, 500), class="b", coef="Intercept"),
+  prior(normal(5000, 2500), class="sigma")
+)
+
+fit1 <- brm(tulot ~ 0 + Intercept + I(arvosana-4) + I(ITPA-21) + sukupuoli + ylempikk, prior = priors1, data=d)
 fit1
 
-fit2_def <- brm(tulot ~ arvosana + sukupuoli + ylempikk, data=d)
-fit2_def
-
-#Esimerkkiprioreja
-priors <- c(
-  prior(normal(-5000, 5000), class="b", coef="sukupuoliNainen"),
-  prior(normal(0,5000), class="b", coef="arvosana"),
+priors2 <- c(
+  prior(normal(5000, 2500), class="b", coef="sukupuoliMies"),
+  prior(normal(5000,2500), class="b", coef="IarvosanaM4"),
   prior(normal(10000, 5000), class="b", coef="ylempikkKyllä"),
-  prior(student_t(3, 18874.5, 9625.4), class="Intercept"),
-  prior(student_t(3, 0, 9625.4), class="sigma")
-  )
+  prior(normal(5000, 500), class="b", coef="Intercept"),
+  prior(normal(5000, 2500), class="sigma")
+)
+
+fit2 <- brm(tulot ~ 0 + Intercept + I(arvosana-4) + sukupuoli + ylempikk, prior = priors2, data=d)
+fit2
+
+fit2_default <- brm(tulot ~ arvosana + sukupuoli + ylempikk, data=d)
 
 #prioriennustejakaumaa varten
-fit2_prior <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, sample_prior = "only", data=d)
+fit2_prior <- brm(tulot ~ 0 + Intercept + I(arvosana-4) + sukupuoli + ylempikk, prior = priors2, sample_prior = "only", data=d)
+fit2_prior
 
+#prioriennustejakaumia
 pp_check(fit2_prior)
 
-fit2_set <- brm(tulot ~ arvosana + sukupuoli + ylempikk, prior = priors, data=d)
-fit2_set
+mean(apply(posterior_predict(fit2_prior), 1, max) > max(d$tulot))
 
 #Mallien vertailu LOO-avulla
-loo1 <- loo(fit2_def)
-loo2 <- loo(fit2_set)
+loo1 <- loo(fit1)
+loo2 <- loo(fit2)
 
 loo_compare(loo1, loo2)
 
-plot(conditional_effects(fit2_set), points = TRUE)
+loo2_default <- loo(fit2_default)
+
+loo_compare(loo2, loo2_default)
+
+plot(conditional_effects(fit2), points = TRUE)
 
 get_prior(tulot ~ arvosana + ITPA + sukupuoli + ylempikk, data=d)
 
