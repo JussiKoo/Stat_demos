@@ -1,0 +1,248 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Bayes-tilastotiede 1 harjoitustyö},
+  pdfauthor={Jussi Kauppinen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Bayes-tilastotiede 1 harjoitustyö}
+\author{Jussi Kauppinen}
+\date{2024-10-14}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\section{Datan analysointia ja visualisointia}\label{datan-analysointia-ja-visualisointia}
+
+Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971--2002 -aineistoa (Kuusinen 2018). Tässä raportissa keskitytään tutkimaan peruskoulun keskiarvon, sukupuolen, ITPA-testituloksen ja koulutustason vaikutusta tuloihin. Havainnot saavat vain positiivisia arvoja ja pääasiassa paljon nollaa suurempia arvoja joten niiden voitaisiin ajatella olevan gamma-jakautuneita. Koska arvot ovat paljon nollasta poikkeavia voitaisiin mallinnusta yksinkertaistaa ajattelemalla, että havainnot ovat normaalijakautuneita. Kuvassa \ref{fig:kuva2} on kuvattu eri selittäjien yhteyttä tuloihin. Näyttäisi siltä, että miehillä on keskimäärin naisia suuremmat tulot. Peruskoulun päättötodistuksen keskiarvolla vaikuttaa olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. ITPA-älykkyystestin tuloksella ei näytä olevan suurta vaikutusta tuloihin. Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä.
+
+\begin{figure}
+\centering
+\includegraphics{Bayes_HT_files/figure-latex/kuva2-1.pdf}
+\caption{\label{fig:kuva2}Eri selittäjien yhteys tuloihin}
+\end{figure}
+
+\section{Mallintaminen}\label{mallintaminen}
+
+Mallinnetaan tuloja lineaarisella regressiomallilla. Oletetaan siis, että tuloille \(y_i\) pätee \(y_i|\mu_i,\sigma^2 \sim N(\mu_i, \sigma^2)\).
+
+\[y_i = \beta_0 + \beta_1 arvosana + \beta_2 ITPA + \beta_3 sukupM + \beta_4ylempikk + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma^2,) \quad i=1,...,n\]
+
+Vertaillaan mallia 1 jossa on kaikki yllä mainitut selittäjät ja mallia 2 jossa ITPA on jätetty pois selittäjistä. Vertaillaan lisäksi mallia 3 joka vastaa mallia 2, mutta mallissa 3 käytetään brms:n oletusprioreja.
+
+Valitaan priorit malleihin 1 ja 2. Voitaisiin ajatella, että päättötodistuksen keskiarvolla on keskimäärin kasvattava vaikutus tuloihin. Kerroin \(\beta_1\) kuvaa siis yhden arvosanan nousun vaikutusta tuloihin ja suuruusluokkaa on hankala arvioida. Valitaan näillä perusteilla \(\beta_1 \sim N(5000, 2500)\). ITPA-älykkyystestillä ei välttämät. Voisi ajatella, että sitä vastaava kerroin on lähellä nollaa joten valitaan \(\beta_2 \sim N(0, 1000)\). On myös tunnettua, että miehillä on keskimäärin naisia suuremmat tulot joten asetetaan \(\beta_3 \sim N(5000, 2500)\). Ylemmän korkeakoulututkinnon omaavien voisi myös olettaa tienaavan keskimäärin enemmän muihin verrattuna joten asetetaan \(\beta_4 \sim N(10000, 5000)\). Asetetaan priori myös vakiotermille. Tilanteessa jossa henkilö on nainen jolla ei ole korkeakoulututkintoa ja hänen peruskoulun keskiarvonsa on 4 ja ITPA-testitulos on 21 (aineiston minimi) voisi olettaa, että hänen tulonsa ovat melko pienet. Asetetaan siis \(\beta_0 \sim N(5000, 1000)\).
+
+Ennen mallin sovittamista ``sukupuoli''-muuttujan oletustasoksi on asetettu ``Nainen''. On luotu myös uusi muuttuja ``ylempikk'' joka saa arvon ``Kyllä'' jos henkilö on suorittanut ylemmän korkeakoulututkinnon ja muuten arvon ``Ei''. Peruskoulun keskiarvo on siirretty siten, että keskiarvo 4 vastaa lukua 0. ITPA on siirretty siten, että aineiston pienin arvo 21 vastaa lukua 0.
+
+\begin{verbatim}
+## [1] 0.11425
+\end{verbatim}
+
+asdasdasdasdasd
+
+\begin{longtable}[]{@{}lrrrr@{}}
+\caption{\label{tab:Malli1}Mallin 1 posteriorikeskiarvot ja 95\% posteriorivälit}\tabularnewline
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & 4975.0 & 496.9 & 4002.4 & 5956.5 \\
+IarvosanaM4 & 2239.4 & 586.2 & 1065.5 & 3398.0 \\
+IITPAM21 & 105.9 & 147.5 & -185.8 & 398.0 \\
+sukupuoliMies & 8245.3 & 1288.6 & 5654.7 & 10771.5 \\
+ylempikkKyllä & 9713.4 & 2045.5 & 5644.3 & 13622.0 \\
+\end{longtable}
+
+sadasdasd
+sadasdasdasdasdasd
+
+\begin{longtable}[]{@{}lrrrr@{}}
+\caption{\label{tab:Malli2}Mallin 2 posteriorikeskiarvot ja 95\% posteriorivälit}\tabularnewline
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & 4926.3 & 994.5 & 2954.1 & 6899.8 \\
+IarvosanaM4 & 2615.0 & 342.6 & 1957.8 & 3292.3 \\
+sukupuoliMies & 8473.2 & 1320.0 & 5924.2 & 11128.3 \\
+ylempikkKyllä & 9742.5 & 2057.9 & 5763.1 & 13784.8 \\
+\end{longtable}
+
+sadasdasdasdasdasd
+
+\begin{longtable}[]{@{}lrrrr@{}}
+\caption{\label{tab:Malli3}Mallin 3 posteriorikeskiarvot ja 95\% posteriorivälit}\tabularnewline
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+& Estimate & Est.Error & Q2.5 & Q97.5 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & 3566.5 & 4294.3 & -5026.4 & 11829.1 \\
+IarvosanaM4 & 2756.4 & 993.8 & 834.6 & 4697.8 \\
+sukupuoliMies & 10082.9 & 1721.8 & 6735.9 & 13504.3 \\
+ylempikkKyllä & 9695.0 & 2409.1 & 5018.1 & 14286.4 \\
+\end{longtable}
+
+Taulukosta \ref{tab:LOO} käy ilmi, että malli 2 on paras PSIS-LOO-menetelmän tuottamien ELPD-arvojen perusteella. Joskin mallien välillä ei ole suurta eroa sillä mallien 1 ja 3 ELPD-arvojen keskivirheet ovat melko suuret.
+
+\begin{table}
+
+\caption{\label{tab:LOO}ELPD-arvojen vertailu malleille 1, 2 ja 3}
+\centering
+\begin{tabular}[t]{l|r|r}
+\hline
+  & elpd\_diff & se\_diff\\
+\hline
+fit2 & 0.0000000 & 0.0000000\\
+\hline
+fit1 & -0.2244778 & 0.5848702\\
+\hline
+fit2\_default & -1.0467664 & 1.0365233\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\centering
+\includegraphics{Bayes_HT_files/figure-latex/Prioriennuste-1.pdf}
+\caption{\label{fig:Prioriennuste}Mallin 2 prioriennustejakaumia vs.~havaintojen jakauma}
+\end{figure}
+
+Mallin 2 prioriennustejakauma näyttää kuvan \ref{fig:Prioriennuste} perusteella kohtalaiselta.
+
+\section*{Lähdeviitteet}\label{luxe4hdeviitteet}
+\addcontentsline{toc}{section}{Lähdeviitteet}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-elama}
+Kuusinen, Jorma. 2018. {``Elämänkulku 1971-2002 {[}Sähköinen Tietoaineisto{]}.''} Jyväskylän yliopisto, Yhteiskuntatieteellinen tietoarkisto. \url{https://urn.fi/urn:nbn:fi:fsd:T-FSD2076}.
+
+\end{CSLReferences}
+
+\end{document}
