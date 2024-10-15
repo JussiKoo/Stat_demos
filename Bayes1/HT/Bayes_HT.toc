@@ -1,0 +1,4 @@
+\contentsline {section}{\numberline {1}Datan analysointia ja visualisointia}{1}{section.1}%
+\contentsline {section}{\numberline {2}Mallintaminen}{1}{section.2}%
+\contentsline {section}{\numberline {3}Tulokset}{3}{section.3}%
+\contentsline {section}{Lähdeviitteet}{4}{section*.2}%
