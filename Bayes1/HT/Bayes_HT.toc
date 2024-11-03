@@ -1,6 +1,7 @@
 \babel@toc {finnish}{}\relax 
-\contentsline {section}{\numberline {1}Datan analysointia ja visualisointia}{1}{section.1}%
-\contentsline {section}{\numberline {2}Mallintaminen}{1}{section.2}%
+\contentsline {section}{\numberline {1}Aineiston analysointia ja visualisointia}{1}{section.1}%
+\contentsline {section}{\numberline {2}Mallintaminen}{2}{section.2}%
 \contentsline {section}{\numberline {3}Tulokset}{3}{section.3}%
 \contentsline {section}{\numberline {4}Tulkinnat}{5}{section.4}%
+\contentsline {section}{\numberline {5}Pohdintaa}{5}{section.5}%
 \contentsline {section}{Lähdeviitteet}{5}{section*.2}%

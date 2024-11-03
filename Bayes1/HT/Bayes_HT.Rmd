@@ -58,12 +58,15 @@ d <- read_spss("daF2076_eng.por") |>
   drop_na()
 ```
 
-# Datan analysointia ja visualisointia
+# Aineiston analysointia ja visualisointia
 
-Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971–2002 - aineistoa [@elama]. Tässä raportissa keskitytään tutkimaan peruskoulun keskiarvon, sukupuolen, ITPA-testituloksen ja koulutustason vaikutusta tuloihin. Havainnot saavat vain positiivisia arvoja ja pääasiassa paljon nollaa suurempia arvoja joten niiden voitaisiin ajatella olevan gamma-jakautuneita. Koska arvot ovat paljon nollasta poikkeavia voitaisiin mallinnusta yksinkertaistaa ajattelemalla, että havainnot ovat normaalijakautuneita. 
-Kuvassa \@ref(fig:kuva2) on visualisoitu eri selittäjien yhteyttä tuloihin. Näyttäisi siltä, että miehillä on keskimäärin naisia suuremmat tulot. Peruskoulun päättötodistuksen keskiarvolla vaikuttaa olevan melko samanlainen vaikutus molemmilla sukupuolilla eli keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. ITPA-älykkyystestin tuloksella ei näytä olevan suurta vaikutusta tuloihin. Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä.
+Aineistona tässä harjoitustyössä käytetään Elämänkulku 1971–2002 - aineistoa [@elama]. Tässä raportissa aineistosta on otettu 300 havainnon satunnainen otos ja yksinkertaisuuden vuoksi käytetään vain täysiä havaintorivejä jolloin aineiston koko on $n=232$. Keskitytään tutkimaan peruskoulun keskiarvon, sukupuolen, ITPA-testituloksen ja koulutustason vaikutusta henkilön tuloihin. Henkilöiden tulot ovat pääasiassa positiivisia arvoja joten niiden voitaisiin ajatella olevan gamma-jakautuneita. Tulot ovat myös paljon nollasta poikkeavia joten mallinnusta voitaisiin yksinkertaistaa ajattelemalla, että havainnot ovat normaalijakautuneita. 
 
-```{r kuva2, fig.cap="Eri selittäjien yhteys tuloihin"}
+Kuvassa \@ref(fig:Aineisto) on visualisoitu eri selittäjien yhteyttä tuloihin. Näyttäisi siltä, että miehillä on keskimäärin naisia suuremmat tulot. Peruskoulun päättötodistuksen keskiarvolla vaikuttaa olevan melko samanlainen vaikutus molemmilla sukupuolilla ja keskiarvo näyttäisi kasvattavan tulotasoja maltillisen lineaarisesti. ITPA-älykkyystestin tuloksella ei näytä olevan selkeää lineaarista vaikutusta tuloihin. Koulutusasteella näyttää olevan olennainen vaikutus tuloihin vain ylemmän korkeakouluasteen ja muiden välillä.
+
+\newpage
+
+```{r Aineisto, fig.cap="Eri selittäjien yhteys tuloihin"}
 kuva1 <- ggplot(data=d, mapping=aes(x=sukupuoli, y=tulot))+
   geom_boxplot()
 
@@ -82,12 +85,12 @@ kuva4 <- ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
 
 # Mallintaminen
 
-Mallinnetaan tuloja lineaarisella regressiomallilla. Oletetaan siis, että tuloille $y_i$ pätee $y_i|\mu_i,\sigma^2 \sim N(\mu_i, \sigma^2)$ ja
+Mallinnetaan selittäjien yhteyttä tuloihin lineaarisella regressiomallilla. Oletetaan siis, että tuloille $y_i$ pätee $y_i|\mu_i,\sigma^2 \sim N(\mu_i, \sigma^2)$ ja
 
 $$y_i = \beta_0 + \beta_1 (arvosana-5) + \beta_2 (ITPA-21) + \beta_3 sukupM + \beta_4ylempikk + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma^2,) \quad i=1,...,n$$
-Tässä siis *arvosana* kuvaa peruskoulun keskiarvoa. *ITPA* on ITPA-testin tulos. *sukupM* saa arvon 1 jos sukupuoli on mies ja muuten arvon 0. *ylempikk* saa arvon 1 jos havainnoitava on suorittanut ylemmän korkeakoulututkinnon ja muuten arvon 0. *arvosana* on siirretty tulkintojen helpottamiseksi sillä peruskoulun keskiarvo ei voi olla 0 ja keskiarvo 4 on myös melko epärealistinen.
-Vertaillaan mallia 1 (fit1) jossa on kaikki yllä mainitut selittäjät ja mallia 2 (fit2) jossa ITPA on jätetty pois selittäjistä. Vertaillaan lisäksi mallia 3 (fit2_default) joka vastaa mallia 2, mutta mallissa 3 käytetään brms:n oletusprioreja. 
-Valitaan priorit malleihin 1 ja 2. Voitaisiin ajatella, että päättötodistuksen keskiarvolla on keskimäärin kasvattava vaikutus tuloihin. Kerroin $\beta_1$ kuvaa siis yhden arvosanan nousun vaikutusta tuloihin ja suuruusluokkaa on hankala arvioida. Valitaan näillä perusteilla $\beta_1 \sim N(5000, 2500)$. ITPA-älykkyystestillä ei välttämät. Voisi ajatella, että sitä vastaava kerroin on lähellä nollaa joten valitaan $\beta_2 \sim N(0, 2500)$. On myös tunnettua, että miehillä on keskimäärin naisia suuremmat tulot joten asetetaan $\beta_3 \sim N(5000, 2500)$. Ylemmän korkeakoulututkinnon omaavien voisi myös olettaa tienaavan keskimäärin enemmän muihin verrattuna joten asetetaan $\beta_4 \sim N(10000, 2500)$. Asetetaan priori myös vakiotermille. Tilanteessa jossa henkilö on nainen jolla ei ole korkeakoulututkintoa ja hänen peruskoulun keskiarvonsa on 5 ja ITPA-testitulos on 21 (aineiston minimi) voisi olettaa, että hänen tulonsa ovat melko pienet. Asetetaan siis $\beta_0 \sim N(2500, 1000)$.
+Tässä siis *arvosana* kuvaa peruskoulun keskiarvoa. *ITPA* on ITPA-testin tulos. *sukupM* saa arvon 1 jos sukupuoli on mies ja muuten arvon 0. *ylempikk* saa arvon 1 jos havainnoitava on suorittanut ylemmän korkeakoulututkinnon ja muuten arvon 0. *arvosana* on siirretty tulkintojen helpottamiseksi sillä peruskoulun keskiarvo ei voi olla 0 ja keskiarvo 4 on myös melko epärealistinen. Vertaillaan mallia 1 jossa on kaikki yllä mainitut selittäjät ja mallia 2 jossa ITPA on jätetty pois selittäjistä. Vertaillaan lisäksi mallia 3 joka vastaa mallia 2, mutta mallissa 3 käytetään brms:n oletusprioreja. 
+
+Valitaan seuraavaksi priorit malleihin 1 ja 2. Voitaisiin ajatella, että päättötodistuksen keskiarvolla on keskimäärin kasvattava vaikutus tuloihin. Valitaan näillä perusteilla $\beta_1 \sim N(5000, 2500)$. ITPA-älykkyystestillä ei välttämättä ole suurta vaikutusta tuloihin. Voisi ajatella, että sitä vastaava kerroin on lähellä nollaa joten valitaan $\beta_2 \sim N(0, 2500)$. On myös tunnettua, että miehillä on keskimäärin naisia suuremmat tulot joten asetetaan $\beta_3 \sim N(5000, 2500)$. Ylemmän korkeakoulututkinnon omaavien voisi myös olettaa tienaavan keskimäärin enemmän muihin verrattuna joten asetetaan $\beta_4 \sim N(10000, 2500)$. Asetetaan priori myös vakiotermille. Tilanteessa jossa henkilö on nainen jolla ei ole korkeakoulututkintoa ja hänen peruskoulun keskiarvonsa on 5 ja ITPA-testitulos on 21 (aineiston minimi) voisi olettaa, että hänen tulonsa ovat melko pienet. Asetetaan siis $\beta_0 \sim N(5000, 1250)$.
 
 ```{r message=FALSE, warning=FALSE}
 d$sukupuoli <- relevel(d$sukupuoli, "Nainen")
@@ -121,45 +124,47 @@ fit2_default <- brm(tulot ~ 0 + Intercept + I(arvosana-5) + sukupuoli + ylempikk
 fit2_prior <- brm(tulot ~ 0 + Intercept + I(arvosana-5) + sukupuoli + ylempikk, 
                   prior = priors2, sample_prior = "only", data=d, refresh=0)
 
-#mean(apply(posterior_predict(fit2_prior), 1, max) > max(d$tulot))
-
-#Mallien vertailu LOO-avulla
 loo1 <- loo(fit1)
 loo2 <- loo(fit2)
 loo2_default <- loo(fit2_default)
 ```
+
 # Tulokset
 
-Taulukosta \@ref(tab:Malli1) voidaan huomata se, että *ITPA*-muuttujan 95%-posterioriväli sisältää nollan joten kyseisellä muuttujalla ei tällä perusteella ole suurta vaikutusta tuloihin. Taulukoista \@ref(tab:Malli2) ja \@ref(tab:Malli3) voidaan huomata, että prioreilla oli jonkin verran vaikutusta regressiokertoimien posteriorikeskiarvoihin. Erityisesti priorien asettaminen pienentää 95%-posteriorivälejä kaikille kertoimille. Joka tapauksessa malleissa 2 ja 3 kaikki regressiokertoimet ovat selvästi positiivisia. Taulukosta \@ref(tab:LOO) käy ilmi, että malli 2 on paras PSIS-LOO-menetelmän tuottamien ELPD-arvojen perusteella. Joskin mallien välillä ei ole suurta eroa sillä ELPD-arvot ovat likimain samat ja mallien 1 ja 3 ELPD-arvojen keskivirheet ovat melko suuret. Taulukosta \@ref(tab:LOO) käy ilmi, että malli 2 on paras PSIS-LOO-menetelmän tuottamien ELPD-arvojen perusteella. Joskin mallien 1 ja 2 välillä ei ole suurta eroa mallin 1 ELPD-arvon ja sen keskivirheen takia. Mallin 2 voisi sanoa olevan parempi kuin mallin 3 joka oli siis sama malli oletusprioreilla.
-Mallin 2 prioriennustejakaumia on simuloitu kuvassa \@ref(fig:Prioriennuste). Simuloidut prioriennustejakaumat mallille 2 näyttävät vähintään kohtalaiselta vaikka joissain hajonta on suurta ja jakaumat sisältävät myös negatiivisia arvoja. Simuloidut posterioriennustejakaumat mallille näyttävät hyvältä kuvassa \@ref(fig:Posterioriennuste).
+Taulukosta \@ref(tab:Malli1) voidaan huomata se, että *ITPA*-muuttujan 95%-posterioriväli sisältää nollan joten kyseisellä muuttujalla ei tällä perusteella ole suurta vaikutusta tuloihin. Taulukoista \@ref(tab:Malli2) ja \@ref(tab:Malli3) voidaan huomata, että prioreilla oli jonkin verran vaikutusta regressiokertoimien posteriorikeskiarvoihin. Erityisesti priorien asettaminen pienentää 95%-posteriorivälejä kaikille kertoimille. Joka tapauksessa malleissa 2 ja 3 kaikki regressiokertoimet ovat selvästi positiivisia. Taulukosta \@ref(tab:LOO) käy ilmi, että malli 2 on paras PSIS-LOO-menetelmän tuottamien ELPD-arvojen perusteella. Joskin mallien 1 ja 2 välillä ei ole suurta eroa mallin 1 ELPD-arvon ja sen keskivirheen takia. Priorien asettaminen myös paransi mallia mallien 2 ja 3 ELPD-arvojen perusteella.
 
-```{r Malli1, results='asis', tab.cap="Mallin 1 (fit1) posteriorikeskiarvot ja 95% posteriorivälit"}
+Simuloidut prioriennustejakaumat mallille 2 kuvassa \@ref(fig:Prioriennuste) näyttävät vähintään kohtalaiselta vaikka joissain hajonta on suurta ja jakaumat sisältävät myös negatiivisia arvoja. Simuloidut posterioriennustejakaumat mallille 2 kuvassa \@ref(fig:Posterioriennuste) näyttävät melko hyvältä vaikka jakaumat eroavat hieman havaintojen jakauman muodosta.
+
+```{r Malli1, results='asis', tab.cap="Mallin 1 posteriorikeskiarvot ja 95% posteriorivälit"}
 fit1df <- round(as.data.frame(fixef(fit1)),1)
 kable(fit1df, format="simple")
 ```
 
-```{r Malli2, results='asis', tab.cap="Mallin 2 (fit2) posteriorikeskiarvot ja 95% posteriorivälit"}
+```{r Malli2, results='asis', tab.cap="Mallin 2 posteriorikeskiarvot ja 95% posteriorivälit"}
 fit2df <- round(as.data.frame(fixef(fit2)),1)
 kable(fit2df, format="simple")
 ```
 
-```{r Malli3, results='asis', tab.cap="Mallin 3 (fit2_deafult) posteriorikeskiarvot ja 95% posteriorivälit"}
+```{r Malli3, results='asis', tab.cap="Mallin 3 posteriorikeskiarvot ja 95% posteriorivälit"}
 fit2_defaultdf <- round(as.data.frame(fixef(fit2_default)),1)
 kable(fit2_defaultdf, format="simple")
 ```
 
-```{r LOO, results='asis', tab.cap="LOO-ristiinvalidointi malleille 1, 2 ja 3 (fit1, fit2, ja fit2_default)"}
+```{r LOO, results='asis', tab.cap="LOO-ristiinvalidointi malleille 1, 2 ja 3"}
 loodf <- as.data.frame(loo_compare(loo1, loo2, loo2_default))
-kable(loodf[,0:2])
+df <- data.frame(malli = c("Malli 2", "Malli 1", "Malli 3"), elpd_diff = loodf[,1], se_diff = loodf[,2])
+kable(df)
 ```
 
 ```{r Prioriennuste, fig.cap="Mallin 2 prioriennustejakaumia vs. havaintojen jakauma", message=FALSE, fig.width=5, fig.height=2, warning=FALSE}
 pp_check(fit2_prior, type="boxplot")
 ```
 
-```{r Posterioriennuste, fig.cap="Mallin 2 posterioriennustejakaumia vs. havaintojen jakauma", message=FALSE, fig.width=5, fig.height=2.1}
+```{r Posterioriennuste, fig.cap="Mallin 2 posterioriennustejakaumia vs. havaintojen jakauma", message=FALSE, fig.width=5, fig.height=2.2, warning=FALSE}
 pp_check(fit2) + xlim(-20000, 100000)
 ```
+
+\newpage
 
 # Tulkinnat
 
@@ -167,10 +172,10 @@ Tulkitaan vielä seuraavaksi mallia 2 tarkemmin. Mallin 2 matemaattinen rakenne 
 
 $$y_i = \beta_0 + \beta_1 (arvosana-5) + \beta_3 sukupM + \beta_4ylempikk + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma^2,) \quad i=1,...,n$$
 
-Kertoimien posteriorikeskiarvoista voidaan siis tulkita seuraavia asioita. Naiselle jolla ei ole ylempää korkeakoulututkintoa ja jonka peruskoulun keskiarvo on 5 tulot ovat noin 5245,2 €. Peruskoulun keskiarvon nouseminen yhdellä arvosanalla kun muut selittäjät pysyy samana nostaa tuloja noin 3258,1 €. Ylemmän korkeakoulututkinnon omaavilla on noin 9481,3 € suuremmat tulot kuin niillä joilla sitä ei ole ja muut selittäjät ovat samat. Miehillä on taas noin 8932,6 € suuremmat tulot kuin naisilla joilla on muuten samat selittäjät. Joka tapauksessa Kaikkien edellä mainittujen kertoimien 95% posteriorivälit kertovat sen, että vaikutukset ovat selvästi positiivisia.
+Kertoimien posteriorikeskiarvoista (taulukko \@ref(tab:Malli2)) voidaan siis tulkita seuraavia asioita. Naiselle jolla ei ole ylempää korkeakoulututkintoa ja jonka peruskoulun keskiarvo on 5 tulot ovat noin 5245,2 €. Peruskoulun keskiarvon nouseminen yhdellä arvosanalla kun muut selittäjät pysyy samana nostaa tuloja noin 3258,1 €. Ylemmän korkeakoulututkinnon omaavilla on noin 9481,3 € suuremmat tulot kuin niillä joilla sitä ei ole ja muut selittäjät ovat samat. Miehillä on taas noin 8932,6 € suuremmat tulot kuin naisilla joilla on muuten samat selittäjät. Kaikkien edellä mainittujen kertoimien 95% posteriorivälit kertovat sen, että vaikutukset ovat ainakin selvästi positiivisia.
 
 # Pohdintaa
 
-Jos mallien sovittamista tähän aineistoon jatkettaisiin, olisi syytä tutkia jotakin mallia joka ottaa huomioon sen, että tulot ovat epänegatiivisia. Yksi vaihtoehto olisi olettaa, että havainnot noudattavat alhaalta katkaistua normaalijakaumaa. Voitaisiin myös olettaa, että havainnot noudattavat gamma-jakaumaa. 
+Tulot ovat epänegatiivisia joten sellaisia malleja voisi tutkia joissa tämä otetaan aidosti huomioon. Yksi vaihtoehto olisi olettaa, että havainnot noudattavat alhaalta katkaistua normaalijakaumaa. Voitaisiin myös olettaa, että havainnot noudattavat gamma-jakaumaa. 
 
 # Lähdeviitteet
