@@ -53,7 +53,7 @@ fit3 <- stan(
   iter = 2000
 )
 
-params <- extract(fit3)
+params <- rstan::extract(fit3)
 
 theta1est <- mean(params$theta1)
 theta2est <- mean(params$theta2)
@@ -74,15 +74,25 @@ Ptheta
 url <- "http://users.jyu.fi/~santikka/bayes2/data/lankarulla.dat"
 lankarulla <- read.table(url, header = TRUE)
 lankarulla$pituus <- lankarulla$pituus/100
+lankarulla$pituuska <- lankarulla$pituus - mean(lankarulla$pituus)
 eka <- lankarulla[1,2]
 lankarulla[1,2] <- NA
 lankarulla <- drop_na(lankarulla)
 
-lankarulla
+mean(lankarulla$pituus)
+
+plot(virheet ~ pituuska, data=lankarulla)
 
 
 #Miten toimitaan? Käytetäänkö sovittamiseen kaikkia muita rivejä vai
 #käsitelläänkö tuo yksi havainto ikään kuin sensuroituna?
+
+#Priorit:
+#exp(alpha) kuvaa kuinka paljon 5.88 m mittaisessa rullassa on keskimäärin virheitä
+#Asetetaan prioriksi normal(log(7), 10)
+
+#exp(beta) kuvaa prosentuaalista muutosta virheiden lukumäärässä kun lankarullan pituus kasvaa 1 m.
+#Asetetaan prioriksi normal(log(1.2, 10))
 
 scode4 <- 
   "data {
@@ -96,8 +106,8 @@ parameters {
   real beta;
 }
 model {
-  alpha ~ normal(0,100);
-  beta ~ normal(0,100);
+  alpha ~ normal(2, 10);
+  beta ~ normal(0.2, 10);
   y ~ poisson_log(alpha+beta*x);
 }
 generated quantities {
@@ -106,7 +116,7 @@ generated quantities {
 
 fit4 <- stan(
   model_code = scode4,
-  data = list(N = nrow(lankarulla), y = lankarulla$virheet, x = lankarulla$pituus, x_tilde = 5.51),
+  data = list(N = nrow(lankarulla), y = lankarulla$virheetka, x = lankarulla$pituus, x_tilde = 5.51),
   iter=2000
   )
 
@@ -121,5 +131,45 @@ params4$y_tilde
 
 
 #T5
+
+url <- "http://users.jyu.fi/~santikka/bayes2/data/erityispedagogiikka.dat"
+ep <- read.table(url, header = TRUE)
+
+head(ep)
+
+scode5 <-
+"data {
+  int<lower=0> N;
+  vector[N] x;
+  array[N] int<lower=0> n;
+  array[N] int<lower=0> y;
+}
+parameters {
+  real alpha;
+  real beta;
+}
+model {
+  y ~ binomial_logit(n, alpha + beta * x);
+}"
+
+fit5 <- stan(
+  model_code = scode5,
+  data=list(N=nrow(ep), x=ep$ika, n=ep$yht, y=ep$onn),
+  iter=2000
+)
+
+fit5
+
+#b)
+
+params5 <- rstan::extract(fit5)
+
+mean(exp(params5$beta))
+
+#Ikien i+1 ja i välisen odds ration posteriorikeskiarvo on 0.767 joten näyttäisi,
+#että vanhemmilla sijoitettavilla on onnistumisen todennäköisyys on huonompi.
+
+#c)
+
 
 #T6
