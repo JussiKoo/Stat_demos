@@ -143,18 +143,26 @@ scode5 <-
   vector[N] x;
   array[N] int<lower=0> n;
   array[N] int<lower=0> y;
+  real<lower=0> x_tilde;
 }
 parameters {
   real alpha;
   real beta;
 }
 model {
+  alpha ~ normal(1.5, 10);
+  beta ~ normal(-0.5, 10);
   y ~ binomial_logit(n, alpha + beta * x);
+}
+generated quantities {
+  real<lower=0, upper=1> pred = binomial_rng(1, inv_logit(alpha + beta * x_tilde));
 }"
+
+
 
 fit5 <- stan(
   model_code = scode5,
-  data=list(N=nrow(ep), x=ep$ika, n=ep$yht, y=ep$onn),
+  data=list(N=nrow(ep), x=ep$ika, n=ep$yht, y=ep$onn, x_tilde=9),
   iter=2000
 )
 
@@ -171,5 +179,48 @@ mean(exp(params5$beta))
 
 #c)
 
+mean(params5$pred)
 
 #T6
+
+scode6 <-
+  "data {
+  int<lower=0> N;
+  vector[N] x;
+  array[N] int<lower=0> n;
+  array[N] int<lower=0> y;
+  real<lower=0> x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+}
+model {
+  alpha ~ normal(1.5, 10);
+  beta ~ normal(-0.5, 10);
+  y ~ binomial(n, inv_cloglog(alpha + beta * x));
+}
+generated quantities {
+  real<lower=0, upper=1> pred = binomial_rng(1, inv_cloglog(alpha + beta * x_tilde));
+}"
+
+#1-exp(-exp(alpha + beta * x))
+
+fit6 <- stan(
+  model_code = scode6,
+  data=list(N=nrow(ep), x=ep$ika, n=ep$yht, y=ep$onn, x_tilde=9),
+  iter=2000
+)
+
+fit5
+
+fit6
+
+params6 <- rstan::extract(fit6)
+
+mean(exp(params6$beta))
+
+mean(params6$pred)
+
+#Molemmilla linkkifunktioilla posterioriennustejakauman avulla laskettu
+#estimaatti todennäköisyydelle on melkein sama.
