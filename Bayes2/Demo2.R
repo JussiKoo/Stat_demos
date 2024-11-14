@@ -116,7 +116,7 @@ generated quantities {
 
 fit4 <- stan(
   model_code = scode4,
-  data = list(N = nrow(lankarulla), y = lankarulla$virheetka, x = lankarulla$pituus, x_tilde = 5.51),
+  data = list(N = nrow(lankarulla), y = lankarulla$virheet, x = lankarulla$pituuska, x_tilde = 5.51-mean(lankarulla$pituus)),
   iter=2000
   )
 
