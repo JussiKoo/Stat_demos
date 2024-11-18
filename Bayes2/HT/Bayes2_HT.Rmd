@@ -44,6 +44,7 @@ monthdiff <- function(year1, month1, year2, month2) {
 # Q44 When did you purchase your current phone? Month of purchase (13 = missing)
 # Q45 When did you purchase your current phone? Season of purchase
 # (1 = winter, 2 = spring, 3 = summer, 4 = autumn, 5 = missing)
+#sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki
 mobile <- mobile |>
 rename(
 year_cur = Q43,
@@ -51,7 +52,8 @@ month_cur = Q44,
 season_cur = Q45,
 year_prev = Q48,
 month_prev = Q49,
-season_prev = Q50
+season_prev = Q50,
+brand_prev = Q47
 ) |>
 mutate(
 # 9999 denotes NA for year in the data,
@@ -143,7 +145,6 @@ geom_density() +
 xlab("Time between purchases (years)") +
 theme_bw()
 ```
-
 
 
 # Mallintaminen
