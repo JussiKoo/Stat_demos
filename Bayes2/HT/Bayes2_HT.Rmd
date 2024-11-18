@@ -1,0 +1,159 @@
+---
+title: "Bayes-tilastotiede 2 harjoitustyö"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: bookdown::pdf_document2
+bibliography: references.bib
+lang: fi
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+
+options(knitr.kable.NA = "", knitr.fig.cap = "Kuva")
+library(ggplot2)
+library(brms)
+library(bookdown)
+library(patchwork)
+library(scales)
+library(rlang)
+library(haven)
+library(tidyr)
+library(dplyr)
+library(knitr)
+library(xtable)
+```
+
+# Aineiston analysointia ja visualisointia
+
+
+
+```{r}
+library("dplyr")
+library("ggplot2")
+library("tidyr")
+url <- "http://users.jyu.fi/~santikka/bayes2/data/mobile_phone_purchases.csv"
+mobile <- read.csv2(url, header = TRUE)
+
+monthdiff <- function(year1, month1, year2, month2) {
+12 * (year2 - year1) + (month2 - month1)
+}
+# Q43 When did you purchase your current phone? Year of purchase (9999 = missing)
+# Q44 When did you purchase your current phone? Month of purchase (13 = missing)
+# Q45 When did you purchase your current phone? Season of purchase
+# (1 = winter, 2 = spring, 3 = summer, 4 = autumn, 5 = missing)
+mobile <- mobile |>
+rename(
+year_cur = Q43,
+month_cur = Q44,
+season_cur = Q45,
+year_prev = Q48,
+month_prev = Q49,
+season_prev = Q50
+) |>
+mutate(
+# 9999 denotes NA for year in the data,
+  year_cur = na_if(year_cur, 9999),
+  year_prev = na_if(year_prev, 9999),
+# month_min and max are helper variables used to determine the
+# first or last possible month based on the season if month is NA
+month_min_cur = month_cur - 1,
+month_max_cur = month_cur,
+month_min_prev = month_prev - 1,
+month_max_prev = month_prev,
+# 13 indicates NA for month, 5 indicates NA for season
+month_min_cur = case_when(
+month_cur == 13 & season_cur == 1 ~ 0,
+month_cur == 13 & season_cur == 2 ~ 3,
+month_cur == 13 & season_cur == 3 ~ 6,
+month_cur == 13 & season_cur == 4 ~ 9,
+month_cur == 13 & season_cur == 5 ~ 0,
+.default = month_min_cur
+),
+month_max_cur = case_when(
+month_cur == 13 & season_cur == 1 ~ 3,
+month_cur == 13 & season_cur == 2 ~ 6,
+month_cur == 13 & season_cur == 3 ~ 9,
+month_cur == 13 & season_cur == 4 ~ 12,
+month_cur == 13 & season_cur == 5 ~ 12,
+.default = month_max_cur
+),
+month_min_prev = case_when(
+month_prev == 13 & season_prev == 1 ~ 0,
+month_prev == 13 & season_prev == 2 ~ 3,
+month_prev == 13 & season_prev == 3 ~ 6,
+month_prev == 13 & season_prev == 4 ~ 9,
+month_prev == 13 & season_prev == 5 ~ 0,
+.default = month_min_prev
+),
+month_max_prev = case_when(
+month_prev == 13 & season_prev == 1 ~ 3,
+month_prev == 13 & season_prev == 2 ~ 6,
+month_prev == 13 & season_prev == 3 ~ 9,
+month_prev == 13 & season_prev == 4 ~ 12,
+month_prev == 13 & season_prev == 5 ~ 12,
+.default = month_max_prev
+),
+# The survey was carried out in Feb 2013
+ict_min = monthdiff(year_prev, month_max_prev, year_cur, month_min_cur),
+ict_max = monthdiff(year_prev, month_min_prev, year_cur, month_max_cur),
+# Enforce sanity of responses (max must be larger than min)
+ict_min = case_when(
+ict_min <= 0 | is.na(ict_min) ~ 0.1, # There must be a slight difference
+.default = ict_min
+),
+ict_max = case_when(
+ict_max <= 0 | is.na(ict_max) ~ 200, # The absolute maximum time (decided),
+.default = ict_max
+),
+# Transformation into years
+ict_min = ict_min / 12,
+ict_max = ict_max / 12
+)
+
+# Empirical cumulative distribution functions
+it <- seq(0, 15, by = 0.05)
+d1 <- data.frame(
+it = c(it, it),
+ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
+time = gl(2, length(it), labels = c("max", "min"))
+)
+
+# Empirical density functions
+d2 <- mobile |>
+select(ict_min, ict_max) |>
+pivot_longer(cols = everything(),
+names_pattern = "ict_(.+)",
+names_to = "time",
+values_to = "ict"
+)
+```
+
+```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
+ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
+geom_line() +
+xlab("Time between purchases (years)") +
+ylab("Cumulative density") +
+theme_bw()
+
+ggplot(d2, aes(x = ict, y = after_stat(density), colour = time)) +
+geom_density() +
+xlab("Time between purchases (years)") +
+theme_bw()
+```
+
+
+
+# Mallintaminen
+
+# Tulokset
+
+# Tulkinnat
+
+# Pohdintaa
+
+ 
+
+# Lähdeviitteet
