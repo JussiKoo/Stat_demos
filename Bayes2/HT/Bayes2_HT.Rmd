@@ -25,12 +25,11 @@ library(dplyr)
 library(knitr)
 library(xtable)
 ```
-
 # Aineiston analysointia ja visualisointia
 
+Tässä harjoitustyössä tullaan arvioimaan eri tekijöiden vaikutusta matkapuhelimen käyttöikään. Harjoitustyössä käytetään aineistona matkapuhelimen hankintaa käsittelevää kyselytutkimusta [@Karvanen_2014]. Kiinnostuksen kohteena olevat tekijät aineistossa ovat sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki ja kotitalouden tulot.
 
-
-```{r}
+```{r, inclue=FALSE}
 library("dplyr")
 library("ggplot2")
 library("tidyr")
@@ -53,18 +52,30 @@ season_cur = Q45,
 year_prev = Q48,
 month_prev = Q49,
 season_prev = Q50,
-brand_prev = Q47
+brand_prev = Q47,
+sex = Sukup,
+age = Ika,
+region = Alue,
+income = Tulot
 ) |>
 mutate(
+  sex = factor(sex, labels=c("Mies", "Nainen")),
+  age = factor(age, labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
+  region = factor(region, labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
+  income = factor(income, labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
+  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "HTC", "Sony Ericsson", "Muu", "Eos")),
+  
 # 9999 denotes NA for year in the data,
   year_cur = na_if(year_cur, 9999),
   year_prev = na_if(year_prev, 9999),
+
 # month_min and max are helper variables used to determine the
 # first or last possible month based on the season if month is NA
 month_min_cur = month_cur - 1,
 month_max_cur = month_cur,
 month_min_prev = month_prev - 1,
 month_max_prev = month_prev,
+
 # 13 indicates NA for month, 5 indicates NA for season
 month_min_cur = case_when(
 month_cur == 13 & season_cur == 1 ~ 0,
@@ -98,9 +109,11 @@ month_prev == 13 & season_prev == 4 ~ 12,
 month_prev == 13 & season_prev == 5 ~ 12,
 .default = month_max_prev
 ),
-# The survey was carried out in Feb 2013
+
+#Min and max months between previous and current phone
 ict_min = monthdiff(year_prev, month_max_prev, year_cur, month_min_cur),
 ict_max = monthdiff(year_prev, month_min_prev, year_cur, month_max_cur),
+
 # Enforce sanity of responses (max must be larger than min)
 ict_min = case_when(
 ict_min <= 0 | is.na(ict_min) ~ 0.1, # There must be a slight difference
@@ -110,13 +123,15 @@ ict_max = case_when(
 ict_max <= 0 | is.na(ict_max) ~ 200, # The absolute maximum time (decided),
 .default = ict_max
 ),
+
 # Transformation into years
 ict_min = ict_min / 12,
-ict_max = ict_max / 12
+ict_max = ict_max / 12,
+ict_mean = (ict_max + ict_min)/2
 )
 
 # Empirical cumulative distribution functions
-it <- seq(0, 15, by = 0.05)
+it <- seq(0, 17, by = 0.05)
 d1 <- data.frame(
 it = c(it, it),
 ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
@@ -133,6 +148,8 @@ values_to = "ict"
 )
 ```
 
+Käyttöikä saadaan aineistosta välisensuroituna, sillä vastaajat ovat ilmoittaneet matkapuhelinten hankinta-ajat tarkimmillaan kuukauden tarkkuudella. Esimerkiksi jos vastaaja olisi ilmoittanut, että hän on hankkinut entisen puhelimensa toukokuussa 2008 ja nykyisen puhelimen heinäkuussa 2009 niin olisi entisen puhelimen käyttöikä pienimmillään 13 kuukautta ja suurimmillaan 15 kuukautta.
+
 ```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
 ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
 geom_line() +
@@ -145,6 +162,27 @@ geom_density() +
 xlab("Time between purchases (years)") +
 theme_bw()
 ```
+
+```{r}
+kuva1 <- ggplot(data=mobile, mapping=aes(x=sex, y=ict_mean))+
+  geom_boxplot()
+
+kuva2 <- ggplot(data=mobile, mapping=aes(x=age, y=ict_mean, colour = sex))+
+  geom_boxplot()
+
+ggplot(data=mobile, mapping=aes(x=income, y=ict_mean))+
+  geom_boxplot()
+
+ggplot(data=mobile, mapping=aes(x=brand_prev, y=ict_mean))+
+  geom_boxplot()
+
+kuva4 <- ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
+  geom_boxplot()+
+  scale_x_discrete(labels=c("2. aste", "Alempi kk", "Ylempi kk"))
+
+(kuva1 | kuva2) / (kuva3 | kuva4)
+```
+
 
 
 # Mallintaminen
