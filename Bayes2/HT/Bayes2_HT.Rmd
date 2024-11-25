@@ -27,7 +27,7 @@ library(xtable)
 ```
 # Aineiston analysointia ja visualisointia
 
-Tässä harjoitustyössä tullaan arvioimaan eri tekijöiden vaikutusta matkapuhelimen käyttöikään. Harjoitustyössä käytetään aineistona matkapuhelimen hankintaa käsittelevää kyselytutkimusta [@Karvanen_2014]. Kiinnostuksen kohteena olevat tekijät aineistossa ovat sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki ja kotitalouden tulot.
+Tässä harjoitustyössä tullaan arvioimaan eri tekijöiden vaikutusta matkapuhelimen käyttöikään. Harjoitustyössä käytetään aineistona matkapuhelimen hankintaa käsittelevää kyselytutkimusta [@Karvanen_2014]. Kiinnostuksen kohteena olevat tekijät aineistossa ovat sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki ja kotitalouden tulot. Entisen puhelimen käyttöikä saadaan aineistosta välisensuroituna, sillä vastaajat ovat ilmoittaneet matkapuhelinten hankinta-ajat tarkimmillaan kuukauden tarkkuudella. Esimerkiksi jos vastaaja olisi ilmoittanut, että hän on hankkinut entisen puhelimensa toukokuussa 2008 ja nykyisen puhelimen heinäkuussa 2009 niin olisi entisen puhelimen käyttöikä pienimmillään 13 kuukautta ja suurimmillaan 15 kuukautta.
 
 ```{r, inclue=FALSE}
 library("dplyr")
@@ -148,8 +148,6 @@ values_to = "ict"
 )
 ```
 
-Käyttöikä saadaan aineistosta välisensuroituna, sillä vastaajat ovat ilmoittaneet matkapuhelinten hankinta-ajat tarkimmillaan kuukauden tarkkuudella. Esimerkiksi jos vastaaja olisi ilmoittanut, että hän on hankkinut entisen puhelimensa toukokuussa 2008 ja nykyisen puhelimen heinäkuussa 2009 niin olisi entisen puhelimen käyttöikä pienimmillään 13 kuukautta ja suurimmillaan 15 kuukautta.
-
 ```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
 ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
 geom_line() +
@@ -162,30 +160,9 @@ geom_density() +
 xlab("Time between purchases (years)") +
 theme_bw()
 ```
-
-```{r}
-kuva1 <- ggplot(data=mobile, mapping=aes(x=sex, y=ict_mean))+
-  geom_boxplot()
-
-kuva2 <- ggplot(data=mobile, mapping=aes(x=age, y=ict_mean, colour = sex))+
-  geom_boxplot()
-
-ggplot(data=mobile, mapping=aes(x=income, y=ict_mean))+
-  geom_boxplot()
-
-ggplot(data=mobile, mapping=aes(x=brand_prev, y=ict_mean))+
-  geom_boxplot()
-
-kuva4 <- ggplot(data=d, mapping=aes(x=koulutustaso, y=tulot))+
-  geom_boxplot()+
-  scale_x_discrete(labels=c("2. aste", "Alempi kk", "Ylempi kk"))
-
-(kuva1 | kuva2) / (kuva3 | kuva4)
-```
-
-
-
 # Mallintaminen
+
+Mallinnetaan selittäjien yhteyttä käyttöikään
 
 # Tulokset
 
