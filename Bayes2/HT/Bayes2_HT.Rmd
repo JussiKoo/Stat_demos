@@ -135,6 +135,10 @@ ict_max = ict_max / 12,
 ict_mean = (ict_max + ict_min)/2
 )
 
+summary(mobile$brand_prev)
+mobile$brand_prev[mobile$brand_prev == "HTC"] <- "Muu"
+mobile$brand_prev[mobile$brand_prev == "Eos"] <- "Muu"
+
 # Empirical cumulative distribution functions
 it <- seq(0, 17, by = 0.05)
 d1 <- data.frame(
@@ -196,6 +200,54 @@ Mallin hierarkinen rakenne on kuvattu kuvassa x.
 knitr::include_graphics("Bayes_dag.svg")
 ```
 
+```{r}
+scode <- 
+"data{
+  int<lower=0> n;
+  real<lower=0> t_max[n];
+  real<lower=0> t_min[n];
+  int<lower=0, upper=5> age;
+  int<lower=0, upper=1> sex;
+  int<lower=0, upper=3> region;
+  int<lower=0, upper=4> brand;
+  int<lower=0, upper=4> income;
+}
+parameters{
+  real<lower=0, upper=1> t_init[n];
+  
+  real beta_female;
+  real beta_25_34;
+  real beta_35_44;
+  real beta_45_54;
+  real beta_55_64;
+  real beta_65_79;
+  real beta_south;
+  real beta_west;
+  real beta_east_north;
+  real beta_iphone;
+  real beta_samsung;
+  real beta_sony_erics;
+  real beta_other_brand;
+  real beta_30k_50k;
+  real beta_50k_70k;
+  real beta_>70k;
+  real beta_income_na;
+  real<lower=0> alpha;
+  real<lower=0> theta[n];
+}
+transformed parameters{
+  //skaalataan t annetuille väleille
+  real<lower=0> t[n];
+  for (i in 1:n){
+    t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
+  }
+}
+model{
+
+}
+generated quantities
+"
+```
 
 
 # Tulokset
