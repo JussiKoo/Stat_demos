@@ -5,6 +5,9 @@ date: "`r Sys.Date()`"
 output: bookdown::pdf_document2
 bibliography: references.bib
 lang: fi
+header-includes: 
+  - \usepackage{tikz}
+  - \usetikzlibrary{arrows.meta}
 ---
 
 ```{r setup, include=FALSE}
@@ -162,20 +165,37 @@ geom_density() +
 xlab("Time between purchases (years)") +
 theme_bw()
 ```
+
 # Mallintaminen
 
-```{r}
-dag <- dagify(
-  t ~ sex + age + income + region + brand,
-  t_min ~ t,
-  t_max ~ t,
-  outcome = c("t_min", "t_max"),
-  latent = c("t")
-) %>%
-  tidy_dagitty()
+Sovitetaan aineistoon vastaavanlainen malli kuin alkuperäisessä tutkimuksessa. Mallin matemattinen rakenne voidaan kuvata siis seuraavasti:
 
-ggdag(dag, layout="treemap")
+\begin{equation}
+  \begin{split}
+    &t_i \in [t_i^{min},t_i^{max}],\\
+    &t_i \sim Gamma(\alpha, \theta_i),\\
+    &\alpha \sim Gamma(1,1),\\
+    &\log(\theta_i) = \beta_0 + \beta_{1[i]} + \beta_{2[i]} + \beta_{3[i]} + \beta_{4[i]} +             \beta_{5[i]}\\
+    \beta \sim N(0,1000)\\
+  \end{split}
+\end{equation}
+
+Nyt kertoimet $\beta_{j[i]}$ määräytyvät vastaajan $i$ ominaisuuksien perusteella. Jokaiselle parametrille $\beta$ asetetaan heikosti informatiivinen priori $N(0,1000)$.
+
+| Parametri      | Selitys           |
+|----------------|-------------------|
+| $\beta_{1[i]}$ | Sukupuoli         |
+| $\beta_{2[i]}$ | Ikäryhmä          |
+| $\beta_{3[i]}$ | Tuloluokka        |
+| $\beta_{4[i]}$ | Alue              |
+| $\beta_{5[i]}$ | Puhelimen merkki  |
+
+Mallin hierarkinen rakenne on kuvattu kuvassa x. 
+
+```{r DAG, echo=FALSE, fig.cap="Mallin DAG-kuvaaja", out.width='70%', out.height='70%', dev='svg', fig.align='center'}
+knitr::include_graphics("Bayes_dag.svg")
 ```
+
 
 
 # Tulokset
