@@ -24,6 +24,8 @@ library(tidyr)
 library(dplyr)
 library(knitr)
 library(xtable)
+library(dagitty)
+library(ggdag)
 ```
 # Aineiston analysointia ja visualisointia
 
@@ -162,7 +164,19 @@ theme_bw()
 ```
 # Mallintaminen
 
-Mallinnetaan selittäjien yhteyttä käyttöikään
+```{r}
+dag <- dagify(
+  t ~ sex + age + income + region + brand,
+  t_min ~ t,
+  t_max ~ t,
+  outcome = c("t_min", "t_max"),
+  latent = c("t")
+) %>%
+  tidy_dagitty()
+
+ggdag(dag, layout="treemap")
+```
+
 
 # Tulokset
 
