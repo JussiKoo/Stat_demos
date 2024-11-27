@@ -27,8 +27,6 @@ library(tidyr)
 library(dplyr)
 library(knitr)
 library(xtable)
-library(dagitty)
-library(ggdag)
 ```
 # Aineiston analysointia ja visualisointia
 
@@ -68,7 +66,9 @@ mutate(
   age = factor(age, labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
   region = factor(region, labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
   income = factor(income, labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
-  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "HTC", "Sony Ericsson", "Muu", "Eos")),
+  brand_prev = ifelse(brand_prev %in% c(4,7), 6, brand_prev),
+  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu")),
+  
   
 # 9999 denotes NA for year in the data,
   year_cur = na_if(year_cur, 9999),
@@ -135,10 +135,6 @@ ict_max = ict_max / 12,
 ict_mean = (ict_max + ict_min)/2
 )
 
-summary(mobile$brand_prev)
-mobile$brand_prev[mobile$brand_prev == "HTC"] <- "Muu"
-mobile$brand_prev[mobile$brand_prev == "Eos"] <- "Muu"
-
 # Empirical cumulative distribution functions
 it <- seq(0, 17, by = 0.05)
 d1 <- data.frame(
@@ -201,8 +197,10 @@ knitr::include_graphics("Bayes_dag.svg")
 ```
 
 ```{r}
-scode <- 
-"data{
+library(rstan)
+
+scode <- "
+data{
   int<lower=0> n;
   real<lower=0> t_max[n];
   real<lower=0> t_min[n];
@@ -230,7 +228,7 @@ parameters{
   real beta_other_brand;
   real beta_30k_50k;
   real beta_50k_70k;
-  real beta_>70k;
+  real beta_min70k;
   real beta_income_na;
   real<lower=0> alpha;
   real<lower=0> theta[n];
@@ -243,10 +241,48 @@ transformed parameters{
   }
 }
 model{
+  alpha ~ gamma(1,1);
+  
+  beta_female ~ normal(0, 1000);
+  beta_25_34 ~ normal(0, 1000);
+  beta_35_44 ~ normal(0, 1000);
+  beta_45_54 ~ normal(0, 1000);
+  beta_55_64 ~ normal(0, 1000);
+  beta_65_79 ~ normal(0, 1000);
+  beta_south ~ normal(0, 1000);
+  beta_west ~ normal(0, 1000);
+  beta_east_north ~ normal(0, 1000);
+  beta_iphone ~ normal(0, 1000);
+  beta_samsung ~ normal(0, 1000);
+  beta_sony_erics ~ normal(0, 1000);
+  beta_other_brand ~ normal(0, 1000);
+  beta_30k_50k ~ normal(0, 1000);
+  beta_50k_70k ~ normal(0, 1000);
+  beta_min70k ~ normal(0, 1000);
+  beta_income_na ~ normal(0, 1000);
+  
+  t ~ gamma(alpha, theta);
+  
+}"
 
-}
-generated quantities
-"
+X <- model.matrix(~ sex + age + income + brand_prev + region, data=mobile)
+dim(X)
+
+fit <- stan(
+  model_code = scode,
+  data = list(
+    n = nrow(mobile),
+    t_max = mobile$ict_max,
+    t_min = mobile$ict_min,
+    age = mobile$age,
+    sex = mobile$sex,
+    income = mobile$income,
+    region = mobile$region,
+    brand = mobile$brand_prev
+  ),
+  iter = 4000,
+  refresh = FALSE
+)
 ```
 
 
