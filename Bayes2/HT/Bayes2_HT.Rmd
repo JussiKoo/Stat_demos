@@ -136,7 +136,7 @@ ict_mean = (ict_max + ict_min)/2
 )
 
 # Empirical cumulative distribution functions
-it <- seq(0, 17, by = 0.05)
+it <- seq(0, 18, by = 0.05)
 d1 <- data.frame(
 it = c(it, it),
 ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
@@ -290,48 +290,48 @@ fit <- stan(
 )
 
 t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
+```
+# Tulokset
 
+```{r, echo=FALSE, fig.cap=""}
 library("bayesplot")
 library("ggplot2")
 
-ppc_ecdf_overlay(mobile$ict_min, t_ennuste$t_ennuste[1:25, ])
+n_plot <- 50
 
-n_plot <- 25
+it <- seq(0, 20, by = 0.05)
 
-it <- seq(0, 17, by = 0.05)
-
-ecdf_values <- matrix(0, ncol = 2+n_plot, nrow = length(it))
-  
-ecdf_values[,1] <- ecdf(mobile$ict_max)(it)
-ecdf_values[,2] <- ecdf(mobile$ict_min)(it)
+ecdf_values <- matrix(0, ncol = n_plot, nrow = length(it))
 
 sample_index <- sample(1:nrow(mobile), n_plot, replace = FALSE)
 
 for (i in 1:n_plot) {
-  ecdf_values[,2+i] <- ecdf(t_ennuste$t_ennuste[sample_index[i],])(it)
+  ecdf_values[,i] <- ecdf(t_ennuste$t_ennuste[sample_index[i],])(it)
 }
 
 time = gl(2, length(it), labels = c("max", "min"))
 
 d1 <- data.frame(
-it = rep(it, 2+n_plot),
+it = rep(it, n_plot),
 ecdf = as.vector(ecdf_values),
-time = factor(c(
-    rep("t_max", length(it)), 
-    rep("t_min", length(it)), 
-    rep("ennuste", length(it) * n_plot)
-  ))
+sample_id = gl(n_plot, length(it)),
+name = rep("posterioriennusteita", n_plot)
 )
 
-ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
-geom_line() +
-xlab("Time between purchases (years)") +
-ylab("Cumulative density") +
+d2 <- data.frame(
+it = c(it, it),
+ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
+name = gl(2, length(it), labels = c("ostovälin yläraja", "ostovälin alaraja"))
+)
+
+ggplot(d2, aes(x = it, y=)) +
+geom_line(data=d1, aes(x=it, y=ecdf, group = sample_id, colour = name), alpha=0.5) +
+geom_line(aes(y=ecdf, colour = name), size=0.8) +
+xlab("Vuosia ostotapahtumien välissä") +
+ylab("Kertymä") +
 theme_bw()
 ```
 
-
-# Tulokset
 
 # Tulkinnat
 
