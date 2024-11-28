@@ -62,12 +62,12 @@ region = Alue,
 income = Tulot
 ) |>
 mutate(
-  sex = factor(sex, labels=c("Mies", "Nainen")),
-  age = factor(age, labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
-  region = factor(region, labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
-  income = factor(income, labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
-  brand_prev = ifelse(brand_prev %in% c(4,7), 6, brand_prev),
-  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu")),
+  sex = factor(sex),# labels=c("Mies", "Nainen")),
+  age = factor(age),# labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
+  region = factor(region),# labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
+  income = factor(income),# labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
+  brand_prev = ifelse(brand_prev %in% c(4,5,6,7), 4, brand_prev), #Jaotellaan Nokia, iPhone, Samsung, Muut
+  brand_prev = factor(brand_prev),# labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu")),
   
   
 # 9999 denotes NA for year in the data,
@@ -152,6 +152,12 @@ names_to = "time",
 values_to = "ict"
 )
 ```
+sex = factor(sex, labels=c("Mies", "Nainen")),
+  age = factor(age, labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
+  region = factor(region, labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
+  income = factor(income, labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
+  brand_prev = ifelse(brand_prev %in% c(4,7), 6, brand_prev),
+  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu"))
 
 ```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
 ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
@@ -204,69 +210,63 @@ data{
   int<lower=0> n;
   real<lower=0> t_max[n];
   real<lower=0> t_min[n];
-  int<lower=0, upper=5> age;
-  int<lower=0, upper=1> sex;
-  int<lower=0, upper=3> region;
-  int<lower=0, upper=4> brand;
-  int<lower=0, upper=4> income;
+  int<lower=1, upper=6> age[n];
+  int<lower=1, upper=2> sex[n];
+  int<lower=1, upper=4> region[n];
+  int<lower=1, upper=4> brand[n];
+  int<lower=1, upper=5> income[n];
 }
 parameters{
-  real<lower=0, upper=1> t_init[n];
+  //real<lower=0, upper=1> t_init[n];
   
-  real beta_female;
-  real beta_25_34;
-  real beta_35_44;
-  real beta_45_54;
-  real beta_55_64;
-  real beta_65_79;
-  real beta_south;
-  real beta_west;
-  real beta_east_north;
-  real beta_iphone;
-  real beta_samsung;
-  real beta_sony_erics;
-  real beta_other_brand;
-  real beta_30k_50k;
-  real beta_50k_70k;
-  real beta_min70k;
-  real beta_income_na;
   real<lower=0> alpha;
-  real<lower=0> theta[n];
+  
+  real beta_0;
+  real beta_age[6];
+  real beta_sex[2];
+  real beta_region[4];
+  real beta_brand[4];
+  real beta_income[5];
 }
 transformed parameters{
   //skaalataan t annetuille väleille
-  real<lower=0> t[n];
+  //real<lower=0> t[n];
+  real<lower=0> logtheta[n];
+  
   for (i in 1:n){
-    t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
+    //t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
+    
+    logtheta[i] = 
+      beta_0
+      + beta_age[age[i]]
+      + beta_sex[sex[i]]
+      + beta_region[region[i]]
+      + beta_brand[brand[i]]
+      + beta_income[income[i]];
   }
+  
 }
 model{
   alpha ~ gamma(1,1);
   
-  beta_female ~ normal(0, 1000);
-  beta_25_34 ~ normal(0, 1000);
-  beta_35_44 ~ normal(0, 1000);
-  beta_45_54 ~ normal(0, 1000);
-  beta_55_64 ~ normal(0, 1000);
-  beta_65_79 ~ normal(0, 1000);
-  beta_south ~ normal(0, 1000);
-  beta_west ~ normal(0, 1000);
-  beta_east_north ~ normal(0, 1000);
-  beta_iphone ~ normal(0, 1000);
-  beta_samsung ~ normal(0, 1000);
-  beta_sony_erics ~ normal(0, 1000);
-  beta_other_brand ~ normal(0, 1000);
-  beta_30k_50k ~ normal(0, 1000);
-  beta_50k_70k ~ normal(0, 1000);
-  beta_min70k ~ normal(0, 1000);
-  beta_income_na ~ normal(0, 1000);
+  beta_0 ~ normal(0, 100);
+  beta_age ~ normal(0, 100);
+  beta_sex ~ normal(0, 100);
+  beta_region ~ normal(0, 100);
+  beta_brand ~ normal(0, 100);
+  beta_income ~ normal(0, 100);
   
-  t ~ gamma(alpha, theta);
+  //t ~ gamma(alpha, exp(-logtheta));
   
+  for (i in 1:n) {
+    target += log_diff_exp(gamma_lcdf(t_max[i] | alpha, exp(-logtheta[i])),
+    gamma_lcdf(t_min[i] | alpha, exp(-logtheta[i])));
+  }
+}
+generated quantities{
+  real t_ennuste[n];
+  for (i in 1:n) t_ennuste[i] = gamma_rng(alpha, exp(-logtheta[i]));
 }"
-
-X <- model.matrix(~ sex + age + income + brand_prev + region, data=mobile)
-dim(X)
 
 fit <- stan(
   model_code = scode,
@@ -274,15 +274,60 @@ fit <- stan(
     n = nrow(mobile),
     t_max = mobile$ict_max,
     t_min = mobile$ict_min,
-    age = mobile$age,
-    sex = mobile$sex,
-    income = mobile$income,
-    region = mobile$region,
-    brand = mobile$brand_prev
+    age = as.integer(mobile$age),
+    sex = as.integer(mobile$sex),
+    income = as.integer(mobile$income),
+    region = as.integer(mobile$region),
+    brand = as.integer(mobile$brand_prev)
   ),
   iter = 4000,
-  refresh = FALSE
+  init = 0,
+  chains = 4,
+  refresh = 0,
+  pars = c("logtheta"),
+  include = FALSE,
+  cores=4
 )
+
+t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
+
+library("bayesplot")
+library("ggplot2")
+
+ppc_ecdf_overlay(mobile$ict_min, t_ennuste$t_ennuste[1:25, ])
+
+n_plot <- 25
+
+it <- seq(0, 17, by = 0.05)
+
+ecdf_values <- matrix(0, ncol = 2+n_plot, nrow = length(it))
+  
+ecdf_values[,1] <- ecdf(mobile$ict_max)(it)
+ecdf_values[,2] <- ecdf(mobile$ict_min)(it)
+
+sample_index <- sample(1:nrow(mobile), n_plot, replace = FALSE)
+
+for (i in 1:n_plot) {
+  ecdf_values[,2+i] <- ecdf(t_ennuste$t_ennuste[sample_index[i],])(it)
+}
+
+time = gl(2, length(it), labels = c("max", "min"))
+
+d1 <- data.frame(
+it = rep(it, 2+n_plot),
+ecdf = as.vector(ecdf_values),
+time = factor(c(
+    rep("t_max", length(it)), 
+    rep("t_min", length(it)), 
+    rep("ennuste", length(it) * n_plot)
+  ))
+)
+
+ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
+geom_line() +
+xlab("Time between purchases (years)") +
+ylab("Cumulative density") +
+theme_bw()
 ```
 
 
