@@ -31,6 +31,9 @@ dis_res[, 3] <- dis_res[, 3] + 1850 # muunnetaan erotus vuodesta 1850 vuosiluvuk
 
 #T2
 
+library(rstan)
+library(tidyr)
+
 url <- "http://users.jyu.fi/~santikka/bayes2/data/Margus_etal_data_gen_2.csv"
 beetle <- read.csv2(url)
 head(beetle)
@@ -51,39 +54,42 @@ data {
 }
 transformed data {
   vector[2] y[n];
+  vector[2] x[n];
+  
   for (i in 1:n) {
     y[i, 1] = 7d_weight[i];
     y[i, 2] = adultweight[i];
+    x[i, 1] = sex[i];
+    x[i, 2] = treatment[i];
   }
 }
 parameters {
-  // hierarkkiset parametrit
-  vector[2] mu;
-  cholesky_factor_corr[2] K;
-
-  // koulukohtaiset parametrit
-  vector[2] beta_1;
-  vector[2] beta_2;
-
-  // kaikille oppilaille yhteiset parametrit
-  cholesky_factor_corr[2] L;
-  vector<lower=0>[3] sigma;
+  vector[2] mu[n];
+  vector[2] beta[2];
+  cov_matrix[n] Sigma;
+}
+transformed parameters {
+  vector[2] mu[n];
+  for (i in 1:n) {
+    mu[i,1] = mean(mu[,1]) + beta[1,1]*x[i,1] + beta[1,2]*x[i,2];
+    mu[i,2] = mean(mu[,2]) + beta[2,1]*x[i,1] + beta[2,2]*x[i,2];
+  }
 }
 model {
-  vector[3] theta_s[n];
-  for (i in 1:n) {
-    theta_s[i] = theta[school[i]];
-  }
-
-  mu ~ normal(500, 100);
-  K ~ lkj_corr_cholesky(2.0);
-  omega ~ inv_gamma(1, 5);
-
-  theta ~ multi_normal_cholesky(mu, diag_pre_multiply(omega, K));
-
-  L ~ lkj_corr_cholesky(2.0);
-  sigma ~ inv_gamma(1, 5);
-
-  y ~ multi_normal_cholesky(theta_s, diag_pre_multiply(sigma, L));
+  Sigma ~ inv_wishart(n, diag_matrix(rep_vector(1,n)));
+  beta ~ normal(0,100);
 }
 "
+
+beetle$Treatment <- beetle$Treatment-1
+beetle$Sex <- beetle$Sex-1 
+beetle$Ad_weight_mg_scaled <- scale(beetle$Ad_weight_mg)
+beetle$Weight_7d_mg_scaled <- scale(beetle$Weight_7d_mg)
+beetle_na <- drop_na(beetle)
+
+fit2 <- stan(
+  model_code = scode,
+  data = list(
+    n=nrow(beetle),
+    )
+)
