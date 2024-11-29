@@ -202,7 +202,7 @@ Mallin hierarkinen rakenne on kuvattu kuvassa x.
 knitr::include_graphics("Bayes_dag.svg")
 ```
 
-```{r}
+```{r, echo=FALSE}
 library(rstan)
 
 scode <- "
@@ -280,13 +280,13 @@ fit <- stan(
     region = as.integer(mobile$region),
     brand = as.integer(mobile$brand_prev)
   ),
-  iter = 4000,
+  iter = 8000,
   init = 0,
-  chains = 4,
+  chains = 1,
   refresh = 0,
   pars = c("logtheta"),
   include = FALSE,
-  cores=4
+  cores=12
 )
 
 t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
@@ -321,15 +321,26 @@ name = rep("posterioriennusteita", n_plot)
 d2 <- data.frame(
 it = c(it, it),
 ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
-name = gl(2, length(it), labels = c("ostovälin yläraja", "ostovälin alaraja"))
+name = gl(2, length(it), labels = c("käyttöiän yläraja", "käyttöiän alaraja"))
 )
 
 ggplot(d2, aes(x = it, y=)) +
 geom_line(data=d1, aes(x=it, y=ecdf, group = sample_id, colour = name), alpha=0.5) +
-geom_line(aes(y=ecdf, colour = name), size=0.8) +
+geom_line(aes(y=ecdf, colour = name), linewidth=0.8) +
 xlab("Vuosia ostotapahtumien välissä") +
 ylab("Kertymä") +
 theme_bw()
+```
+
+
+```{r}
+mean(apply(t_ennuste$t_ennuste, 2, min) < mobile$ict_min)
+
+mean(apply(t_ennuste$t_ennuste, 2, max) > mobile$ict_max)
+
+ppc_dens_overlay(mobile$ict_mean, t_ennuste$t_ennuste)
+
+plot(fit, plotfun="trace", pars=c("beta_age"), bins=100)
 ```
 
 
