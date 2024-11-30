@@ -46,10 +46,10 @@ head(beetle)
 
 scode <- "
 data {
-  int<lower=0> n;         // kuoriaisten määrä
+  int<lower=0> n;         // mittausten määrä
   int<lower=0, upper=1> sex[n]; // kuoriaisen sukupuoli
   int<lower=0, upper=1> treatment[n]; //käsittely
-  real 7d_weight[n];
+  real weight_7d[n];
   real adultweight[n];
 }
 transformed data {
@@ -57,27 +57,28 @@ transformed data {
   vector[2] x[n];
   
   for (i in 1:n) {
-    y[i, 1] = 7d_weight[i];
+    y[i, 1] = weight_7d[i];
     y[i, 2] = adultweight[i];
     x[i, 1] = sex[i];
     x[i, 2] = treatment[i];
   }
 }
 parameters {
-  vector[2] mu[n];
   vector[2] beta[2];
-  cov_matrix[n] Sigma;
+  cov_matrix[2] Sigma;
 }
 transformed parameters {
   vector[2] mu[n];
   for (i in 1:n) {
-    mu[i,1] = mean(mu[,1]) + beta[1,1]*x[i,1] + beta[1,2]*x[i,2];
-    mu[i,2] = mean(mu[,2]) + beta[2,1]*x[i,1] + beta[2,2]*x[i,2];
+    mu[i, 1] = mean(y[,1]) + beta[1, 1]*x[i, 1] + beta[1, 2]*x[i, 2];
+    mu[i, 2] = mean(y[,2]) + beta[2, 1]*x[i, 1] + beta[2, 2]*x[i, 2];
   }
 }
 model {
-  Sigma ~ inv_wishart(n, diag_matrix(rep_vector(1,n)));
-  beta ~ normal(0,100);
+  Sigma ~ inv_wishart(2, diag_matrix(rep_vector(100,2)));
+  y ~ multi_normal(mu, Sigma);
+  beta[1,] ~ normal(0,100);
+  beta[2,] ~ normal(0,100);
 }
 "
 
@@ -90,6 +91,12 @@ beetle_na <- drop_na(beetle)
 fit2 <- stan(
   model_code = scode,
   data = list(
-    n=nrow(beetle),
-    )
+    n=nrow(beetle_na),
+    sex = beetle_na$Sex,
+    treatment = beetle_na$Treatment,
+    weight_7d = beetle_na$Weight_7d_mg_scaled[,1],
+    adultweight = beetle_na$Ad_weight_mg_scaled[,1]
+    ),
+  iter=2000,
+  chains = 4
 )

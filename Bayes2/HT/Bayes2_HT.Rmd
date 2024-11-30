@@ -212,74 +212,15 @@ data{
   real<lower=0> t_min[n];
   int<lower=1, upper=6> age[n];
   int<lower=1, upper=2> sex[n];
-  //int<lower=1, upper=4> region[n];
+  int<lower=1, upper=4> region[n];
   int<lower=1, upper=4> brand[n];
-  //int<lower=1, upper=5> income[n];
+  int<lower=1, upper=5> income[n];
 }
 parameters{
   //real<lower=0, upper=1> t_init[n];
   
   real<lower=0> alpha;
   
-  real beta_0;
-  real beta_age[6];
-  real beta_sex[2];
-  //real beta_region[4];
-  real beta_brand[4];
-  //real beta_income[5];
-}
-transformed parameters{
-  //skaalataan t annetuille väleille
-  //real<lower=0> t[n];
-  real<lower=0> logtheta[n];
-  
-  for (i in 1:n){
-    //t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
-    
-    logtheta[i] = 
-      beta_0
-      + beta_age[age[i]]
-      + beta_sex[sex[i]]
-      //+ beta_region[region[i]]
-      + beta_brand[brand[i]];
-      //+ beta_income[income[i]]
-  }
-  
-}
-model{
-  alpha ~ gamma(1,1);
-  
-  beta_0 ~ normal(0, 100);
-  beta_age ~ normal(0, 100);
-  beta_sex ~ normal(0, 100);
-  //beta_region ~ normal(0, 1);
-  beta_brand ~ normal(0, 100);
-  //beta_income ~ normal(0, 1);
-  
-  //t ~ gamma(alpha, exp(-logtheta));
-  
-  for (i in 1:n) {
-    target += log_diff_exp(gamma_lcdf(t_max[i] | alpha, exp(-logtheta[i])),
-    gamma_lcdf(t_min[i] | alpha, exp(-logtheta[i])));
-  }
-}
-generated quantities{
-  real t_ennuste[n];
-  for (i in 1:n) t_ennuste[i] = gamma_rng(alpha, exp(-logtheta[i]));
-}"
-
-scode2 <- "
-data{
-  int<lower=0> n;
-  real<lower=0> t_max[n];
-  real<lower=0> t_min[n];
-  int<lower=1, upper=6> age[n];
-  int<lower=1, upper=2> sex[n];
-  int<lower=1, upper=4> region[n];
-  int<lower=1, upper=4> brand[n];
-  int<lower=1, upper=5> income[n];
-}
-parameters{
   real beta_0;
   real beta_age[6];
   real beta_sex[2];
@@ -293,6 +234,7 @@ transformed parameters{
   real<lower=0> logtheta[n];
   
   for (i in 1:n){
+    //t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
     
     logtheta[i] = 
       beta_0
@@ -305,6 +247,8 @@ transformed parameters{
   
 }
 model{
+  alpha ~ gamma(1,1);
+  
   beta_0 ~ normal(0, 100);
   beta_age ~ normal(0, 100);
   beta_sex ~ normal(0, 100);
@@ -312,14 +256,16 @@ model{
   beta_brand ~ normal(0, 100);
   beta_income ~ normal(0, 100);
   
+  //t ~ gamma(alpha, exp(-logtheta));
+  
   for (i in 1:n) {
-    target += log_diff_exp(exponential_lcdf(t_max[i] | exp(-logtheta[i])),
-    exponential_lcdf(t_min[i] | exp(-logtheta[i])));
+    target += log_diff_exp(gamma_lcdf(t_max[i] | alpha, exp(-logtheta[i])),
+    gamma_lcdf(t_min[i] | alpha, exp(-logtheta[i])));
   }
 }
 generated quantities{
   real t_ennuste[n];
-  for (i in 1:n) t_ennuste[i] = exponential_rng(exp(-logtheta[i]));
+  for (i in 1:n) t_ennuste[i] = gamma_rng(alpha, exp(-logtheta[i]));
 }"
 
 fit <- stan(
@@ -330,16 +276,16 @@ fit <- stan(
     t_min = mobile$ict_min,
     age = as.integer(mobile$age),
     sex = as.integer(mobile$sex),
-    #income = as.integer(mobile$income),
-    #region = as.integer(mobile$region),
+    income = as.integer(mobile$income),
+    region = as.integer(mobile$region),
     brand = as.integer(mobile$brand_prev)
   ),
   iter = 4000,
-  chains = 2,
+  chains = 1,
   refresh = 0,
   pars = c("logtheta"),
   include = FALSE,
-  cores=4
+  cores=12
 )
 
 t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
@@ -393,7 +339,7 @@ mean(apply(t_ennuste$t_ennuste, 2, max) > mobile$ict_max)
 
 ppc_dens_overlay(mobile$ict_mean, t_ennuste$t_ennuste)
 
-plot(fit, plotfun="trace", pars=c("beta_age"))
+plot(fit, plotfun="trace", pars=c("beta_income"))
 
 plot(fit, plotfun="trace", pars=c("t_ennuste[1]"))
 ```
