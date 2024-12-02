@@ -210,11 +210,11 @@ data{
   int<lower=0> n;
   real<lower=0> t_max[n];
   real<lower=0> t_min[n];
-  int<lower=1, upper=6> age[n];
-  int<lower=1, upper=2> sex[n];
-  int<lower=1, upper=4> region[n];
-  int<lower=1, upper=4> brand[n];
-  int<lower=1, upper=5> income[n];
+  int<lower=0, upper=5> age[n];
+  int<lower=0, upper=1> sex[n];
+  int<lower=0, upper=3> region[n];
+  int<lower=0, upper=3> brand[n];
+  int<lower=0, upper=4> income[n];
 }
 parameters{
   //real<lower=0, upper=1> t_init[n];
@@ -222,32 +222,40 @@ parameters{
   real<lower=0> alpha;
   
   real beta_0;
-  real beta_age[6];
-  real beta_sex[2];
-  real beta_region[4];
-  real beta_brand[4];
-  real beta_income[5];
+  real beta_age[5];
+  real beta_sex;
+  real beta_region[3];
+  real beta_brand[3];
+  real beta_income[4];
 }
 transformed parameters{
   //skaalataan t annetuille väleille
   //real<lower=0> t[n];
-  real<lower=0> logtheta[n];
   
+  real logtheta[n];
   for (i in 1:n){
     //t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
     
-    logtheta[i] = 
-      beta_0
-      + beta_age[age[i]]
-      + beta_sex[sex[i]]
-      + beta_region[region[i]]
-      + beta_brand[brand[i]]
-      + beta_income[income[i]];
+    logtheta[i] = beta_0;
+    
+    if (age[i] != 0) logtheta[i] += beta_age[age[i]];
+    if (sex[i] != 0) logtheta[i] += beta_sex;
+    if (region[i] != 0) logtheta[i] += beta_region[region[i]];
+    if (brand[i] != 0) logtheta[i] += beta_brand[brand[i]];
+    if (income[i] != 0) logtheta[i] += beta_income[income[i]];
+    
+    //logtheta[i] = 
+    //  beta_0
+    //  + beta_age[age[i]]
+    //  + beta_sex[sex[i]]
+    //  + beta_region[region[i]]
+    //  + beta_brand[brand[i]]
+    //  + beta_income[income[i]];
   }
   
 }
 model{
-  alpha ~ gamma(1,1);
+  alpha ~ gamma(1,1); // Weibull?
   
   beta_0 ~ normal(0, 100);
   beta_age ~ normal(0, 100);
@@ -274,15 +282,14 @@ fit <- stan(
     n = nrow(mobile),
     t_max = mobile$ict_max,
     t_min = mobile$ict_min,
-    age = as.integer(mobile$age),
-    sex = as.integer(mobile$sex),
-    income = as.integer(mobile$income),
-    region = as.integer(mobile$region),
-    brand = as.integer(mobile$brand_prev)
+    age = as.integer(mobile$age)-1,
+    sex = as.integer(mobile$sex)-1,
+    income = as.integer(mobile$income)-1,
+    region = as.integer(mobile$region)-1,
+    brand = as.integer(mobile$brand_prev)-1
   ),
-  iter = 4000,
+  iter = 2000,
   chains = 1,
-  refresh = 0,
   pars = c("logtheta"),
   include = FALSE,
   cores=12

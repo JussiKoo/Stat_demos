@@ -100,3 +100,82 @@ fit2 <- stan(
   iter=2000,
   chains = 4
 )
+
+#beta[1,1] sukupuolen vaikutus varhaispainoon
+#beta[1,2] käsittelyn vaikutus varhaispainoon
+#beta[2,1] sukupuolen vaikutus aikuispainoon
+#beta[2,2] käsittelyn vaikutus aikuispainoon
+summary(fit2, pars=c("beta"), probs=c(0.025, 0.975))
+
+#T3
+
+scode3 <- "
+data{
+  int<lower=0> y[4];
+}
+parameters{
+  real<lower=0, upper=1> theta;
+}
+transformed parameters{
+  vector[4] pi;
+  pi[1] = 0.5 + 0.25*theta;
+  pi[2] = 0.25*(1-theta);
+  pi[3] = 0.25*(1-theta);
+  pi[4] = 0.25*theta;
+}
+model{
+  theta ~ normal(0.5, 0.2);
+  y ~ multinomial(pi);
+}
+"
+fit3 <- stan(
+  model_code = scode3,
+  data = list(
+    y=c(125, 18, 20, 34)
+  ),
+  iter=2000
+)
+
+fit3
+
+plot(fit3, plotfun="hist", pars="theta")
+
+#T5
+
+y <- c(
+  0.77, NA, 0.53, NA, NA, 0.60, 0.64, 0.64, 0.67, 0.57, 0.68, 0.75,
+  0.77, NA, NA, 0.65, 0.57, 0.54, 0.53, 0.84, 0.68, 0.82, NA, 0.51,
+  0.77, 0.72, NA, 0.61, 0.56, 0.90, 0.52, NA, NA, NA, 0.50, 0.83
+)
+
+scode5 <- "
+data{
+  int<lower=0> n_obs;
+  int<lower=0> n_mis;
+  real y_obs[n_obs];
+  real U;
+}
+parameters{
+  real<lower=2> alpha;
+}
+model{
+  alpha ~ normal(3,10);
+  y_obs ~ pareto(0.5, alpha);
+  target += n_mis*pareto_lccdf(U | 0.5, alpha);
+}
+"
+
+fit5 <- stan(
+  model_code = scode5,
+  data=list(
+    n_obs = sum(!is.na(y)),
+    n_mis = sum(is.na(y)),
+    y_obs=y[!is.na(y)],
+    U=1.0
+  ),
+  iter=2000
+)
+
+fit5
+
+plot(fit5, pars=c("alpha"), plotfun="hist")
