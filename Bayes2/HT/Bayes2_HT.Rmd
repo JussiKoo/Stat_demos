@@ -257,12 +257,12 @@ transformed parameters{
 model{
   alpha ~ gamma(1,1); // Weibull?
   
-  beta_0 ~ normal(0, 100);
-  beta_age ~ normal(0, 100);
-  beta_sex ~ normal(0, 100);
-  beta_region ~ normal(0, 100);
-  beta_brand ~ normal(0, 100);
-  beta_income ~ normal(0, 100);
+  beta_0 ~ normal(0, 10);
+  beta_age ~ normal(0, 10);
+  beta_sex ~ normal(0, 10);
+  beta_region ~ normal(0, 10);
+  beta_brand ~ normal(0, 10);
+  beta_income ~ normal(0, 10);
   
   //t ~ gamma(alpha, exp(-logtheta));
   
@@ -292,7 +292,7 @@ fit <- stan(
   chains = 1,
   pars = c("logtheta"),
   include = FALSE,
-  cores=12
+  cores=4
 )
 
 t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
@@ -344,11 +344,13 @@ mean(apply(t_ennuste$t_ennuste, 2, min) < mobile$ict_min)
 
 mean(apply(t_ennuste$t_ennuste, 2, max) > mobile$ict_max)
 
+mean(between(apply(t_ennuste$t_ennuste, 2, min), mobile$ict_min, mobile$ict_max))
+
 ppc_dens_overlay(mobile$ict_mean, t_ennuste$t_ennuste)
 
-plot(fit, plotfun="trace", pars=c("beta_income"))
+plot(fit, plotfun="hist", pars=c("beta_income"))
 
-plot(fit, plotfun="trace", pars=c("t_ennuste[1]"))
+plot(fit, plotfun="hist", pars=c("t_ennuste[1]"))
 ```
 
 
