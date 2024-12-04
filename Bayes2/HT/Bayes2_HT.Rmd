@@ -152,12 +152,7 @@ names_to = "time",
 values_to = "ict"
 )
 ```
-sex = factor(sex, labels=c("Mies", "Nainen")),
-  age = factor(age, labels=c("15-24", "25-34", "35-44", "45-54", "55-64", "65-79")),
-  region = factor(region, labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
-  income = factor(income, labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
-  brand_prev = ifelse(brand_prev %in% c(4,7), 6, brand_prev),
-  brand_prev = factor(brand_prev, labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu"))
+
 
 ```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
 ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
@@ -359,24 +354,24 @@ fit <- stan(
     region = as.integer(mobile$region)-1,
     brand = as.integer(mobile$brand_prev)-1
   ),
-  iter = 2000,
-  chains = 1,
+  iter = 4000,
+  chains = 4,
   pars = c("logtheta", "t_init"),
   include = FALSE,
-  cores=4
+  cores=12
 )
 
 t_ennuste <- rstan::extract(fit, pars = c("t"))
 ```
 # Tulokset
 
-Mallin sopivuutta on hieman haastaavaa tarkastella. Posterioriennusteita kyselyyn vastaajien puhelimen käyttöiälle voidaan verrata tunnettuihin ala- ja ylärajoihin esimerkiksi kertymäfunktioiden avulla.
+Mallin sopivuutta suhteessa aineistoon on haastavaa tarkastella, sillä todellisia puhelinten käyttöikiä ei tunneta. Posterioriennusteita kyselyyn vastaajien puhelimen käyttöiälle voidaan verrata tunnettuihin ala- ja ylärajoihin esimerkiksi kertymäfunktioiden avulla \@ref(fig: .
 
-```{r, echo=FALSE, fig.cap="Posterioriennusteita puhelimen käyttöiälle vs. havaitut käyttöikien ala- ja ylärajat"}
+```{r, echo=FALSE, include=FALSE}
 library("bayesplot")
 library("ggplot2")
 
-n_plot <- 50
+n_plot <- 25
 
 it <- seq(0, 20, by = 0.05)
 
@@ -402,14 +397,18 @@ it = c(it, it),
 ecdf = c(ecdf(mobile$ict_max)(it), ecdf(mobile$ict_min)(it)),
 name = gl(2, length(it), labels = c("käyttöiän yläraja", "käyttöiän alaraja"))
 )
+```
 
+
+```{r post_pred, echo=FALSE, fig.cap="Kertymäfunktiot käyttöiän minimeille, maksimeille ja 25 posterioriennusteelle"}
 ggplot(d2, aes(x = it, y=)) +
-geom_line(data=d1, aes(x=it, y=ecdf, group = sample_id, colour = name), alpha=0.5) +
+geom_line(data=d1, aes(x=it, y=ecdf, group = sample_id, colour = name), alpha=0.7) +
 geom_line(aes(y=ecdf, colour = name), linewidth=0.8) +
-xlab("Vuosia ostotapahtumien välissä") +
+xlab("Puhelimen käyttöikä") +
 ylab("Kertymä") +
 theme_bw()
 ```
+
 
 
 ```{r}
@@ -419,7 +418,13 @@ mean(apply(t_ennuste$t, 2, min) < mobile$ict_min)
 
 mean(apply(t_ennuste$t, 2, max) > mobile$ict_max)
 
+mean(apply(t_ennuste$t, 2, min) < mobile$ict_mean)
+
 mean(between(apply(t_ennuste$t, 2, min), mobile$ict_min, mobile$ict_max))
+
+mean(mobile$ict_min < 2)
+
+mean(apply(t_ennuste$t, 2, min) < 2)
 
 beta <- rstan::extract(fit, pars=c("beta_sex"))
 
@@ -427,7 +432,11 @@ coda::effectiveSize(as.mcmc(as.vector(beta$beta_sex)))
 
 plot(fit, plotfun="hist", pars=c("beta_income"))
 
-plot(fit, plotfun="hist", pars=c("t[1]"))
+plot(fit, plotfun="hist", pars=c("t[1]", "t[2]", "t[3]"), bins=20)
+
+ppc_dens_overlay(mobile$ict_mean, t_ennuste$t[1:50,])
+
+mean(t_ennuste$t)
 ```
 
 
