@@ -273,11 +273,82 @@ model{
 }
 generated quantities{
   real t_ennuste[n];
-  for (i in 1:n) t_ennuste[i] = gamma_rng(alpha, exp(-logtheta[i]));
+  for (i in 1:n) {
+  
+    real P_min = gamma_cdf(t_min[i], alpha, exp(-logtheta[i]));
+    real P_max = gamma_cdf(t_max[i], alpha, exp(-logtheta[i]));
+  
+    real u = uniform_rng(P_min, P_max);
+    
+    t_ennuste[i] = gamma_icdf(u, alpha, exp(-logtheta[i]));
+    
+    //t_ennuste[i] = gamma_rng(alpha, exp(-logtheta[i]));
+  }
 }"
 
+
+scode2 <- "
+data{
+  int<lower=0> n;
+  real<lower=0> t_max[n];
+  real<lower=0> t_min[n];
+  int<lower=0, upper=5> age[n];
+  int<lower=0, upper=1> sex[n];
+  int<lower=0, upper=3> region[n];
+  int<lower=0, upper=3> brand[n];
+  int<lower=0, upper=4> income[n];
+}
+parameters{
+  real<lower=0, upper=1> t_init[n];
+  
+  real<lower=0> alpha;
+  
+  real beta_0;
+  real beta_age[5];
+  real beta_sex;
+  real beta_region[3];
+  real beta_brand[3];
+  real beta_income[4];
+}
+transformed parameters{
+  //skaalataan t annetuille väleille
+  real<lower=0> t[n];
+  
+  real logtheta[n];
+  for (i in 1:n){
+    t[i] = t_min[i] + t_init[i]*(t_max[i] - t_min[i]);
+    
+    logtheta[i] = beta_0;
+    
+    if (age[i] != 0) logtheta[i] += beta_age[age[i]];
+    if (sex[i] != 0) logtheta[i] += beta_sex;
+    if (region[i] != 0) logtheta[i] += beta_region[region[i]];
+    if (brand[i] != 0) logtheta[i] += beta_brand[brand[i]];
+    if (income[i] != 0) logtheta[i] += beta_income[income[i]];
+  }
+  
+}
+model{
+  alpha ~ gamma(1,1); // Weibull?
+  
+  beta_0 ~ normal(0, 10);
+  beta_age ~ normal(0, 10);
+  beta_sex ~ normal(0, 10);
+  beta_region ~ normal(0, 10);
+  beta_brand ~ normal(0, 10);
+  beta_income ~ normal(0, 10);
+  
+  t ~ gamma(alpha, exp(-logtheta));
+  
+  //for (i in 1:n) {
+  //  target += log_diff_exp(gamma_lcdf(t_max[i] | alpha, exp(-logtheta[i])),
+  //  gamma_lcdf(t_min[i] | alpha, exp(-logtheta[i])));
+  //}
+}
+"
+
 fit <- stan(
-  model_code = scode,
+  model_code = scode2,
   data = list(
     n = nrow(mobile),
     t_max = mobile$ict_max,
@@ -290,16 +361,18 @@ fit <- stan(
   ),
   iter = 2000,
   chains = 1,
-  pars = c("logtheta"),
+  pars = c("logtheta", "t_init"),
   include = FALSE,
   cores=4
 )
 
-t_ennuste <- rstan::extract(fit, pars = c("t_ennuste"))
+t_ennuste <- rstan::extract(fit, pars = c("t"))
 ```
 # Tulokset
 
-```{r, echo=FALSE, fig.cap=""}
+Mallin sopivuutta on hieman haastaavaa tarkastella. Posterioriennusteita kyselyyn vastaajien puhelimen käyttöiälle voidaan verrata tunnettuihin ala- ja ylärajoihin esimerkiksi kertymäfunktioiden avulla.
+
+```{r, echo=FALSE, fig.cap="Posterioriennusteita puhelimen käyttöiälle vs. havaitut käyttöikien ala- ja ylärajat"}
 library("bayesplot")
 library("ggplot2")
 
@@ -312,7 +385,7 @@ ecdf_values <- matrix(0, ncol = n_plot, nrow = length(it))
 sample_index <- sample(1:nrow(mobile), n_plot, replace = FALSE)
 
 for (i in 1:n_plot) {
-  ecdf_values[,i] <- ecdf(t_ennuste$t_ennuste[sample_index[i],])(it)
+  ecdf_values[,i] <- ecdf(t_ennuste$t[sample_index[i],])(it)
 }
 
 time = gl(2, length(it), labels = c("max", "min"))
@@ -340,17 +413,21 @@ theme_bw()
 
 
 ```{r}
-mean(apply(t_ennuste$t_ennuste, 2, min) < mobile$ict_min)
+library(coda)
 
-mean(apply(t_ennuste$t_ennuste, 2, max) > mobile$ict_max)
+mean(apply(t_ennuste$t, 2, min) < mobile$ict_min)
 
-mean(between(apply(t_ennuste$t_ennuste, 2, min), mobile$ict_min, mobile$ict_max))
+mean(apply(t_ennuste$t, 2, max) > mobile$ict_max)
 
-ppc_dens_overlay(mobile$ict_mean, t_ennuste$t_ennuste)
+mean(between(apply(t_ennuste$t, 2, min), mobile$ict_min, mobile$ict_max))
+
+beta <- rstan::extract(fit, pars=c("beta_sex"))
+
+coda::effectiveSize(as.mcmc(as.vector(beta$beta_sex)))
 
 plot(fit, plotfun="hist", pars=c("beta_income"))
 
-plot(fit, plotfun="hist", pars=c("t_ennuste[1]"))
+plot(fit, plotfun="hist", pars=c("t[1]"))
 ```
 
 
