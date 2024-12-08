@@ -5,9 +5,6 @@ date: "`r Sys.Date()`"
 output: bookdown::pdf_document2
 bibliography: references.bib
 lang: fi
-header-includes: 
-  - \usepackage{tikz}
-  - \usetikzlibrary{arrows.meta}
 ---
 
 ```{r setup, include=FALSE}
@@ -27,15 +24,22 @@ library(tidyr)
 library(dplyr)
 library(knitr)
 library(xtable)
+library(bayesplot)
+library(rstan)
 ```
-# Aineiston analysointia ja visualisointia
+# Aineisto
 
-Tässä harjoitustyössä tullaan arvioimaan eri tekijöiden vaikutusta matkapuhelimen käyttöikään. Harjoitustyössä käytetään aineistona matkapuhelimen hankintaa käsittelevää kyselytutkimusta [@Karvanen_2014]. Kiinnostuksen kohteena olevat tekijät aineistossa ovat sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki ja kotitalouden tulot. Entisen puhelimen käyttöikä saadaan aineistosta välisensuroituna, sillä vastaajat ovat ilmoittaneet matkapuhelinten hankinta-ajat tarkimmillaan kuukauden tarkkuudella. Esimerkiksi jos vastaaja olisi ilmoittanut, että hän on hankkinut entisen puhelimensa toukokuussa 2008 ja nykyisen puhelimen heinäkuussa 2009 niin olisi entisen puhelimen käyttöikä pienimmillään 13 kuukautta ja suurimmillaan 15 kuukautta.
+Harjoitustyössä tehtävänä on arvioida eri tekijöiden vaikutusta matkapuhelimen käyttöikään. Harjoitustyössä käytetään aineistona matkapuhelimen hankintaa käsittelevää kyselytutkimusta [@Karvanen_2014]. Kiinnostuksen kohteena olevat tekijät aineistossa ovat sukupuoli, ikä, maantieteellinen alue, matkapuhelimen merkki ja kotitalouden tulot. Kaikki selittäjät ovat nyt kategorisia. Kyselyssä vastaajat ovat esimerkiksi ilmoittaneet vain ikäryhmänsä eivätkä tarkkaa ikäänsä. Entisen puhelimen käyttöikä saadaan aineistosta välisensuroituna, sillä vastaajat ovat ilmoittaneet matkapuhelinten hankinta-ajat tarkimmillaan kuukauden tarkkuudella. Esimerkiksi jos vastaaja olisi ilmoittanut, että hän on hankkinut entisen puhelimensa toukokuussa 2008 ja nykyisen puhelimen heinäkuussa 2009 niin olisi entisen puhelimen käyttöikä pienimmillään 13 kuukautta ja suurimmillaan 15 kuukautta. Aineistossa on tapauksia, joissa vastaaja ei muista juuri mitään nykyisen tai entisen puhelimen hankinnasta. Tällaisissa tapauksissa minimikäyttöiästä tulee hyvin pieni ja maksimikäyttöiästä hyvin suuri. Maksimikäyttöiälle on asetettu ylärajaksi 200 kuukautta. Kuvassa \@ref(fig:Aika) nähdään minimi- ja maksimikäyttöikien tiheysfunktioiden kuvaajat.
 
-```{r, inclue=FALSE}
+\newpage
+
+```{r, echo=FALSE, inclue=FALSE}
 library("dplyr")
 library("ggplot2")
 library("tidyr")
+
+set.seed(123)
+
 url <- "http://users.jyu.fi/~santikka/bayes2/data/mobile_phone_purchases.csv"
 mobile <- read.csv2(url, header = TRUE)
 
@@ -67,8 +71,7 @@ mutate(
   region = factor(region),# labels=c("Helsinki-Uusimaa", "Etelä-Suomi", "Länsi-Suomi", "Itä- ja Pohjois-Suomi")),
   income = factor(income),# labels=c("max 30 000 €", "30 001–50 000 €", "50 001–70 000 €", "min 70 000 €", "Eos")),
   brand_prev = ifelse(brand_prev %in% c(4,5,6,7), 4, brand_prev), #Jaotellaan Nokia, iPhone, Samsung, Muut
-  brand_prev = factor(brand_prev),# labels=c("Nokia", "Apple iPhone", "Samsung", "Sony Ericsson", "Muu")),
-  
+  brand_prev = factor(brand_prev),# labels=c("Nokia", "Apple iPhone", "Samsung", "Muu")),
   
 # 9999 denotes NA for year in the data,
   year_cur = na_if(year_cur, 9999),
@@ -153,53 +156,45 @@ values_to = "ict"
 )
 ```
 
-
-```{r Aika, fig.cap="Ostotapahtumien välinen aika"}
-ggplot(d1, aes(x = it, y = ecdf, colour = time)) +
-geom_line() +
-xlab("Time between purchases (years)") +
-ylab("Cumulative density") +
-theme_bw()
-
+```{r Aika, echo=FALSE, fig.cap="Minimi- ja maksimikäyttöiän tiheydet"}
 ggplot(d2, aes(x = ict, y = after_stat(density), colour = time)) +
 geom_density() +
 xlab("Time between purchases (years)") +
 theme_bw()
 ```
 
-# Mallintaminen
+# Mallinnus
 
-Sovitetaan aineistoon vastaavanlainen malli kuin alkuperäisessä tutkimuksessa. Mallin matemattinen rakenne voidaan kuvata siis seuraavasti:
+Mallinnetaan selittäjien yhteyttä puhelimen käyttöikään seuraavasti:
 
 \begin{equation}
   \begin{split}
     &t_i \in [t_i^{min},t_i^{max}],\\
     &t_i \sim Gamma(\alpha, \theta_i),\\
-    &\alpha \sim Gamma(1,1),\\
-    &\log(\theta_i) = \beta_0 + \beta_{1[i]} + \beta_{2[i]} + \beta_{3[i]} + \beta_{4[i]} +             \beta_{5[i]}\\
-    \beta \sim N(0,1000)\\
+    &\alpha \sim invGamma(1,1),\\
+    &\log(\theta_i) = \beta_0 + \beta_{nainen} + \beta_{ikä} + \beta_{tulot} + \beta_{alue} + \beta_{merkki},\\
+    &\beta \sim N(0,10)\\
   \end{split}
 \end{equation}
 
-Nyt kertoimet $\beta_{j[i]}$ määräytyvät vastaajan $i$ ominaisuuksien perusteella. Jokaiselle parametrille $\beta$ asetetaan heikosti informatiivinen priori $N(0,1000)$.
+Käyttöiät $t_i$ oletetaan siis gammajakautuneiksi yhteisellä muotoparametrilla $\alpha$ ja jokaiselle käyttöiälle omalla skaalaparametrilla $\theta_i$. Muotoparametrille asetetaan heikosti informatiiviinen priori ja skaalaparametrien logaritmien oletetaan riippuvan lineaarisesti selittäjistä. Referenssitaso on nyt Uudellamaalla asuva 15-24-vuotias mies, jonka tuloluokka on alle 30000 € ja jonka edellinen puhelin oli Nokia.
+Parametrit $\beta$ kuvaavat selittäjien vaikutusta puhelimen käyttöikään. Nyt esimerkiksi ikäryhmiä on kuusi joten siihen liittyviä regressiokertoimia on 5. Yhteensä $beta$-kertoimia mallissa on 17 ja tarkemmin ne on kuvattu taulukossa x. Jokaiselle parametrille $\beta$ asetetaan heikosti informatiivinen priori $N(0,10)$. Mallin hierarkinen rakenne on kuvattu kuvassa \@ref(fig:DAG). 
 
-| Parametri      | Selitys           |
-|----------------|-------------------|
-| $\beta_{1[i]}$ | Sukupuoli         |
-| $\beta_{2[i]}$ | Ikäryhmä          |
-| $\beta_{3[i]}$ | Tuloluokka        |
-| $\beta_{4[i]}$ | Alue              |
-| $\beta_{5[i]}$ | Puhelimen merkki  |
-
-Mallin hierarkinen rakenne on kuvattu kuvassa x. 
+| Parametri             | Selitys           |
+|-----------------------|-------------------|
+| $\beta_{0}$           | Vakiotermi        |
+| $\beta_{nainen}$      | Sukupuoli         |
+| $\beta_{ikä}[5]$      | Ikäryhmä          |
+| $\beta_{tulot}[4]$    | Tuloluokka        |
+| $\beta_{alue}[3]$     | Alue              |
+| $\beta_{merkki}[3]$   | Puhelimen merkki  |
+Table: Selittäjiä vastaavat kertoimet
 
 ```{r DAG, echo=FALSE, fig.cap="Mallin DAG-kuvaaja", out.width='70%', out.height='70%', dev='svg', fig.align='center'}
-knitr::include_graphics("Bayes_dag.svg")
+knitr::include_graphics("Bayes_dag.png")
 ```
 
-```{r, echo=FALSE}
-library(rstan)
-
+```{r, echo=FALSE, include=FALSE}
 scode <- "
 data{
   int<lower=0> n;
@@ -297,6 +292,7 @@ parameters{
   real<lower=0, upper=1> t_init[n];
   
   real<lower=0> alpha;
+  //real<lower=0> sigma;
   
   real beta_0;
   real beta_age[5];
@@ -324,7 +320,9 @@ transformed parameters{
   
 }
 model{
-  alpha ~ gamma(1,1); // Weibull?
+  alpha ~ inv_gamma(1,1); // Weibull?
+  
+  //sigma ~ inv_gamma(1,1);
   
   beta_0 ~ normal(0, 10);
   beta_age ~ normal(0, 10);
@@ -334,6 +332,7 @@ model{
   beta_income ~ normal(0, 10);
   
   t ~ gamma(alpha, exp(-logtheta));
+  //t ~ normal(exp(-logtheta), sigma);
   
   //for (i in 1:n) {
   //  target += log_diff_exp(gamma_lcdf(t_max[i] | alpha, exp(-logtheta[i])),
@@ -354,23 +353,71 @@ fit <- stan(
     region = as.integer(mobile$region)-1,
     brand = as.integer(mobile$brand_prev)-1
   ),
-  iter = 4000,
-  chains = 4,
+  iter = 2000,
+  chains = 1,
   pars = c("logtheta", "t_init"),
   include = FALSE,
-  cores=12
+  cores=4,
+  refresh=0
 )
+
+params <- rstan::extract(fit, pars = c("t"), include=FALSE)
 
 t_ennuste <- rstan::extract(fit, pars = c("t"))
 ```
+
 # Tulokset
 
-Mallin sopivuutta suhteessa aineistoon on haastavaa tarkastella, sillä todellisia puhelinten käyttöikiä ei tunneta. Posterioriennusteita kyselyyn vastaajien puhelimen käyttöiälle voidaan verrata tunnettuihin ala- ja ylärajoihin esimerkiksi kertymäfunktioiden avulla \@ref(fig: .
+```{r, include=FALSE, echo=FALSE}
+s <- summary(fit, pars = c("alpha", "beta_0", "beta_age", "beta_sex",
+                 "beta_region", "beta_brand", "beta_income"), probs=c(0.025, 0.975))$summary
+
+labels <- c("$\\alpha$", "$\\beta_0$", "$\\beta_{25-34}$", "$\\beta_{35-44}$",
+            "$\\beta_{45-54}$", "$\\beta_{55-64}$", "$\\beta_{65-79}$",
+            "$\\beta_{nainen}$", "$\\beta_{etelä}$", "$\\beta_{länsi}$", 
+            "$\\beta_{\text{itä ja pohjoinen}}$", "$\\beta_{iPhone}$", "$\\beta_{Samsung}$",
+            "$\\beta_{Muu merkki}$", "$\\beta_{30k-50k}$", 
+            "$\\beta_{50k-70k}$", "$\\beta_{min 70k}$", "$\\beta_{tulot EOS}$")
+
+means <- rep(0, 18)
+
+means[1] <- mean(params$alpha)
+means[2] <- mean(params$beta_0)
+means[3:7] <- apply(params$beta_age, 2, mean)
+means[8] <- mean(params$beta_sex)
+means[9:11] <- apply(params$beta_region, 2, mean)
+means[12:14] <- apply(params$beta_brand, 2, mean)
+means[15:18] <- apply(params$beta_income, 2, mean)
+
+means <- round(means, digits = 3)
+
+intervals <- cbind(rep(0, 18), rep(0, 18))
+
+intervals[1,] <- quantile(params$alpha, probs = c(0.025, 0.975))
+intervals[2,] <- quantile(params$beta_0, probs = c(0.025, 0.975))
+intervals[3:7,] <- t(apply(params$beta_age, 2, quantile, probs = c(0.025, 0.975)))
+intervals[8,] <- quantile(params$beta_sex, probs = c(0.025, 0.975))
+intervals[9:11,] <- t(apply(params$beta_region, 2, quantile, probs = c(0.025, 0.975)))
+intervals[12:14,] <- t(apply(params$beta_brand, 2, quantile, probs = c(0.025, 0.975)))
+intervals[15:18,] <- t(apply(params$beta_income, 2, quantile, probs = c(0.025, 0.975)))
+
+intervals <- round(intervals, digits=3)
+
+param_df <- data.frame(param = labels, means = means, q2.5 = intervals[,1], q97.5 = intervals[,2])
+```
+
+Mallinnus toteutettiin Stanilla. Tulokset ovat näkyvillä taulukossa \@ref(tab:Parametrit). Selittäjien vaikutusta puhelimen käyttöikään on nyt hieman vaikeampaa tulkita, kuin esimerkiksi tavallisen lineaarisen regression tapauksessa. Gamma-jakautuneen käyttöiän odotusarvo on $E(t_i) = \alpha\theta_i$. Tarkastellaan esimerkiksi kerrointa $\beta_{55-64}$, jonka posteriorikeskiarvo on noin $0,537$ ja jonka $95 \%$-posterioriväli sisältää vain selvästi positiivisia arvoja. Parametrin $\theta_i$ arvo on siis $e^{\beta_{55-64}} \approx 1,72$-kertaa suurempi 55-64-vuotiailla kuin muuten vastaavanlaisilla 15-24 vuotiailla (referenssitaso). Täten myös käyttöiän odotusarvo on vastaavan kertoimen verran suurempi.
+Yleisesti voidaan myös todeta, että jos parametrin $95 \%$-posterioriväli sisältää nollan, ei vastaavalla ominaisuudella ole merkittävää vaikutusta puhelimen käyttöikään. Nyt näyttäisi siltä, että puhelimen käyttöikä on pidempi 45-79 vuotiailla. Sukupuolella, asuinalueella tai tuloluokalla ei näytä olevan selkeää vaikutusta käyttöikään. iPhonen käyttäjillä puhelimen käyttöikä vaikuttaisi olevan pienempi kuin muilla. 
+
+```{r Parametrit, echo=FALSE, tab.cap="Mallinnuksen tulokset"}
+kable(param_df, escape = FALSE, col.names = c("Parametri", "Posteriorikeskiarvo", "2,5 \\%", "97,5 \\%"))
+```
+
+# Tulkinnat
+
+Todellisia puhelimien käyttöikiä ei ole saatavilla, joten keinot mallin sopivuuden tarkasteluun ovat varsin rajalliset. Posterioriennusteita kyselyyn vastaajien puhelimen käyttöiälle voidaan verrata tunnettuihin ala- ja ylärajoihin esimerkiksi kertymäfunktioiden avulla \@ref(fig:Posteriori).
 
 ```{r, echo=FALSE, include=FALSE}
-library("bayesplot")
-library("ggplot2")
-
 n_plot <- 25
 
 it <- seq(0, 20, by = 0.05)
@@ -400,7 +447,7 @@ name = gl(2, length(it), labels = c("käyttöiän yläraja", "käyttöiän alara
 ```
 
 
-```{r post_pred, echo=FALSE, fig.cap="Kertymäfunktiot käyttöiän minimeille, maksimeille ja 25 posterioriennusteelle"}
+```{r Posteriori, echo=FALSE, fig.cap="Posteriorinäytteiden kertymäfunktioita verrattuna aineistoon"}
 ggplot(d2, aes(x = it, y=)) +
 geom_line(data=d1, aes(x=it, y=ecdf, group = sample_id, colour = name), alpha=0.7) +
 geom_line(aes(y=ecdf, colour = name), linewidth=0.8) +
@@ -422,9 +469,9 @@ mean(apply(t_ennuste$t, 2, min) < mobile$ict_mean)
 
 mean(between(apply(t_ennuste$t, 2, min), mobile$ict_min, mobile$ict_max))
 
-mean(mobile$ict_min < 2)
+mean(mobile$ict_min < 3)
 
-mean(apply(t_ennuste$t, 2, min) < 2)
+mean(apply(t_ennuste$t, 2, min) < 3)
 
 beta <- rstan::extract(fit, pars=c("beta_sex"))
 
@@ -434,13 +481,10 @@ plot(fit, plotfun="hist", pars=c("beta_income"))
 
 plot(fit, plotfun="hist", pars=c("t[1]", "t[2]", "t[3]"), bins=20)
 
-ppc_dens_overlay(mobile$ict_mean, t_ennuste$t[1:50,])
+ppc_dens_overlay(mobile$ict_max, t_ennuste$t[1:50,])
 
 mean(t_ennuste$t)
 ```
-
-
-# Tulkinnat
 
 # Pohdintaa
 
