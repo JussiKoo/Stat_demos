@@ -66,3 +66,16 @@ ue.stl <- stl(ue, "per")
 plot(ue.stl)
 
 #Pohdinnat vielä
+
+#T5
+
+n <- 1000
+
+w = rnorm(n, 0, 1)
+
+x = ma_smooth(w, 3)
+
+acf(x, na.action = na.omit)
+
+#Näyttää pitävän paikkansa
+
