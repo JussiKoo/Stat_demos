@@ -8,6 +8,7 @@ osuus <- data$unempl/data$population
 
 ue <- ts(osuus, start=1993, frequency=12)
 plot(ue)
+
 #b
 
 ma_smooth <- function(x, window_size) {
@@ -65,7 +66,12 @@ plot(ue.d)
 ue.stl <- stl(ue, "per")
 plot(ue.stl)
 
-#Pohdinnat vielä
+#decompose: Decompose a time series into seasonal,
+#trend and irregular components using moving averages.
+
+#stl: Decompose a time series into seasonal, trend and irregular
+#components using loess-regression.
+
 
 #T5
 
