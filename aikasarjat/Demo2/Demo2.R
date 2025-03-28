@@ -59,4 +59,14 @@ spec.pgram(faulty3, detrend=F, demean=T, taper=0.0)
 
 #b
 
+spec.pgram(good1, detrend=F, spans=765, demean=T, taper=0.0)
+spec.pgram(good2, detrend=F, spans=765, demean=T, taper=0.0)
+spec.pgram(good3, detrend=F, spans=765, demean=T, taper=0.0)
+
+spec.pgram(faulty1, detrend=F, demean=T, taper=0.0)
+
+spec.pgram(faulty2, detrend=F, demean=T, taper=0.0)
+
+spec.pgram(faulty3, detrend=F, demean=T, taper=0.0)
+
 
