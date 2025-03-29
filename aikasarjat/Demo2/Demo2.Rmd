@@ -1,0 +1,26 @@
+---
+title: "Demo2"
+author: "Jussi Kauppinen"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tehtävä 4
+
+Nyt siis $X_i = \sum_{j=1}^q\theta_j W_{i-j}$.
+
+Autokovarianssi on
+
+$$\gamma(i,j) = \mathbb{E}[(X_i - \mu_i)(X_j - \mu_j)]$$
+
+\begin{equation}
+  \begin{split}
+  \gamma_i &= \mathbb{E}[(X_0 - \mu_0)(X_i - \mu_i)]\\
+  &=\mathbb{E}[X_0 X_i] = 0, \quad \text{kun } i \neq 0\\
+  \end{split}
+\end{equation}
+

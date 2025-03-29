@@ -59,14 +59,54 @@ spec.pgram(faulty3, detrend=F, demean=T, taper=0.0)
 
 #b
 
-spec.pgram(good1, detrend=F, spans=765, demean=T, taper=0.0)
-spec.pgram(good2, detrend=F, spans=765, demean=T, taper=0.0)
-spec.pgram(good3, detrend=F, spans=765, demean=T, taper=0.0)
+span <- 765
 
-spec.pgram(faulty1, detrend=F, demean=T, taper=0.0)
+spec.pgram(good1, detrend=F, spans=span, demean=T, taper=0.0)
+spec.pgram(good2, detrend=F, spans=span, demean=T, taper=0.0)
+spec.pgram(good3, detrend=F, spans=span, demean=T, taper=0.0)
 
-spec.pgram(faulty2, detrend=F, demean=T, taper=0.0)
+spec.pgram(faulty1, detrend=F, spans=span, demean=T, taper=0.0)
+spec.pgram(faulty2, detrend=F, spans=span, demean=T, taper=0.0)
+spec.pgram(faulty3, detrend=F, spans=span, demean=T, taper=0.0)
 
-spec.pgram(faulty3, detrend=F, demean=T, taper=0.0)
+#Tasoitus helpottaa vertailua, piikit näkyy selkeämmin
+
+#c
+
+cpgram(good1, taper=0)
+cpgram(good2, taper=0)
+cpgram(good3, taper=0)
+cpgram(faulty1, taper=0)
+cpgram(faulty2, taper=0)
+cpgram(faulty3, taper=0)
+
+#Jokaisessa hyvässä laakerissa tapahtuu samanlainen "hyppy" noin 1500 Hz 
+#kohdalla
+
+#===============================================================================
+
+#T3
+
+#a
+
+phi <- c(3/4, -1/4)
+
+y_ar <- arima.sim(model=list(ar=phi), 500)
+
+plot(y_ar)
+
+#b
+
+theta <- c(0.73, 0.26)
+
+y_ma <- arima.sim(model=list(ma=theta), 500)
+
+plot(y)
+
+#c
+
+y_arma <- arima.sim(model=list(ar=phi, ma=theta), 500)
+
+plot(y_arma)
 
 
