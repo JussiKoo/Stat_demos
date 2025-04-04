@@ -105,8 +105,27 @@ plot(y)
 
 #c
 
-y_arma <- arima.sim(model=list(ar=phi, ma=theta), 500)
+y_arma <- arima.sim(model=list(ar=phi, ma=theta), 500, n.start = 1e5)
 
 plot(y_arma)
 
+#d
 
+acf(y_ar, lag.max = 50)
+
+acf(y_ma, lag.max = 50)
+
+acf(y_arma, lag.max = 50)
+
+#Joka aikasarjassa autokorrelaatiot ovat suuria pienillä viiveillä ja muuten
+#melko pieniä. Jokaisessa sarjassa on myös useita autokorrelaatioita suuremmilla
+#viiveillä, jotka ovat merkitseviä.
+
+spec.pgram(y_ar, detrend=F, spans=7, demean=T, taper=0.0)
+
+spec.pgram(y_ma, detrend=F, spans=7, demean=T, taper=0.0)
+
+spec.pgram(y_arma, detrend=F, spans=7, demean=T, taper=0.0)
+
+#Periodogrammeissa ei ole kauheasti eroavaisuuksia. Matalia taajuuksia aikasar-
+#joissa esiintyy paljon.
