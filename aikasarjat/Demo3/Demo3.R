@@ -92,6 +92,24 @@ ts.plot(data_ap - fitted(fit_b))
 #havaittavissa kasvavaa lineaarista trendiä ja välillä laskevaa lineaarista
 #trendiä.
 
+#e
+
+fit_e <- arima(data_ap, order=c(0,1,0), seasonal=c(2,0,0), xreg=t)
+
+fit_e$model$phi
+
+sim_e <- arima.sim(model = list(ar=fit_e$model$phi), length(data_ap), start)
+
+ts.plot(diff(data_ap))
+
+ts.plot(sim_e)
+
+ts.plot(data_ap, sim_e, gpars=list(xlab="vuosi", ylab="residual", 
+                                                            col=c("black","red")))
+
+#f
+
+
 
 
 
