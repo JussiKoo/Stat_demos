@@ -98,17 +98,43 @@ fit_e <- arima(data_ap, order=c(0,1,0), seasonal=c(2,0,0), xreg=t)
 
 fit_e$model$phi
 
-sim_e <- arima.sim(model = list(ar=fit_e$model$phi), length(data_ap), start)
+#f
 
-ts.plot(diff(data_ap))
+sim_e <- arima.sim(model = list(ar=fit_e$model$phi), n=length(data_ap), n.start = 1e5)
+
+sim_e <- ts(sim_e, start=1949, frequency=12)
 
 ts.plot(sim_e)
 
-ts.plot(data_ap, sim_e, gpars=list(xlab="vuosi", ylab="residual", 
-                                                            col=c("black","red")))
+#g
 
-#f
+fit_g <- arima(data_ap, order=c(0,1,1), seasonal=c(0,1,1))
 
+#h
+
+sim_g <- arima.sim(model = list(ma=fit_g$model$theta), n=length(data_ap), n.start = 1e5)
+
+sim_g <- ts(sim_g, start=1949, frequency=12)
+
+ts.plot(sim_g)
+
+s <- 12; n.sim <- 144
+y <- arima.sim(list(ma = theta_joint), n.sim)
+x <- diffinv(diffinv(y), lag=s)
+# Sama summaus suoraan kirjoitettuna:
+z <- cumsum(y); y_ <- rep(0, n.sim)
+for (k in 1:s) {
+  y_[seq(k, n.sim, by=s)] <- cumsum(z[seq(k, n.sim, by=s)])
+}
+
+#i
+
+ts.plot(diff(data_ap, lag=1), sim_e, gpars=list(xlab="vuosi", ylab="airpassengers", 
+                                                col=c("black","red")))
+
+
+ts.plot(diff(data_ap, lag=1), sim_g, gpars=list(xlab="vuosi", ylab="airpassengers", 
+                                                col=c("black","red")))
 
 
 
