@@ -47,8 +47,6 @@ confint(model_ma1)
 
 model_ma1$var.coef
 
-#T2
-
 #standard error
 
 se <- sqrt(model_ma1$var.coef[1])
@@ -102,7 +100,7 @@ fit_e$model$phi
 
 sim_e <- arima.sim(model = list(ar=fit_e$model$phi), n=length(data_ap), n.start = 1e5)
 
-sim_e <- sim_e + 1:144*fit_e$coef[3]
+#sim_e <- sim_e + 1:144*fit_e$coef[3]
 
 sim_e <- ts(sim_e, start=1949, frequency=12)
 
@@ -126,7 +124,7 @@ ts.plot(diff(data_ap), sim_e, gpars=list(xlab="vuosi", ylab="airpassengers",
                                                 col=c("black","red")))
 
 
-ts.plot(diff(data_ap), sim_g, gpars=list(xlab="vuosi", ylab="airpassengers", 
+ts.plot(diff(diff(data_ap), lag=12), sim_g, gpars=list(xlab="vuosi", ylab="airpassengers", 
                                                 col=c("black","red")))
 
 
