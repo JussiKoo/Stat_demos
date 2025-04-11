@@ -42,6 +42,7 @@ model_ar1 <- arima(eq_ts, order=c(1,0,0))
 #d
 
 confint(model_ma1)
+confint(model_ar1)
 
 #e
 
@@ -102,9 +103,13 @@ sim_e <- arima.sim(model = list(ar=fit_e$model$phi), n=length(data_ap), n.start 
 
 #sim_e <- sim_e + 1:144*fit_e$coef[3]
 
+sim_e <- diffinv(sim_e)
+
 sim_e <- ts(sim_e, start=1949, frequency=12)
 
-ts.plot(sim_e)
+sim_e <- sim_e + 1:144*fit_e$coef[3]
+
+ts.plot(-sim_e)
 
 #g
 
@@ -120,11 +125,11 @@ ts.plot(sim_g)
 
 #i
 
-ts.plot(diff(data_ap), sim_e, gpars=list(xlab="vuosi", ylab="airpassengers", 
+ts.plot(data_ap, -sim_e, gpars=list(xlab="vuosi", 
                                                 col=c("black","red")))
 
 
-ts.plot(diff(diff(data_ap), lag=12), sim_g, gpars=list(xlab="vuosi", ylab="airpassengers", 
+ts.plot(diff(diff(data_ap), lag=12), sim_g, gpars=list(xlab="vuosi", 
                                                 col=c("black","red")))
 
 
