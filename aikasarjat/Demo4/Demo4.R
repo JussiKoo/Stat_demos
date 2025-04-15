@@ -60,20 +60,33 @@ AIC(arima32, k=log(n))
 
 #d
 
-predict_plot <- function(mod, h, newxreg) {
-  p <- predict(mod, h, newxreg=newxreg)
-  m <- p$pred; s <- p$se
-  ts.plot(b, m, m+1.96*s, m-1.96*s, col=c(1,2,2,2), lty=c(1,1,2,2))
-}
+p <- predict(arima32, n.ahead=48)
+m <- p$pred; s <- p$se
+ts.plot(diff_ue, m, m+1.96*s, m-1.96*s, col=c(1,2,2,2), lty=c(1,1,2,2), 
+        xlim=c(2009, 2020))
 
-h <- 48 
-
-t <- time(diff_ue)
-
-nx <- t[length(t)] + (1:h)/12
-
-predict_plot(arima32, h, nx)
+predict_plot(arima32)
 
 #===============================================================================
 
 #T2
+
+funcc <- function(model) {
+  par(mfrow=c(2,1))
+  ts.plot(model$residuals)
+  res_acf <- acf(model$residuals)
+  
+  n <- length(model$residuals)
+  
+  Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf**2)
+  print(length(Q))
+  
+  p <- pchisq(Q, df=(1:20)-3)
+  plot(p)
+}
+
+set.seed(12345)
+x <- arima.sim(model=list(ar=c(1/2, 1/3)), 80)
+fit <- arima(x, order=c(0,0,3))
+
+funcc(fit)
