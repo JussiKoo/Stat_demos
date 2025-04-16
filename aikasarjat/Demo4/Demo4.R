@@ -65,28 +65,36 @@ m <- p$pred; s <- p$se
 ts.plot(diff_ue, m, m+1.96*s, m-1.96*s, col=c(1,2,2,2), lty=c(1,1,2,2), 
         xlim=c(2009, 2020))
 
-predict_plot(arima32)
-
 #===============================================================================
 
 #T2
 
-funcc <- function(model) {
+funcc <- function(model, p, q) {
   par(mfrow=c(2,1))
   ts.plot(model$residuals)
   res_acf <- acf(model$residuals)
   
   n <- length(model$residuals)
   
-  Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf**2)
-  print(length(Q))
+  pval <- rep(NA,20)
   
-  p <- pchisq(Q, df=(1:20)-3)
-  plot(p)
+  for (lag in (p+q+1):20) {
+    Q <- n*sum((res_acf$acf[1:lag] ** 2) * (n+2)/(n-(1:lag)))
+    pval[lag] <- 1-pchisq(Q, df=lag-p-q)
+  }
+  print(pval)
+  
+  #Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf[1:20]**2)
+  #Q <- tail(Q, p+q)
+  
+  #p <- 1-pchisq(Q, df=(p+q:20)-3)
+  #print(p)
 }
 
 set.seed(12345)
 x <- arima.sim(model=list(ar=c(1/2, 1/3)), 80)
 fit <- arima(x, order=c(0,0,3))
 
-funcc(fit)
+tsdiag(fit)
+
+funcc(fit, 0, 3)
