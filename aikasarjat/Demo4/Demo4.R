@@ -69,20 +69,20 @@ ts.plot(diff_ue, m, m+1.96*s, m-1.96*s, col=c(1,2,2,2), lty=c(1,1,2,2),
 
 #T2
 
-funcc <- function(model, p, q) {
-  par(mfrow=c(2,1))
+my_diagnosis <- function(model, p, q) {
+  par(mfrow=c(2,2))
   ts.plot(model$residuals)
   res_acf <- acf(model$residuals)
   
   n <- length(model$residuals)
   
-  pval <- rep(NA,20)
+  pval <- rep(NA,10)
   
-  for (lag in (p+q+1):20) {
-    Q <- n*sum((res_acf$acf[1:lag] ** 2) * (n+2)/(n-(1:lag)))
-    pval[lag] <- 1-pchisq(Q, df=lag-p-q)
+  for (lag in (p+q+1):(p+q+10)) {
+    Q <- n*sum((res_acf$acf[2:(lag+1)]^2) * (n+2)/(n-(2:(lag+1))))
+    pval[lag - p - q] <- 1-pchisq(Q, df=lag-p-q)
   }
-  print(pval)
+  plot(x=(p+q+1):(p+q+10), y=pval, xlab="lag")
   
   #Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf[1:20]**2)
   #Q <- tail(Q, p+q)
@@ -97,4 +97,4 @@ fit <- arima(x, order=c(0,0,3))
 
 tsdiag(fit)
 
-funcc(fit, 0, 3)
+my_diagnosis(fit, 0, 3)
