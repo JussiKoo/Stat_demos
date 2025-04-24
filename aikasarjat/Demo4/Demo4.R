@@ -28,7 +28,9 @@ arima_p <- function(p, P) {
   return (arima(diff_ue, order=c(p,1,0), seasonal=c(P,0,0)))
 }
 
-#P*s + p 
+#Sovitetaan joitain malleja
+
+arima10 <- arima_p(1, 0) #1 parametri
 
 arima20 <- arima_p(2, 0) #2 parametria
 
@@ -40,9 +42,11 @@ n <- length(diff_ue)
 
 #tavallinen AIC
 
-AIC(arima20, arima21, arima32)
+AIC(arima10, arima20, arima21, arima32)
 
 #korjattu AIC
+
+AIC(arima10, k=2*n/(n-3+1))
 
 AIC(arima20, k=2*n/(n-4+1))
 
@@ -51,6 +55,8 @@ AIC(arima21, k=2*n/(n-7+1))
 AIC(arima32, k=2*n/(n-13+1))
 
 #BIC
+
+AIC(arima10, k=log(n))
 
 AIC(arima20, k=log(n))
 
@@ -78,11 +84,12 @@ my_diagnosis <- function(model, p, q) {
   
   pval <- rep(NA,10)
   
-  for (lag in (p+q+1):(p+q+10)) {
-    Q <- n*sum((res_acf$acf[2:(lag+1)]^2) * (n+2)/(n-(2:(lag+1))))
-    pval[lag - p - q] <- 1-pchisq(Q, df=lag-p-q)
+  #Lasketaan Ljung-Box tunnuslukuja eri K arvoilla (p+q < K << n)
+  for (K in (p+q+1):(p+q+10)) {
+    Q <- n*sum((res_acf$acf[2:(K+1)]^2) * (n+2)/(n-(2:(K+1))))
+    pval[K - p - q] <- 1-pchisq(Q, df=K-p-q)
   }
-  plot(x=(p+q+1):(p+q+10), y=pval, xlab="lag")
+  plot(x=(p+q+1):(p+q+10), y=pval, xlab="K")
   
   #Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf[1:20]**2)
   #Q <- tail(Q, p+q)
