@@ -82,14 +82,14 @@ my_diagnosis <- function(model, p, q) {
   
   n <- length(model$residuals)
   
-  pval <- rep(NA,10)
+  pval <- rep(NA,20)
   
   #Lasketaan Ljung-Box tunnuslukuja eri K arvoilla (p+q < K << n)
-  for (K in (p+q+1):(p+q+10)) {
+  for (K in (p+q+1):(p+q+20)) {
     Q <- n*sum((res_acf$acf[2:(K+1)]^2) * (n+2)/(n-(2:(K+1))))
     pval[K - p - q] <- 1-pchisq(Q, df=K-p-q)
   }
-  plot(x=(p+q+1):(p+q+10), y=pval, xlab="K")
+  plot(x=(p+q+1):(p+q+20), y=pval, xlab="K")
   
   #Q <- n*cumsum((n+2)/(n+(1:20)) * res_acf$acf[1:20]**2)
   #Q <- tail(Q, p+q)
