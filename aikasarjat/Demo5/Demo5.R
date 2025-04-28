@@ -26,12 +26,12 @@ pacf(x, lag.max = 2000)
 fit <- ar(x, method="yw", order.max=100, aic = FALSE)
 
 #Simuloidaan 4001-pituinen signaali
-x_sim <- arima.sim(list(fit$ar), n=4001)
-x_sim <- ts(sim, frequency=8000, start=0)
+x_sim <- arima.sim(list(ar=fit$ar), sd=sqrt(fit$var.pred), n=4001)
+x_sim <- ts(x_sim, frequency=8000, start=0)
 
 ts.plot(x_sim)
 
-#Vetaillaan alkuperäisen signaalin ja simuloidun signaalin ominaisuuksia
+#Vertaillaan alkuperäisen signaalin ja simuloidun signaalin ominaisuuksia
 
 par(mfrow=c(2,1))
 
@@ -39,7 +39,7 @@ ts.plot(x)
 ts.plot(x_sim)
 
 spec.pgram(x)
-spec.pgram(sim)
+spec.pgram(x_sim)
 
 acf(x)
 acf(x_sim)
