@@ -1,6 +1,6 @@
 #T1
 
-f <- file("ah.wav", "rb")              # avataan tiedosto luettavaksi
+f <- file("ah.wav", "rb")    # avataan tiedosto luettavaksi
 hdr <- readBin(f, "raw", 44)           # luetaan otsikko-osa
 x <- readBin(f, "int", size=2, n=4001) # luetaan data muuttujaan 'x'
 close(f)                               # suljetaan tiedosto
@@ -52,7 +52,7 @@ pacf(x_sim)
 x_sim_scaled <- 30e3*x_sim/max(abs(x_sim))      # "normalisoidaan" y välille [-30000,30000]
 f <- file("ah_sim.wav", "wb") # avataan tiedosto, johon simuloitu signaali kirjoitetaan
 writeBin(hdr, f)              # kirjoitetaan wav-tiedoston otsikko-osa
-writeBin(as.integer(x_sim_scaled), f, size=2) # ...ja itse data
+writeBin(as.integer(x_sim), f, size=2) # ...ja itse data
 close(f)                      # suljetaan tiedosto
 
 #===============================================================================
@@ -114,4 +114,4 @@ for (k in 1:n) {
   mu[k] <- mu_; y[k] <- mu_ + rnorm(1, sd=sigma_y)
 }
 
-kf(y)
+kf(y, Q=sigma_mu**2, R=sigma_y**2)
